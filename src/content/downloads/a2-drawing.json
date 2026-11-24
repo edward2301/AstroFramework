@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "A2 — dimensional drawing",
+  "docType": "drawing",
+  "version": "v2.0",
+  "updated": "2026-09-25",
+  "model": "a2",
+  "gated": false,
+  "file": "/downloads/a2-drawing.pdf",
+  "locales": {
+    "zh": {
+      "title": "A2 — 尺寸图"
+    }
+  }
+}

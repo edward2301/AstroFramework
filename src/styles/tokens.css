@@ -1,0 +1,83 @@
+/**
+ * 设计变量。
+ * 全站唯一来源，组件不写死颜色与间距。
+ *
+ * 色板对齐参考站 soukacatv.com 的实测值：白底、蓝色主色（#1863dc）、
+ * 深灰正文（#212121）、浅灰分区（#f4f4f4）。
+ * 改主色只动 --color-brand 系列，按钮/链接/h2 竖条自动跟随。
+ */
+
+:root {
+  /* 色板 */
+  --color-bg: #ffffff;            /* 页面背景：白 */
+  --color-bg-subtle: #f5f7fa;     /* 分区浅底：带蓝调的中性灰，与品牌色同族 */
+  --color-surface: #f5f7fa;       /* 信息块浅底（与分区同色） */
+  --color-text: #1c2430;          /* 正文与标题：略带蓝调的深灰，不用纯黑 */
+  --color-text-muted: #626b78;    /* 次要文字：白底 5.3:1、浅灰底 4.7:1，过 AA */
+  --color-border: #e3e7ed;        /* 边框与分隔线：更轻，减少线条噪点 */
+  --color-border-strong: #cfd6e0; /* 需要强调的边框（输入框、表格外框） */
+  /* 语义化边框：组件统一取这两个令牌 */
+  --color-border-soft: color-mix(in srgb, var(--color-border) 55%, transparent);
+  --color-border-brand: color-mix(in srgb, var(--color-brand) 12%, var(--color-border));
+  --color-brand: #1863dc;         /* 主色：按钮、链接、h2 竖条 */
+  --color-brand-hover: #0056a7;   /* 主色悬停（深蓝） */
+  --color-brand-soft: #eaf1fc;    /* 主色浅底：图标块、强调信息背景 */
+  --color-link: #1863dc;
+  --color-link-hover: #0096de;    /* 链接悬停（亮蓝） */
+  --color-ink: #0a1e3c;           /* 深海军蓝：首页 hero 与页脚共用同一深色 */
+  --color-ink-soft: #10336b;      /* 深色渐变中段（hero 背景） */
+  /* 品牌色阶：由浅到深一套，避免各处自行 mix 出不同蓝 */
+  --color-brand-50: #f2f7fe;
+  --color-brand-100: #e2edfd;
+  --color-brand-200: #c6dbfb;
+  --color-brand-700: #0f47a8;
+  --color-brand-900: #0b2a5b;     /* 深色带（banner / metric 条）底色 */
+  /* 强调色：只用于数字与关键标记，占画面不超过 5%，避免与品牌蓝抢 */
+  --color-accent: #0d8a72;
+  --color-accent-soft: #e6f5f1;
+
+  /* 排版 */
+  /* 中西文统一栈：西文系统字体 + 中文黑体，避免中文回落到衬线 */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fs-body: 16px;
+  --fs-lead: 19px;                /* 首屏导语 */
+  --fs-sm: 14px;
+  --fs-xs: 12px;
+  --fs-h1: 40px;
+  --fs-h2: 28px;
+  --fs-h3: 18px;
+  --lh-body: 1.75;
+  --lh-tight: 1.25;
+  --ls-tight: -0.02em;            /* 大字号收字距，视觉更紧实 */
+  --ls-wide: 0.05em;              /* 大写小标签的疏字距 */
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgb(0 0 0 / 6%);
+  --shadow-md: 0 8px 24px rgb(0 0 0 / 10%);
+
+  /* 间距 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* 布局 */
+  --container: 1400px; /* 宽屏留白利用：1920 屏两侧各 260px（原 1200 时为 360px） */
+  --container-narrow: 820px;
+  --radius: 6px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --fs-h1: 30px;
+    --fs-h2: 23px;
+    --space-7: 32px;
+    --space-8: 44px;
+  }
+}

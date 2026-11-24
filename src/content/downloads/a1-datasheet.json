@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "A1 — datasheet",
+  "docType": "datasheet",
+  "version": "v1.2",
+  "updated": "2026-09-25",
+  "model": "a1",
+  "gated": false,
+  "file": "/downloads/a1-datasheet.pdf",
+  "locales": {
+    "zh": {
+      "title": "A1 — 规格书"
+    }
+  }
+}

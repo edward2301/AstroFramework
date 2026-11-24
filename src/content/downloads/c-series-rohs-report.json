@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "C series — RoHS test report",
+  "docType": "certificate",
+  "version": "v1.3",
+  "updated": "2026-10-02",
+  "gated": true,
+  "file": "/downloads/c-series-rohs-report.pdf",
+  "model": "c1",
+  "locales": {
+    "zh": {
+      "title": "C 系列 — RoHS 检测报告"
+    }
+  }
+}

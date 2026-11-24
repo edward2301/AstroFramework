@@ -1,0 +1,355 @@
+/**
+ * 静态页装配（公共层）。
+ *
+ * 输入是一条页面条目（src/data/pages/entries/*.ts），输出渲染载荷。
+ * 这里按 **版式** 分支，不按页面分支 —— 新增一个两段式栏目页只是新增一条条目，
+ * 本文件一行都不用改；只有新增一种版式时才需要动这里。
+ *
+ * 版式分两类：
+ *   · 数据版式（home / products）：要读内容集合
+ *   · 文案版式（section / about / quote / notFound）：数据来自条目本身或组织数据
+ */
+import { buildMeta } from '../seo/meta';
+import { breadcrumbSchema, collectionSchema } from '../seo/schema';
+import { crumb, homeCrumb, productsCrumbs } from '../seo/breadcrumb';
+import { crumbLabel, type PageDef } from '../../data/pages';
+import { detailPath } from '../../data/routes';
+import { getAllCategories } from '../content/categories';
+import { getAllModels } from '../content/models';
+import { getAllApplications } from '../content/applications';
+import { getAllCases } from '../content/cases';
+import { getAllGuides } from '../content/guides';
+import { getAllFaqs } from '../content/faqs';
+import { getAllDownloads } from '../content/downloads';
+import { categoryView, modelView, applicationView, caseView } from '../content/localize';
+import { bareSlug } from '../../i18n/routing';
+import { organizationFor } from '../../data/organization';
+import { t } from '../../i18n/ui';
+import { localizePath, type Locale } from '../../i18n/routing';
+import type { RenderedPage } from './render';
+
+/**
+ * @param label 出错时用于定位的标识（页面 id），与内容页的 `model:xx:en` 同风格
+ */
+export async function loadStaticPage(
+  def: PageDef,
+  locale: Locale,
+  label: string
+): Promise<RenderedPage> {
+  const seo = def.seo[locale];
+  const meta = buildMeta(seo.title, seo.description, `${label}:${locale}`);
+  const path = def.path;
+
+  switch (def.layout) {
+    case 'home': {
+      const categories = await getAllCategories();
+      const models = await getAllModels();
+
+      /**
+       * 首页机型卡：总量封顶，按品类均分。
+       *
+       * 上限是页面设计参数（恒定，不随数据变化），名额在品类间均分、
+       * 余数分给前面的品类 —— 任何品类都至少占一份，首页规模也不随
+       * 型号总数增长。
+       */
+      const HOME_MODEL_CARDS = 12;
+      const groups = categories.map((c) =>
+        models.filter((m) => m.data.category.id === c.id)
+      );
+      const perGroup = Math.max(1, Math.floor(HOME_MODEL_CARDS / Math.max(1, groups.length)));
+      const remainder = HOME_MODEL_CARDS - perGroup * groups.length;
+
+      const featured = groups.flatMap((list, i) =>
+        list.slice(0, perGroup + (i < remainder ? 1 : 0))
+      );
+
+      const categoryCards = categories.map((c) => {
+        const v = categoryView(c, locale);
+        return { id: c.id, name: v.name, intro: v.intro, image: c.data.image };
+      });
+
+      const modelCards = featured.map((m) => {
+        const v = modelView(m, locale);
+        return {
+          id: m.id,
+          categoryId: m.data.category.id,
+          code: v.code,
+          name: v.name,
+          firstParamKey: v.keyParams[0].k,
+          firstParam: v.keyParams[0].v,
+          image: v.image,
+        };
+      });
+
+      return {
+        locale,
+        path,
+        ...meta,
+        /** 首页分享图用品牌横幅（其余页面走 SITE.ogImage 全站默认图） */
+        image: '/og-home.png',
+        // 首页精选型号以 ItemList 结构化数据声明，强化「主推产品」信号
+        schemas: [
+          collectionSchema({
+            locale,
+            name: meta.title,
+            description: meta.description,
+            path,
+            items: modelCards.map((m) => ({
+              name: m.code,
+              path: detailPath.model(m.categoryId, m.id),
+            })),
+          }),
+        ],
+        body: 'home',
+        // totalModels 是目录里的真实型号数：导语引用它，
+        // 首页机型卡有上限，两个数字不能混用
+        bodyProps: {
+          locale,
+          categories: categoryCards,
+          models: modelCards,
+          totalModels: models.length,
+        },
+      };
+    }
+
+    case 'products': {
+      const categories = await getAllCategories();
+      const models = await getAllModels();
+
+      const countByCategory = new Map<string, number>();
+      for (const m of models) {
+        const key = m.data.category.id;
+        countByCategory.set(key, (countByCategory.get(key) ?? 0) + 1);
+      }
+
+      const crumbs = productsCrumbs(locale);
+
+      const cards = categories.map((c) => {
+        const v = categoryView(c, locale);
+        return {
+          id: c.id,
+          name: v.name,
+          intro: v.intro,
+          modelCount: countByCategory.get(c.id) ?? 0,
+          /** 品类封面：品类条目自己的 image 字段（运营维护，构建不处理） */
+          image: c.data.image,
+        };
+      });
+
+      const schemas = [
+        collectionSchema({
+          locale,
+          name: meta.title,
+          description: meta.description,
+          path,
+          items: cards.map((c) => ({ name: c.name, path: detailPath.category(c.id) })),
+        }),
+        breadcrumbSchema(crumbs),
+      ];
+
+      return {
+        locale,
+        path,
+        ...meta,
+        schemas,
+        body: 'products',
+        bodyProps: { locale, crumbs, categories: cards, totalModels: models.length },
+      };
+    }
+
+    case 'about': {
+      // 指标数字由内容集合统计，组件只负责渲染（组件不取数）
+      const dict = t(locale);
+      const [categories, models] = await Promise.all([getAllCategories(), getAllModels()]);
+      const metrics = [
+        { value: String(categories.length), label: dict.home.categories },
+        { value: String(models.length), label: dict.category.modelsTitle },
+        { value: dict.aboutPage.responseValue, label: dict.aboutPage.responseLabel },
+      ];
+      const crumbs = [
+        homeCrumb(locale),
+        crumb(crumbLabel(def, locale), localizePath(locale, path)),
+      ];
+
+      return {
+        locale,
+        path,
+        ...meta,
+        schemas: [breadcrumbSchema(crumbs)],
+        body: 'about',
+        // 标题来自条目（heading），改标题只需改条目
+        bodyProps: { locale, crumbs, heading: def.heading?.[locale] ?? seo.title, metrics },
+      };
+    }
+
+    case 'quote': {
+      const dict = t(locale);
+      const org = organizationFor(locale);
+
+      const crumbs = [
+        homeCrumb(locale),
+        crumb(crumbLabel(def, locale), localizePath(locale, path)),
+      ];
+
+      const mailto = `mailto:${org.contactPoint.email}?subject=${encodeURIComponent(
+        dict.quote.subject
+      )}`;
+
+      return {
+        locale,
+        path,
+        ...meta,
+        schemas: [breadcrumbSchema(crumbs)],
+        body: 'quote',
+        bodyProps: {
+          locale,
+          crumbs,
+          mailto,
+          org: {
+            email: org.contactPoint.email,
+            telephone: org.contactPoint.telephone,
+            address: org.address,
+          },
+        },
+      };
+    }
+
+    case 'section': {
+      const content = def.content[locale];
+      // 面包屑当前项走 crumbLabel，条目里显式写的 crumb 才生效；
+      // 标题本体（h1）仍取 content.heading，两者可以不同（如「资源」栏目下的具体页）
+      const crumbs = [homeCrumb(locale), crumb(crumbLabel(def, locale), localizePath(locale, path))];
+
+      return {
+        locale,
+        path,
+        ...meta,
+        schemas: [breadcrumbSchema(crumbs)],
+        body: 'section',
+        bodyProps: {
+          locale,
+          crumbs,
+          heading: content.heading,
+          body: { intro: content.intro, current: content.current },
+          ...(await sectionContent(path, locale, content.heading)),
+        },
+      };
+    }
+
+    case 'notFound': {
+      return {
+        locale,
+        path,
+        ...meta,
+        noindex: true,
+        switchPath: '/',
+        schemas: [],
+        body: 'notFound',
+        bodyProps: { locale },
+      };
+    }
+  }
+}
+
+/**
+ * 栏目页列表项：按页面路径取对应集合。
+ *
+ * 路径与集合一一对应，新增栏目只需在 entries 里加条目并在此登记一行；
+ * 集合为空时返回空数组，由组件渲染空状态（不会出现空白页）。
+ */
+async function sectionContent(
+  path: string,
+  locale: Locale,
+  heading: string
+): Promise<{
+  items: { title: string; meta?: string; href: string; badge?: string }[];
+  metrics: { value: string; label: string }[];
+}> {
+  const dict = t(locale);
+  if (path === '/applications/') {
+    const all = await getAllApplications();
+    return {
+      items: all.map((e) => {
+        const v = applicationView(e, locale);
+        return { title: v.name, meta: v.condition, href: localizePath(locale, detailPath.application(e.id)) };
+      }),
+      metrics: [
+        { value: String(all.length), label: heading },
+        { value: String(new Set(all.flatMap((e) => e.data.recommended.map((r) => r.id))).size), label: dict.section.modelsCovered },
+      ],
+    };
+  }
+  if (path === '/case-studies/') {
+    const all = await getAllCases();
+    return {
+      items: all.map((e) => {
+        const v = caseView(e, locale);
+        return { title: v.title, meta: v.background, href: localizePath(locale, detailPath.caseStudy(e.id)) };
+      }),
+      metrics: [
+        { value: String(all.length), label: heading },
+        { value: String(new Set(all.flatMap((e) => e.data.config.map((c) => c.id))).size), label: dict.section.modelsCovered },
+      ],
+    };
+  }
+  if (path === '/resources/guides/') {
+    const all = await getAllGuides(locale);
+    return {
+      items: all.map((e) => ({
+        title: e.data.title,
+        meta: e.data.tldr,
+        href: localizePath(locale, detailPath.guide(bareSlug(e.id))),
+      })),
+      metrics: [
+        { value: String(all.length), label: heading },
+        { value: String(new Set(all.flatMap((e) => e.data.relatedModels.map((m) => m.id))).size), label: dict.section.modelsCovered },
+      ],
+    };
+  }
+  if (path === '/resources/faq/') {
+    const all = await getAllFaqs(locale);
+    return {
+      items: all.map((e) => ({
+        title: e.data.question,
+        meta: dict.section.clusterLabels[e.data.cluster],
+        href: localizePath(locale, detailPath.faq(bareSlug(e.id))),
+      })),
+      metrics: [
+        { value: String(all.length), label: heading },
+        { value: String(new Set(all.map((e) => e.data.cluster)).size), label: dict.section.clusters },
+      ],
+    };
+  }
+  if (path === '/certifications/') {
+    // 认证页只列证书类文件：与页面正文（体系、检验、文件发放）互为补充
+    const all = (await getAllDownloads()).filter((e) => e.data.docType === 'certificate');
+    return {
+      items: all.map((e) => ({
+        title: e.data.locales?.[locale]?.title ?? e.data.title,
+        meta: e.data.version,
+        href: e.data.file,
+        badge: e.data.docType,
+      })),
+      metrics: [
+        { value: String(all.length), label: dict.section.files },
+        { value: 'CE / RoHS', label: dict.section.standards },
+      ],
+    };
+  }
+  if (path === '/resources/downloads/') {
+    const all = await getAllDownloads();
+    return {
+      items: all.map((e) => ({
+        title: e.data.locales?.[locale]?.title ?? e.data.title,
+        meta: e.data.version,
+        href: e.data.file,
+        badge: e.data.docType,
+      })),
+      metrics: [
+        { value: String(all.length), label: heading },
+        { value: String(new Set(all.map((e) => e.data.docType)).size), label: dict.section.docTypes },
+      ],
+    };
+  }
+  return { items: [], metrics: [] };
+}

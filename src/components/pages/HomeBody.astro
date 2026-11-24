@@ -1,0 +1,319 @@
+---
+/**
+ * 首页主体。
+ *
+ * 只负责渲染，不取数、不拼 SEO —— 数据与元标签由路由层准备后传入。
+ * 中英文路由共用本组件，差异只来自 locale 与已本地化的数据。
+ *
+ * 机型卡轮播用公共组件 Carousel：所有卡片都在服务端 HTML 里，
+ * 翻页与箭头只是「切换看哪几张」的视图开关，不决定内容有无，也不产生新 URL。
+ */
+import Carousel from '../layout/Carousel.astro';
+import CtaBand from '../layout/CtaBand.astro';
+import CategoryCard from '../cards/CategoryCard.astro';
+import ModelCard from '../cards/ModelCard.astro';
+import { t } from '../../i18n/ui';
+import { localizePath, type Locale } from '../../i18n/routing';
+import { ROUTES, detailPath } from '../../data/routes';
+
+interface Props {
+  locale: Locale;
+  categories: { id: string; name: string; intro: string; image?: string }[];
+  models: {
+    id: string;
+    categoryId: string;
+    code: string;
+    name: string;
+    firstParamKey: string;
+    firstParam: string;
+    /** 主图公开路径（public/ 下），来自内容条目的 image 字段 */
+    image?: string;
+  }[];
+  /** 目录内型号总数：导语用它，与首页展示的卡片数（models）是两个数 */
+  totalModels: number;
+}
+
+const { locale, categories, models, totalModels } = Astro.props;
+const dict = t(locale);
+---
+
+<section class="hero">
+  <div class="container">
+    <h1>{dict.home.h1}</h1>
+    <p class="lead">{dict.home.lead(categories.length, totalModels)}</p>
+    <div class="actions">
+      <a class="btn btn-primary" href={localizePath(locale, ROUTES.products)}>
+        {dict.home.browseProducts}
+      </a>
+      <a class="btn btn-secondary" href={localizePath(locale, ROUTES.quote)}>
+        {dict.home.requestQuote}
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>
+  <a class="section-title-link" href={localizePath(locale, ROUTES.products)}>
+    {dict.home.categories}
+  </a>
+</h2>
+    <Carousel
+      class="category-carousel"
+      pagination="segments"
+      labelPrev={dict.carousel.prev}
+      labelNext={dict.carousel.next}
+    >
+      {
+        categories.map((c) => (
+          <li>
+            <CategoryCard
+              href={localizePath(locale, detailPath.category(c.id))}
+              name={c.name}
+              intro={`${c.intro.slice(0, 80)}…`}
+              linkLabel={`${dict.home.viewModels} →`}
+              image={c.image}
+            />
+          </li>
+        ))
+      }
+    </Carousel>
+  </div>
+</section>
+
+{
+  models.length > 0 && (
+    <section class="section section-subtle">
+      <div class="container">
+        <h2>{dict.home.selectedModels}</h2>
+        <Carousel
+          class="model-carousel"
+          labelPrev={dict.carousel.prev}
+          labelNext={dict.carousel.next}
+          labelPages={dict.carousel.pages}
+        >
+          {models.map((m) => (
+            <li>
+              <ModelCard
+                href={localizePath(locale, detailPath.model(m.categoryId, m.id))}
+                code={m.code}
+                firstParamLabel={m.firstParamKey}
+                firstParam={m.firstParam}
+                image={m.image}
+              />
+            </li>
+          ))}
+        </Carousel>
+      </div>
+    </section>
+  )
+}
+
+{/* 信任条：三条可核验事实 + 认证页入口（措辞取自 /certifications/，不另造说法） */}
+<section class="trust-band" aria-label={dict.home.trust.link}>
+  <div class="container trust-band-inner">
+    <ul>
+      {dict.home.trust.facts.map((fact) => <li>{fact}</li>)}
+    </ul>
+    <a class="trust-band-link" href={localizePath(locale, ROUTES.certifications)}>
+      {dict.home.trust.link} →
+    </a>
+  </div>
+</section>
+
+{/* 首页唯一的转化横条：hero 之后直到页脚的询价入口 */}
+<CtaBand locale={locale} />
+
+<style>
+  /*
+   * 深色 hero：透明页眉浮在上面（白字），所以这里必须是深色底、白字。
+   * 顶部内边距先补回固定页眉的高度（72px），再留出呼吸空间。
+   */
+  /*
+   * 深色 hero：透明页眉浮在上面（白字），所以这里必须是深色底、白字。
+   * 顶部内边距先补回固定页眉的高度（72px）。两个品牌色光斑做视觉锚点。
+   */
+  .hero {
+    padding: calc(72px + var(--space-7)) 0 var(--space-7);
+    background:
+      radial-gradient(560px 280px at 85% 15%, rgb(24 99 220 / 28%), transparent 70%),
+      radial-gradient(420px 260px at 8% 95%, rgb(0 150 222 / 14%), transparent 70%),
+      linear-gradient(135deg, var(--color-ink) 0%, var(--color-ink-soft) 55%, #1863dc 145%);
+  }
+
+  .hero h1 {
+    max-width: 820px;
+    color: #fff;
+  }
+
+  .lead {
+    max-width: 680px;
+    font-size: var(--fs-lead);
+    color: rgb(255 255 255 / 78%);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-top: var(--space-5);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 26px;
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--color-brand);
+    color: #fff;
+    box-shadow: 0 4px 14px rgb(0 0 0 / 25%);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-brand-hover);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 35%);
+    text-decoration: none;
+  }
+
+  /* 深色 hero 里的次按钮：白描边幽灵样式（首页只有 hero 用到它） */
+  .hero .btn-secondary {
+    background: transparent;
+    border-color: rgb(255 255 255 / 45%);
+    color: #fff;
+  }
+
+  .hero .btn-secondary:hover {
+    background: rgb(255 255 255 / 12%);
+    border-color: #fff;
+  }
+
+  .btn-secondary {
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .section-subtle {
+    background: var(--color-bg-subtle);
+  }
+
+  /*
+   * 两个轮播的每屏张数（--per-view）：同一组断点内一并声明，避免两套媒体查询平行维护。
+   *   · 品类（大卡，目录层）：1 / 2 / 2 / 3
+   *   · 型号（左文右图，商品层）：1 / 2 / 3 / 4
+   * 改断点只动下面四处；容器 1400px 下宽屏各卡约 335–450px。
+   */
+  :global(.category-carousel) {
+    --per-view: 1;
+  }
+
+  :global(.model-carousel) {
+    --per-view: 1;
+  }
+
+  @media (min-width: 768px) {
+    :global(.category-carousel) {
+      --per-view: 2;
+    }
+
+    :global(.model-carousel) {
+      --per-view: 2;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    :global(.category-carousel) {
+      --per-view: 2;
+    }
+
+    :global(.model-carousel) {
+      --per-view: 3;
+    }
+  }
+
+  /* 宽屏：品类 3 张、型号 4 张——1400 容器里的密度与大屏匹配 */
+  @media (min-width: 1600px) {
+    :global(.category-carousel) {
+      --per-view: 3;
+    }
+
+    :global(.model-carousel) {
+      --per-view: 4;
+    }
+  }
+
+  /* 信任条：与正文同宽的细带，三条事实 + 认证页链接 */
+  .trust-band {
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    background: var(--color-bg-subtle);
+    padding: var(--space-5) 0;
+  }
+
+  .trust-band-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3) var(--space-6);
+  }
+
+  .trust-band ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    flex: 1;
+  }
+
+  .trust-band li {
+    position: relative;
+    padding-left: 14px;
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+  }
+
+  /* 品牌色小方点：与页眉/h2 的方点语言一致，不用图标 */
+  .trust-band li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: var(--color-brand);
+  }
+
+  .trust-band-link {
+    flex-shrink: 0;
+    font-size: var(--fs-sm);
+    color: var(--color-brand);
+  }
+
+  .trust-band-link:hover {
+    color: var(--color-link-hover);
+  }
+  /* 板块标题里的链接：外观与标题一致，悬停才染品牌色 */
+  .section-title-link {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .section-title-link:hover {
+    color: var(--color-brand);
+    text-decoration: none;
+  }
+</style>

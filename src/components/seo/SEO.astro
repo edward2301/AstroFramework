@@ -1,0 +1,73 @@
+---
+/**
+ * 元标签唯一出口。
+ * 页面不手写 title / description / og，一律经此组件输出，
+ * 这样长度与唯一性才有可能被统一校验。
+ */
+import { SITE } from '../../data/site';
+import { absoluteUrl } from '../../lib/seo/meta';
+import { LOCALE_META, type Locale } from '../../i18n/routing';
+
+interface Props {
+  /** 完整标题，已含品牌后缀 */
+  title: string;
+  description: string;
+  /** 相对路径，已含语言前缀，如 /zh/products/category-a/a1/ */
+  canonical: string;
+  image?: string;
+  noindex?: boolean;
+  ogType?: 'website' | 'article' | 'product';
+  locale: Locale;
+  /** 同一页面在各语言下的路径，用于 hreflang */
+  alternates: { hreflang: string; path: string; ogLocale: string }[];
+}
+
+const {
+  title,
+  description,
+  canonical,
+  image = SITE.ogImage,
+  noindex = false,
+  ogType = 'website',
+  locale,
+  alternates,
+} = Astro.props;
+
+const canonicalUrl = absoluteUrl(canonical);
+const imageUrl = absoluteUrl(image);
+const meta = LOCALE_META[locale];
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+{
+  /* noindex 页不输出 canonical。
+     404 这类页面没有「自己的正式地址」—— 它是任意错误路径的落点，
+     若输出一个 /404/ 的 canonical，等于声明一个不存在的地址是它的归属，
+     与 noindex 自相矛盾，且会被抓取工具报为配置错误。 */
+  !noindex && <link rel="canonical" href={canonicalUrl} />
+}
+{
+  /* hreflang 必须与 canonical 同时存在：只声明多语言而不声明互指关系，
+     等于把两个语言版本交给搜索引擎自行判断，容易变成重复内容 */
+  alternates.map((alt) => (
+    <link rel="alternate" hreflang={alt.hreflang} href={absoluteUrl(alt.path)} />
+  ))
+}
+{noindex && <meta name="robots" content="noindex, follow" />}
+
+<meta property="og:type" content={ogType} />
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+{!noindex && <meta property="og:url" content={canonicalUrl} />}
+<meta property="og:image" content={imageUrl} />
+<meta property="og:locale" content={meta.ogLocale} />
+{
+  alternates
+    .filter((alt) => alt.hreflang !== 'x-default' && alt.hreflang !== meta.htmlLang)
+    .map((alt) => <meta property="og:locale:alternate" content={alt.ogLocale} />)
+}
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={imageUrl} />

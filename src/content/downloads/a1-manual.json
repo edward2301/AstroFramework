@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "A1 — installation manual",
+  "docType": "manual",
+  "version": "v1.0",
+  "updated": "2026-09-25",
+  "model": "a1",
+  "gated": false,
+  "file": "/downloads/a1-manual.pdf",
+  "locales": {
+    "zh": {
+      "title": "A1 — 安装手册"
+    }
+  }
+}

@@ -1,0 +1,231 @@
+﻿---
+/**
+ * 栏目页主体（应用方向 / 案例 / 指南 / 问答 / 下载 / 认证与质量）。
+ *
+ * 与基准页（首页、产品中心）同一套骨架：section + container + PageHeader，
+ * 标题层级 h1 → h2，内容区给「栏目定位 + 当前状态 + 替代入口」三段，
+ * 集合为空时也不会出现空白页或死路（每条替代入口都是真实内链）。
+ *
+ * 集合有内容后，由各自的路由在此处追加列表渲染。
+ */
+import PageHeader from '../layout/PageHeader.astro';
+import MetricStrip from '../layout/MetricStrip.astro';
+import { localizePath, type Locale } from '../../i18n/routing';
+import { ROUTES } from '../../data/routes';
+import { t } from '../../i18n/ui';
+import type { Crumb } from '../../lib/seo/breadcrumb';
+
+interface Props {
+  locale: Locale;
+  crumbs: Crumb[];
+  heading: string;
+  body: { intro: string; current: string };
+  /** 该栏目下的条目；为空时渲染空状态 */
+  items: { title: string; meta?: string; href: string; badge?: string }[];
+  /** 栏目指标（条目数、覆盖型号数等） */
+  metrics: { value: string; label: string }[];
+}
+
+const { locale, crumbs, heading, body, items, metrics } = Astro.props;
+const dict = t(locale);
+
+/** 空状态下的替代入口：都是站内真实页面，避免栏目页成为死路 */
+const related = [
+  { href: localizePath(locale, ROUTES.products), label: dict.nav.products },
+  { href: localizePath(locale, ROUTES.certifications), label: dict.section.quality },
+  { href: localizePath(locale, ROUTES.quote), label: dict.nav.quote },
+];
+---
+
+<section class="section">
+  <div class="container">
+    <PageHeader locale={locale} crumbs={crumbs} title={heading} lead={body.intro} />
+
+    {metrics.length > 0 && <MetricStrip items={metrics} />}
+
+    {/* 栏目说明：有列表时同样要出现，否则页面只剩标题与卡片，正文全丢 */}
+    {body.current.trim() !== '' && <p class="section-current">{body.current}</p>}
+
+    <div class="section-layout">
+      <div class="section-main">
+        {
+          items.length > 0 ? (
+            <>
+              <h2>{dict.section.items}</h2>
+              <ul class="items">
+                {items.map((it, i) => (
+                  <li>
+                    <a href={it.href}>
+                      <span class="item-mark" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                      <strong>{it.title}</strong>
+                      {it.meta && <span class="meta">{it.meta}</span>}
+                      {it.badge && <span class="badge">{it.badge}</span>}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <>
+              <h2>{dict.section.statusTitle}</h2>
+              <p class="status">{body.current}</p>
+            </>
+          )
+        }
+      </div>
+
+      <aside class="related-card">
+        <h2>{dict.section.related}</h2>
+        <ul class="links">
+          {related.map((r) => (
+            <li>
+              <a href={r.href}>{r.label} →</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+
+<style>
+  /* 双栏：左侧栏目说明，右侧相关入口卡（与关于页、询价页一致） */
+  :global(.metrics) {
+    margin-bottom: var(--space-6);
+  }
+
+  /* 栏目说明段：与列表同宽、灰字，读起来像导语而不是正文墙 */
+  .section-current {
+    max-width: 760px;
+    margin: 0 0 var(--space-6);
+    color: var(--color-text-muted);
+  }
+
+  .section-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  /* 条目字母标记：无图集合也有一点色彩，避免整列纯文字 */
+  .item-mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    margin-bottom: var(--space-2);
+    border-radius: 8px;
+    background: var(--color-brand-50);
+    border: 1px solid var(--color-brand-100);
+    color: var(--color-brand);
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .section-main h2 {
+    margin-top: var(--space-6);
+  }
+
+  .status {
+    max-width: 680px;
+    margin: 0;
+  }
+
+  /* 条目列表：两列卡片，标题 + 摘要 + 徽标 */
+  .items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .items a {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    height: 100%;
+    padding: var(--space-5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg);
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .items a:hover {
+    border-color: var(--color-brand);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    text-decoration: none;
+  }
+
+  .items strong {
+    font-size: var(--fs-body);
+    color: var(--color-ink);
+    line-height: 1.4;
+  }
+
+  .items .meta {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .items .badge {
+    margin-top: auto;
+    align-self: flex-start;
+    padding: 2px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: var(--fs-xs);
+    color: var(--color-brand);
+  }
+
+  .related-card {
+    padding: var(--space-5);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .related-card h2 {
+    font-size: var(--fs-h3);
+  }
+
+  .links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .links a {
+    font-size: var(--fs-sm);
+    color: var(--color-brand);
+  }
+
+  .links a:hover {
+    color: var(--color-link-hover);
+  }
+
+  @media (max-width: 1024px) {
+    .items {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .section-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+  }
+</style>

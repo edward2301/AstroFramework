@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "A2 — declaration of conformity",
+  "docType": "certificate",
+  "version": "v1.0",
+  "updated": "2026-09-25",
+  "model": "a2",
+  "gated": true,
+  "file": "/downloads/a2-certificate.pdf",
+  "locales": {
+    "zh": {
+      "title": "A2 — 合格声明"
+    }
+  }
+}

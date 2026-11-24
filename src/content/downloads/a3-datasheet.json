@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "A3 — datasheet",
+  "docType": "datasheet",
+  "version": "v1.0",
+  "updated": "2026-09-25",
+  "model": "a3",
+  "gated": false,
+  "file": "/downloads/a3-datasheet.pdf",
+  "locales": {
+    "zh": {
+      "title": "A3 — 规格书"
+    }
+  }
+}

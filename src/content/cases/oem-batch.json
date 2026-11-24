@@ -1,0 +1,44 @@
+{
+  "draft": false,
+  "title": "OEM batch supply for a pump skid",
+  "background": "A skid builder needed one model family for twelve machine variants, with identical mounting and wiring on every unit.",
+  "requirements": [
+    "One wiring scheme across all variants.",
+    "Delivery in weekly batches.",
+    "Replacements traceable by batch."
+  ],
+  "selection": "Two models cover the whole range: the base variant for standard units and the extended-range variant for high-pressure units.",
+  "config": [
+    "a1",
+    "a2"
+  ],
+  "results": [
+    "Assembly time cut by 30 minutes per unit.",
+    "Only two part numbers to stock.",
+    "Field replacements match the original batch.",
+    "Spare stock kept at two part numbers after the first year."
+  ],
+  "date": "2025-11-18",
+  "seoTitle": "OEM batch supply for a pump skid — deployment note",
+  "seoDescription": "OEM batch supply for a pump skid: constraints, models chosen and measurable results. A short deployment note for engineers comparing similar setups.",
+  "locales": {
+    "zh": {
+      "title": "泵撬块 OEM 批量配套",
+      "background": "撬块厂商需要一套型号覆盖 12 种机型，且每台的安装与接线方式必须一致。",
+      "requirements": [
+        "所有机型共用一种接线方案。",
+        "按周分批交付。",
+        "替代件可按批次追溯。"
+      ],
+      "selection": "两个型号覆盖全线：标准机型用基础款，高压机型用扩展量程款。",
+      "results": [
+        "单台装配时间减少 30 分钟。",
+        "备件只需两个料号。",
+        "现场替换件与原批次一致。",
+        "运行一年后备件只需维护两个料号。"
+      ],
+      "seoTitle": "泵撬块 OEM 批量配套：十二机型共用一套方案",
+      "seoDescription": "泵撬块批量配套项目记录：十二种机型共用一套接线与安装方案，按周分批交付，替代件可按批次追溯，并记录选定型号、约束条件与装配时间的变化。现场可用。"
+    }
+  }
+}

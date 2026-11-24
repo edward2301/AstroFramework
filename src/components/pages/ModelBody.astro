@@ -1,0 +1,384 @@
+﻿---
+/**
+ * 型号页主体。
+ *
+ * 布局：左图（黄金比）+ 右信息（关键参数两列 + 行动按钮）两栏
+ * → 技术规格（规格组两列并排）→ 尺寸与合规 → 替代型号 / 同品类其他型号 → 页尾 CTA。
+ *
+ * 取舍：图片与关键参数进首屏，规格表退到第二层；询价横条只在页尾出现一次，
+ * 不插在参数与规格之间打断阅读。
+ */
+import PageHeader from '../layout/PageHeader.astro';
+import { t } from '../../i18n/ui';
+import { localizePath, type Locale } from '../../i18n/routing';
+import { detailPath, ROUTES } from '../../data/routes';
+import type { Crumb } from '../../lib/seo/breadcrumb';
+
+interface Props {
+  locale: Locale;
+  crumbs: Crumb[];
+  /** 主图公开路径（`public/` 下），由内容条目的 image 字段提供 */
+  image?: string;
+  model: {
+    code: string;
+    name: string;
+    status: 'active' | 'discontinued';
+    keyParams: { k: string; v: string }[];
+    specGroups: { title: string; rows: { k: string; v: string }[] }[];
+    dimensions?: string;
+    interface?: string;
+    certifications: string[];
+  };
+  /** 资料文件存在时才输出下载按钮，避免死链 */
+  datasheet?: { path: string; available: boolean };
+  replacements: { id: string; categoryId: string; code: string; name: string }[];
+  applications: { id: string; name: string }[];
+  cases: { id: string; title: string }[];
+  /** 同品类其他型号（横向内链，用于型号间对比与抓取） */
+  siblings: { id: string; categoryId: string; code: string }[];
+}
+
+const { locale, crumbs, model, image, datasheet, replacements, applications, cases, siblings } =
+  Astro.props;
+const dict = t(locale);
+---
+
+<section class="section">
+  <div class="container">
+    <PageHeader locale={locale} crumbs={crumbs} title={`${model.code} ${model.name}`} />
+
+    {
+      model.status === 'discontinued' && (
+        <div class="notice">
+          <strong>{dict.model.discontinuedTitle}</strong>
+          {replacements.length > 0 ? dict.model.superseded : dict.model.support}
+        </div>
+      )
+    }
+
+    <div class="product-hero">
+      {
+        image && (
+          <figure class="hero-media">
+            <img
+              src={image}
+              alt={`${model.code} ${model.name}`}
+              width="800"
+              height="494"
+              loading="eager"
+              fetchpriority="high"
+              decoding="async"
+            />
+          </figure>
+        )
+      }
+
+      <div class="product-side">
+        <dl class="key-params">
+          {
+            model.keyParams.map((p) => (
+              <div>
+                <dt>{p.k}</dt>
+                <dd>{p.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div class="product-actions">
+          <a class="btn" href={localizePath(locale, ROUTES.quote)}>{dict.home.requestQuote}</a>
+          {
+            datasheet?.available && (
+              <a class="btn btn-secondary" href={datasheet.path}>
+                {dict.model.datasheet}
+              </a>
+            )
+          }
+        </div>
+      </div>
+    </div>
+
+    <h2>{dict.model.specs}</h2>
+    <div class="spec-grid">
+      {
+        model.specGroups.map((group) => (
+          <div class="spec-group">
+            <h3>{group.title}</h3>
+            <table class="spec">
+              <tbody>
+                {group.rows.map((row) => (
+                  <tr>
+                    <th scope="row">{row.k}</th>
+                    <td>{row.v}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ))
+      }
+    </div>
+
+    <h2>{dict.model.dimensionsAndCompliance}</h2>
+    <dl class="facts">
+      {model.dimensions && (<><dt>{dict.model.dimensions}</dt><dd>{model.dimensions}</dd></>)}
+      {model.interface && (<><dt>{dict.model.interface}</dt><dd>{model.interface}</dd></>)}
+      <dt>{dict.model.certifications}</dt>
+      <dd>{model.certifications.join(', ') || '—'}</dd>
+    </dl>
+
+    {
+      replacements.length > 0 && (
+        <>
+          <h2>{dict.model.replacement}</h2>
+          <ul class="related">
+            {replacements.map((r) => (
+              <li>
+                <a href={localizePath(locale, detailPath.model(r.categoryId, r.id))}>
+                  {r.code} {r.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    {
+      applications.length > 0 && (
+        <>
+          <h2>{dict.model.applications}</h2>
+          <ul class="related">
+            {applications.map((a) => (
+              <li>
+                <a href={localizePath(locale, detailPath.application(a.id))}>{a.name}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    {
+      cases.length > 0 && (
+        <>
+          <h2>{dict.model.relatedCases}</h2>
+          <ul class="related">
+            {cases.map((c) => (
+              <li>
+                <a href={localizePath(locale, detailPath.caseStudy(c.id))}>{c.title}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    {
+      siblings.length > 0 && (
+        <>
+          <h2>{dict.model.otherModels}</h2>
+          <ul class="related related--inline">
+            {siblings.map((m) => (
+              <li>
+                <a href={localizePath(locale, detailPath.model(m.categoryId, m.id))}>{m.code}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+  </div>
+</section>
+
+
+<style>
+  /* 首屏两栏：左图（黄金比）+ 右信息（参数与行动） */
+  .product-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+    gap: var(--space-7);
+    align-items: start;
+    /* 上边距由 PageHeader 统一提供，这里只管与下方规格区的距离 */
+    margin-bottom: var(--space-8);
+  }
+
+  .hero-media {
+    margin: 0;
+  }
+
+  .hero-media :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.618;
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-bg-subtle);
+  }
+
+  .product-side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  /* 关键参数：两列，标签小灰字在上、值在下 */
+  .key-params {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-5);
+    margin: 0;
+  }
+
+  .key-params div {
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+
+  .key-params dt {
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+  }
+
+  .key-params dd {
+    margin: 2px 0 0;
+    font-size: var(--fs-body);
+    font-weight: 600;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .product-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .notice {
+    padding: var(--space-4);
+    background: var(--color-bg-subtle);
+    border-left: 3px solid var(--color-brand);
+    margin-bottom: var(--space-5);
+    font-size: var(--fs-sm);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--color-brand);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+  }
+
+  .btn:hover {
+    background: var(--color-brand-hover);
+    text-decoration: none;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .btn-secondary:hover {
+    background: transparent;
+    border-color: var(--color-text-muted);
+  }
+
+  /* 规格：两组并排，铺满内容宽度（之前单列 720 右侧全空） */
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5) var(--space-7);
+    margin-bottom: var(--space-6);
+  }
+
+  .spec-group h3 {
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-2);
+  }
+
+  .spec {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .spec th,
+  .spec td {
+    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
+    padding: var(--space-3) var(--space-3);
+    text-align: left;
+    font-size: var(--fs-sm);
+    vertical-align: top;
+  }
+
+  .spec th {
+    font-weight: 400;
+    color: var(--color-text-muted);
+    width: 42%;
+  }
+
+  .spec td {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-2) var(--space-5);
+    margin: 0 0 var(--space-6);
+    font-size: var(--fs-sm);
+    max-width: 720px;
+  }
+
+  .facts dt {
+    color: var(--color-text-muted);
+  }
+
+  .facts dd {
+    margin: 0;
+  }
+
+  .related {
+    max-width: 720px;
+    margin: 0 0 var(--space-5);
+    padding-left: 18px;
+  }
+
+  /* 同品类其他型号：横排一行，便于逐个对比 */
+  .related--inline {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .related--inline li {
+    padding: 6px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: var(--fs-sm);
+  }
+
+  @media (max-width: 1024px) {
+    .product-hero {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+    }
+
+    .spec-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

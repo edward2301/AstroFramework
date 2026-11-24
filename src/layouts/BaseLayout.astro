@@ -1,0 +1,136 @@
+---
+/**
+ * 全站基础骨架。
+ *
+ * 页面通过 props 传入语言、路径、SEO 载荷与结构化数据，本布局负责：
+ * 取导航 → 渲染头部 → 注入 SEO 与 hreflang → 输出主体 → 渲染页脚。
+ *
+ * 页面不手写 title / meta / JSON-LD，也不自己拼语言前缀 —— 传语言无关的 path，
+ * 由本布局统一加前缀并生成各语言的互指关系。
+ */
+import '../styles/global.css';
+import brandTokens from '../styles/tokens.css?raw';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import SEO from '../components/seo/SEO.astro';
+import JsonLd from '../components/seo/JsonLd.astro';
+import { getSiteNav } from '../lib/content/site';
+import { buildFooterNav, buildMainNav } from '../lib/nav';
+import { organizationNode, websiteNode } from '../lib/seo/schema';
+import { t } from '../i18n/ui';
+import {
+  LOCALE_META,
+  alternatePaths,
+  localizePath,
+  type Locale,
+} from '../i18n/routing';
+
+interface Props {
+  locale: Locale;
+  /** 语言无关路径，如 /products/category-a/a1/ */
+  path: string;
+  /** 完整标题，已含品牌后缀 */
+  title: string;
+  description: string;
+  image?: string;
+  noindex?: boolean;
+  ogType?: 'website' | 'article' | 'product';
+  /** 页面级结构化数据，Organization 与 WebSite 自动附加 */
+  schemas?: unknown[];
+  /**
+   * 语言切换器要跳转的语言无关路径，默认取当前页面。
+   * 404 这类在目标语言中不存在的页面需要显式指定（通常指向对方首页）。
+   */
+  switchPath?: string;
+  /** 首页为 true：页眉以透明浮层盖在深色 hero 上（白字），内页保持白底吸顶 */
+  overlay?: boolean;
+}
+
+const {
+  locale,
+  path,
+  title,
+  description,
+  image,
+  noindex = false,
+  ogType = 'website',
+  schemas = [],
+  switchPath,
+  overlay = false,
+} = Astro.props;
+
+const nav = await getSiteNav(locale);
+/** 导航由页面条目的 nav 字段派生，不在这里或组件里手写链接 */
+const mainNav = buildMainNav(locale);
+const footerNav = buildFooterNav(locale, nav.categories, nav.applications);
+const dict = t(locale);
+
+/** 当前语言的实际地址，以及同一页面在其他语言下的地址 */
+const canonical = localizePath(locale, path);
+
+/**
+ * 移动端主题色直接由设计令牌派生，不另写一份颜色字面值。
+ * 找不到令牌时构建期报错，而不是悄悄回落到一个可能与 CSS 不一致的颜色。
+ */
+const brandMatch = /--color-brand:\s*(#[0-9a-f]{3,8})/i.exec(brandTokens);
+if (!brandMatch) {
+  throw new Error('[BaseLayout] tokens.css 中找不到 --color-brand，无法派生 theme-color');
+}
+const themeColor = brandMatch[1];
+
+/**
+ * noindex 页面不输出 hreflang：404 这类页面本身不可索引，也就不存在「同一页面的
+ * 其他语言版本」，强行声明会指向未生成的路径，变成断链。
+ */
+const alternates = noindex ? [] : alternatePaths(path);
+
+/** 全站实体节点始终存在，页面只追加自己的类型节点 */
+const allSchemas = [
+  organizationNode(locale),
+  websiteNode(locale),
+  ...schemas,
+];
+---
+<!doctype html>
+<html lang={LOCALE_META[locale].htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content={themeColor} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="generator" content={Astro.generator} />
+
+    <SEO
+      title={title}
+      description={description}
+      canonical={canonical}
+      image={image}
+      noindex={noindex}
+      ogType={ogType}
+      locale={locale}
+      alternates={alternates}
+    />
+    {
+      /* noindex 页不输出结构化数据。
+         结构化数据的作用是让页面进入富媒体结果，而 noindex 页本就不进索引，
+         在错误页上声明组织与站点实体既无收益，又会与 noindex 形成矛盾信号。 */
+      !noindex && <JsonLd schemas={allSchemas} />
+    }
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">{dict.header.skipToContent}</a>
+    <Header
+      locale={locale}
+      items={mainNav}
+      categories={nav.categories}
+      switchPath={switchPath}
+      variant={overlay ? 'overlay' : 'solid'}
+    />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer locale={locale} columns={footerNav} />
+  </body>
+</html>

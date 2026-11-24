@@ -1,0 +1,146 @@
+﻿---
+/**
+ * 关于我们：条带页头 → 指标条 → 三组图文行（生产 / 文档 / 响应）→ 联系区。
+ *
+ * 采用「数字 + 图 + 短句」的节奏，图文交替形成 Z 字阅读动线；
+ * 数字取自内容集合，不编造。
+ */
+import PageHeader from '../layout/PageHeader.astro';
+import MetricStrip from '../layout/MetricStrip.astro';
+import FeatureRow from '../layout/FeatureRow.astro';
+import { t } from '../../i18n/ui';
+import { localizePath, type Locale } from '../../i18n/routing';
+import type { Crumb } from '../../lib/seo/breadcrumb';
+import { organizationFor } from '../../data/organization';
+
+interface Props {
+  locale: Locale;
+  crumbs: Crumb[];
+  heading: string;
+  metrics: { value: string; label: string }[];
+}
+
+const { locale, crumbs, heading, metrics } = Astro.props;
+const dict = t(locale);
+const org = organizationFor(locale);
+
+const images = [
+  { src: '/images/pages/about-production.png', alt: dict.aboutPage.sections[0]?.t ?? '' },
+  { src: '/images/pages/about-documents.png', alt: dict.aboutPage.sections[1]?.t ?? '' },
+  { src: '/images/pages/about-inspection.png', alt: dict.aboutPage.sections[2]?.t ?? '' },
+];
+---
+
+<section class="section">
+  <div class="container">
+    <PageHeader locale={locale} crumbs={crumbs} title={heading} lead={org.description} />
+
+    <MetricStrip items={metrics} />
+
+    <div class="about-rows">
+      {
+        dict.aboutPage.sections.slice(0, -1).map((sec, i) => (
+          <FeatureRow
+            title={sec.t}
+            body={sec.d}
+            image={images[i % images.length].src}
+            imageAlt={images[i % images.length].alt}
+            reverse={i % 2 === 1}
+          />
+        ))
+      }
+    </div>
+
+    <div class="about-contact">
+      <div class="about-contact-text">
+        <h2>{dict.aboutPage.contactTitle}</h2>
+        <p>{dict.quote.lead}</p>
+        <a class="btn" href={localizePath(locale, '/contact/quote/')}>{dict.home.requestQuote} →</a>
+      </div>
+
+      <dl class="about-contact-card">
+        <div>
+          <dt>{dict.quote.emailLabel}</dt>
+          <dd><a href={`mailto:${org.contactPoint.email}`}>{org.contactPoint.email}</a></dd>
+        </div>
+        <div>
+          <dt>{dict.quote.telLabel}</dt>
+          <dd><a href={`tel:${org.contactPoint.telephone}`}>{org.contactPoint.telephone}</a></dd>
+        </div>
+        <div>
+          <dt>{dict.quote.addressLabel}</dt>
+          <dd>
+            {org.address.street}{locale === 'zh' ? ' ' : ', '}{org.address.city}{locale === 'zh' ? ' ' : ', '} {org.address.region} {org.address.postalCode}
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-rows {
+    margin-top: var(--space-8);
+  }
+
+  .about-contact {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 380px;
+    gap: var(--space-7);
+    align-items: center;
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .about-contact-text p {
+    color: var(--color-text-muted);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 999px;
+    background: var(--color-brand);
+    color: #fff;
+    font-size: var(--fs-sm);
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .btn:hover {
+    background: var(--color-brand-hover);
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .about-contact-card {
+    margin: 0;
+    padding: var(--space-5);
+    background: var(--color-brand-50);
+    border: 1px solid var(--color-brand-100);
+    border-radius: var(--radius);
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .about-contact-card dt {
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wide);
+    color: var(--color-text-muted);
+  }
+
+  .about-contact-card dd {
+    margin: 2px 0 0;
+    font-size: var(--fs-sm);
+    color: var(--color-ink);
+  }
+
+  @media (max-width: 1024px) {
+    .about-contact {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+    }
+  }
+</style>

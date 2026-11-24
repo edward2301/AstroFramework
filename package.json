@@ -1,0 +1,30 @@
+{
+  "name": "AstroFramework",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": "^24.14.1",
+    "npm": ">=9.6.5"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "validate": "node scripts/validate-content.mjs",
+    "check": "astro check",
+    "check-links": "node scripts/check-links.mjs",
+    "test": "vitest run",
+    "build": "npm run check && astro build",
+    "preview": "astro preview",
+    "deploy": "npm run build && wrangler pages deploy",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.2"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.160.1"
+  }
+}

@@ -1,0 +1,12 @@
+# 尾斜杠由 Cloudflare Pages 默认的 auto-trailing-slash 以 3xx 自动补齐
+#（astro.config.mjs 的 trailingSlash: 'always'）。不要写通配 rewrite：
+# 会覆盖默认行为，甚至把不存在的路径变成 200。
+
+# 404 产物禁止直访：Pages 会把它当普通静态文件返回 200。
+# 这几条只作用于直接请求，Pages 内部渲染 404 时读取 404.html 不经过重定向。
+/404.html  /  301
+/zh/404.html  /zh/  301
+/zh/404/index.html  /zh/  301
+
+# 旧链接 301：精确匹配，新增条目写在下面，不要用通配以免误伤。
+# /products/category-a/old-model/  /products/category-a/new-model/  301

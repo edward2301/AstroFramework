@@ -1,0 +1,18 @@
+# 带内容 hash 的构建资源可缓存一年
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# 404 产物禁止缓存：一次错误不能被边缘固化
+/404.html
+  Cache-Control: no-store
+/zh/404.html
+  Cache-Control: no-store
+/zh/404/index.html
+  Cache-Control: no-store
+
+# sitemap 与 robots 不缓存，新页面才能及时被发现。
+# /sitemap-*.xml 已覆盖 sitemap-index.xml：同一路径匹配两条规则会把响应头合并成「no-store, no-store」。
+/sitemap-*.xml
+  Cache-Control: no-store
+/robots.txt
+  Cache-Control: no-store

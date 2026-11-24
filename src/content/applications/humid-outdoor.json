@@ -1,0 +1,42 @@
+{
+  "draft": false,
+  "name": "Humid or outdoor installation",
+  "condition": "Condensing humidity, occasional water spray, wide ambient swing between day and night.",
+  "criteria": [
+    "IP rating is the first filter, not the last.",
+    "Seal material must suit the medium.",
+    "Cable entry direction matters for drainage.",
+    "Check the drain path after mounting, not before."
+  ],
+  "recommended": [
+    "b1",
+    "b2",
+    "c1"
+  ],
+  "cautions": [
+    "IP65 is not a substitute for a protective housing.",
+    "Condensation drains need a slope.",
+    "Seal material degrades with some media; confirm compatibility before the first run."
+  ],
+  "seoTitle": "Humid or outdoor installation — selection notes",
+  "seoDescription": "Humid or outdoor installation: why the IP rating is only the first filter, which seal materials survive condensation, and how cable entry affects drainage.",
+  "locales": {
+    "zh": {
+      "name": "高湿或户外安装",
+      "condition": "存在凝露、偶发喷淋，昼夜温差较大。",
+      "criteria": [
+        "防护等级要作为首要筛选条件。",
+        "密封材质需与介质相容。",
+        "进线方向影响排水，需现场确认。",
+        "排水路径应在安装完成后复核，而不是安装前。"
+      ],
+      "cautions": [
+        "IP65 不能替代防护箱。",
+        "凝露排水口需留坡度。",
+        "部分介质的密封材质会老化，首次运行前先确认相容性。"
+      ],
+      "seoTitle": "高湿或户外安装：防护等级与密封材质的选法",
+      "seoDescription": "高湿与户外安装的选型要点：防护等级是首要筛选条件，密封材质需与介质相容，进线方向决定排水路径，同时说明凝露与喷淋场景容易忽略的安装细节。现场可用。"
+    }
+  }
+}

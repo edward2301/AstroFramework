@@ -1,0 +1,160 @@
+@import './tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: var(--lh-tight);
+  margin: 0 0 var(--space-4);
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: var(--ls-tight);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+}
+
+/* 板块标题统一带 4px 品牌色竖条（文章正文里的 h2 同样式，全站一致） */
+h2 {
+  font-size: var(--fs-h2);
+  position: relative;
+  padding-left: 14px;
+}
+
+h2::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.14em;
+  width: 4px;
+  height: 1.1em;
+  border-radius: 2px;
+  background: var(--color-brand);
+}
+
+h3 {
+  font-size: var(--fs-h3);
+}
+
+p {
+  margin: 0 0 var(--space-4);
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+/*
+ * 正文里的行内链接不能只靠颜色区分（WCAG 1.4.1）。
+ * 作用域严格限定在 Markdown 正文与内页正文的文本流元素下、且无 class 的链接：
+ * 主导航、面包屑、卡片、按钮、页脚、分页控件都不在命中范围内。
+ * .prose 分支允许 li（Markdown 列表），内页分支不含 li 以避开面包屑与链接列表。
+ */
+:is(
+  .prose :where(p, li, dd, blockquote, figcaption, td),
+  main .container :where(p, dd, blockquote, figcaption, td)
+) > a[href]:not([class]) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+::selection {
+  background: var(--color-brand-soft);
+}
+
+/* 键盘焦点：Tab 到链接/按钮/箭头/页码时的可见描边（鼠标点击不显示） */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+img,
+picture,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+ul,
+ol {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* 布局工具 */
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+}
+
+.container-narrow {
+  max-width: var(--container-narrow);
+}
+
+/* 板块节奏：桌面 64px，移动端由空间令牌自动降到 44px */
+.section {
+  padding: var(--space-8) 0;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: var(--space-4);
+  top: var(--space-4);
+  background: var(--color-bg);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  z-index: 100;
+}

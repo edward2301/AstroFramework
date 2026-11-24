@@ -1,0 +1,57 @@
+{
+  "draft": false,
+  "name": "Category B",
+  "intro": "Category B is a placeholder group built around selection work. The sample items differ only in measurable values, which makes them useful for checking how comparison columns read, how long values wrap in narrow cells, and how discontinued entries are marked. Use it to tune how much information each card carries before real data arrives.",
+  "image": "/images/categories/category-b.png",
+  "comparisonParams": [
+    "Range",
+    "Accuracy",
+    "Body Material",
+    "Connection",
+    "Output"
+  ],
+  "selectionPoints": [
+    "Start from the duty point: the range you need sets the measuring scale.",
+    "Then match accuracy and output to what your control system accepts.",
+    "Finally confirm the connection and IP rating suit the installation site."
+  ],
+  "purchaseInfo": {
+    "moq": "5 units",
+    "leadTime": "20–25 days",
+    "payment": "T/T 30% deposit, balance before shipment",
+    "certifications": [
+      "CE"
+    ]
+  },
+  "order": 20,
+  "seoTitle": "Category B — placeholder category and demos",
+  "seoDescription": "Category B placeholder group: 6 demo models for checking cards, tables and detail layouts. Replace this copy before launch. Numbers are samples.",
+  "locales": {
+    "zh": {
+      "name": "产品B",
+      "intro": "产品B 是一组围绕选型场景的占位品类。样本条目只在可测量的数值上不同，正适合检查对比列的阅读顺序、长数值在窄单元格里的折行方式，以及停产条目的标记效果。在真实数据到位前，可以用它来确定每张卡片承载多少信息。字段、链接与结构化数据均由条目自动生成，真实资料到位时无需改动模板。字段、链接与结构化数据均由条目自动生成，真实资料到位时无需改动模板。",
+      "comparisonParams": [
+        "量程",
+        "精度",
+        "表体材质",
+        "连接方式",
+        "输出"
+      ],
+      "selectionPoints": [
+        "先确定工况点：所需量程决定量程档位。",
+        "再按精度与输出匹配控制系统。",
+        "最后确认接口与防护等级能否适配现场。"
+      ],
+      "purchaseInfo": {
+        "moq": "5 台",
+        "leadTime": "20–25 天",
+        "payment": "电汇，30% 定金，余款发货前付清",
+        "certifications": [
+          "CE"
+        ]
+      },
+      "seoTitle": "产品B — 占位品类，用于版式与流程验证，含示例数据",
+      "seoDescription": "产品B 占位品类：6 个演示型号，用于检查卡片、表格与详情页的版式表现。上线前请替换此处文案。规格与数量均为示例。页面结构无需改动。上线前请替换此处文案。"
+    }
+  }
+}

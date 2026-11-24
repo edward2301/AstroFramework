@@ -1,0 +1,118 @@
+﻿---
+/**
+ * 图文行：左（或右）图 + 右侧标题、正文、要点列表。
+ *
+ * 图文交替构成阅读动线（Z 字），比连续大段文字更容易扫读；
+ * reverse=true 时图在右侧，用于相邻两行交替。
+ */
+interface Props {
+  title: string;
+  body: string;
+  points?: string[];
+  image: string;
+  imageAlt: string;
+  reverse?: boolean;
+}
+
+const { title, body, points = [], image, imageAlt, reverse = false } = Astro.props;
+---
+
+<section class:list={['feature-row', reverse && 'is-reversed']}>
+  <figure class="feature-row-media">
+    <img src={image} alt={imageAlt} width="1200" height="742" loading="lazy" decoding="async" />
+  </figure>
+
+  <div class="feature-row-body">
+    <h2>{title}</h2>
+    <p>{body}</p>
+    {
+      points.length > 0 && (
+        <ul>
+          {points.map((p) => (
+            <li>{p}</li>
+          ))}
+        </ul>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .feature-row {
+    display: grid;
+    /* 图列略窄于文字列：图是情绪，文字是信息，别让图占满半屏 */
+    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: center;
+    margin-bottom: var(--space-7);
+  }
+
+  .feature-row:last-child {
+    margin-bottom: 0;
+  }
+
+  .feature-row-media {
+    margin: 0;
+  }
+
+  .feature-row-media :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.618;
+    object-fit: cover;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, var(--color-brand) 10%, var(--color-border));
+    background: var(--color-brand-50);
+  }
+
+  .feature-row-body h2 {
+    margin-bottom: var(--space-3);
+  }
+
+  .feature-row-body p {
+    color: var(--color-text-muted);
+  }
+
+  .feature-row-body ul {
+    list-style: none;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .feature-row-body li {
+    position: relative;
+    padding-left: 16px;
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+  }
+
+  .feature-row-body li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    border-radius: 1px;
+    background: var(--color-accent);
+  }
+
+  /* 交替：图移到右列（DOM 顺序不变，读屏与 SEO 仍是先文后图） */
+  .is-reversed .feature-row-media {
+    order: 2;
+  }
+
+  @media (max-width: 1024px) {
+    .feature-row {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-5);
+    }
+
+    .is-reversed .feature-row-media {
+      order: 0;
+    }
+  }
+</style>

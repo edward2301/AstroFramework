@@ -1,0 +1,66 @@
+---
+/**
+ * 可见面包屑。
+ * 与 BreadcrumbList 共用同一份数据源，保证层级一致。
+ * 最后一级为当前页，不做链接。
+ */
+import type { Crumb } from '../../lib/seo/breadcrumb';
+
+interface Props {
+  items: Crumb[];
+  /** 无障碍名称随语言变化，默认英文 */
+  label?: string;
+}
+
+const { items, label = 'Breadcrumb' } = Astro.props;
+---
+<nav class="breadcrumb" aria-label={label}>
+  <ol>
+    {
+      items.map((item, i) => {
+        const isLast = i === items.length - 1;
+        return (
+          <li>
+            {isLast ? (
+              <span aria-current="page">{item.name}</span>
+            ) : (
+              <a href={item.url}>{item.name}</a>
+            )}
+            {!isLast && <span class="sep" aria-hidden="true">/</span>}
+          </li>
+        );
+      })
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumb {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+  .breadcrumb ol {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+  }
+  .breadcrumb li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--color-text-muted);
+  }
+  .breadcrumb a {
+    color: var(--color-link);
+    text-decoration: none;
+  }
+  .breadcrumb a:hover {
+    text-decoration: underline;
+  }
+  .breadcrumb .sep {
+    color: var(--color-border);
+  }
+</style>

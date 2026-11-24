@@ -1,0 +1,33 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# environment variables
+.env
+.env.production
+
+# Cloudflare Wrangler 本地状态（D1 --local、本地调试产物）
+.wrangler/
+
+# D1 导出备份与批量导入文件（含客户数据，不入库）
+*.sql
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains setting folder
+.idea/
+
+# CodeBuddy 本地工具状态（插件开关等，因机器而异，不入库）
+.codebuddy/settings.json

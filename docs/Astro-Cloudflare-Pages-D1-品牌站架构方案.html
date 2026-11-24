@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Astro + Cloudflare Pages + D1 品牌产品站架构方案</title>
+<style>
+:root{
+  --bg:#f4f6f9;--card:#fff;--ink:#12171f;--ink2:#3b4553;--muted:#6d7888;
+  --line:#e3e8ef;--line2:#eef1f5;--accent:#1d4ed8;--accent-bg:#eef3fe;
+  --teal:#0f766e;--red:#b91c1c;--amber:#b45309;--amber-bg:#fbf4ea;
+  --code-bg:#f3f5f9;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 10px 28px -16px rgba(16,24,40,.18);
+}
+[data-theme="dark"]{
+  --bg:#0c1016;--card:#151a21;--ink:#e7edf4;--ink2:#bec9d6;--muted:#8a96a6;
+  --line:#242c37;--line2:#1b222b;--accent:#79a5f8;--accent-bg:#131b2b;
+  --teal:#4ec9b0;--red:#f07171;--amber:#e0913f;--amber-bg:#231a11;
+  --code-bg:#1a212a;
+  --shadow:0 1px 2px rgba(0,0,0,.35),0 10px 28px -16px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.78;-webkit-font-smoothing:antialiased;}
+p{margin:0 0 14px;}
+a{color:var(--accent);text-decoration:none;}
+.hero{position:relative;overflow:hidden;background:linear-gradient(126deg,#0b1220 0%,#132038 48%,#0f2a3a 100%);color:#fff;padding:58px 32px 50px;}
+.hero::after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(ellipse at 72% 18%,#000 8%,transparent 70%);
+  -webkit-mask-image:radial-gradient(ellipse at 72% 18%,#000 8%,transparent 70%);pointer-events:none;}
+.hero-inner{position:relative;max-width:1180px;margin:0 auto;z-index:1;}
+.kicker{display:inline-block;font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:#7fb0f5;border:1px solid rgba(127,176,245,.42);border-radius:100px;padding:4px 13px;margin-bottom:20px;}
+.hero h1{font-size:34px;line-height:1.28;margin:0 0 14px;letter-spacing:-.5px;font-weight:700;}
+.hero .sub{font-size:15.5px;color:#a9b6c6;max-width:800px;margin:0 0 26px;line-height:1.72;}
+.meta{display:flex;flex-wrap:wrap;gap:10px;}
+.meta span{font-size:12.5px;color:#c9d4e1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:6px;padding:5px 11px;}
+.meta span.hot{background:rgba(224,145,63,.14);border-color:rgba(224,145,63,.4);color:#f0b169;}
+.layout{max-width:1180px;margin:0 auto;padding:44px 32px 90px;display:grid;grid-template-columns:224px minmax(0,1fr);gap:52px;align-items:start;}
+.toc{position:sticky;top:28px;font-size:13px;max-height:calc(100vh - 56px);overflow-y:auto;padding-right:6px;}
+.toc-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:600;}
+.toc a{display:block;color:var(--ink2);padding:5px 0 5px 12px;border-left:2px solid var(--line);transition:.15s;}
+.toc a:hover{color:var(--accent);border-left-color:var(--accent);}
+.toc .theme-btn{margin-top:20px;width:100%;background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;padding:7px;font-size:12px;cursor:pointer;font-family:inherit;}
+main{min-width:0;}
+section{margin-bottom:52px;scroll-margin-top:28px;}
+.s-num{font-size:11.5px;letter-spacing:.14em;color:var(--accent);font-weight:600;margin-bottom:6px;}
+h2{font-size:24px;line-height:1.35;margin:0 0 8px;letter-spacing:-.3px;font-weight:700;}
+h2 + .lead{color:var(--muted);font-size:14px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid var(--line);}
+h3{font-size:16.5px;margin:32px 0 10px;font-weight:650;letter-spacing:-.1px;}
+h4{font-size:14.5px;margin:22px 0 8px;font-weight:650;color:var(--ink2);}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:18px 0;box-shadow:var(--shadow);}
+.card.tight{padding:15px 18px;}
+.card h4:first-child{margin-top:0;}
+.note{border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0;font-size:14px;}
+.note strong{color:var(--accent);}
+.warn{border-left:3px solid var(--red);background:rgba(185,28,28,.055);border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0;font-size:14px;}
+.warn strong{color:var(--red);}
+.good{border-left:3px solid var(--teal);background:rgba(15,118,110,.06);border-radius:0 8px 8px 0;padding:14px 18px;margin:18px 0;font-size:14px;}
+.good strong{color:var(--teal);}
+.tbl-wrap{overflow-x:auto;margin:18px 0;border:1px solid var(--line);border-radius:10px;background:var(--card);}
+table{width:100%;border-collapse:collapse;font-size:13.5px;line-height:1.6;min-width:580px;}
+th{text-align:left;font-weight:600;font-size:12.5px;color:var(--muted);letter-spacing:.04em;background:var(--code-bg);padding:10px 13px;border-bottom:1px solid var(--line);white-space:nowrap;}
+td{padding:10px 13px;border-bottom:1px solid var(--line2);vertical-align:top;color:var(--ink2);}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(127,127,127,.035);}
+td strong{color:var(--ink);font-weight:650;}
+td[style*="color:"] strong{color:inherit;}
+table.wide{min-width:800px;}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;}
+.tag{display:inline-block;font-size:11.5px;padding:1px 8px;border-radius:4px;font-weight:600;white-space:nowrap;}
+.tag.b{background:rgba(29,78,216,.1);color:var(--accent);}
+.tag.t{background:rgba(15,118,110,.11);color:var(--teal);}
+.tag.r{background:rgba(185,28,28,.1);color:var(--red);}
+.tag.a{background:rgba(180,83,9,.12);color:var(--amber);}
+.tag.g{background:rgba(100,116,139,.12);color:var(--muted);}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:15px;margin:18px 0;}
+.g2 .card{margin:0;}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;}
+.g3 .card{margin:0;}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0;}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;text-align:left;}
+.stat .k{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px;}
+.stat .v{font-size:24px;font-weight:700;letter-spacing:-.5px;line-height:1.1;font-variant-numeric:tabular-nums;}
+.stat .d{font-size:12px;color:var(--muted);margin-top:4px;}
+code{background:var(--code-bg);padding:1.5px 6px;border-radius:4px;font-size:12.5px;font-family:"SF Mono",Consolas,monospace;color:var(--accent);}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:8px;padding:15px 17px;overflow-x:auto;font-size:12.5px;line-height:1.7;font-family:"SF Mono",Consolas,monospace;color:var(--ink2);margin:16px 0;}
+pre code{background:none;padding:0;color:inherit;}
+ul.clean{margin:10px 0;padding-left:18px;font-size:13.5px;color:var(--ink2);}
+ul.clean li{margin-bottom:6px;}
+.check{list-style:none;padding-left:0;}
+.check li{padding-left:22px;position:relative;margin-bottom:7px;font-size:13.5px;}
+.check li::before{content:"×";position:absolute;left:4px;color:var(--red);font-weight:700;}
+.check li.ok::before{content:"√";color:var(--teal);}
+/* 架构图 */
+.arch{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 20px;margin:18px 0;box-shadow:var(--shadow);}
+.arch-row{display:flex;align-items:stretch;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.arch-node{flex:1;min-width:150px;border:1px solid var(--line);border-radius:8px;padding:12px 14px;background:var(--code-bg);}
+.arch-node .n-t{font-size:13px;font-weight:650;color:var(--ink);margin-bottom:3px;}
+.arch-node .n-d{font-size:12px;color:var(--muted);line-height:1.55;}
+.arch-node.hl{border-color:var(--accent);background:var(--accent-bg);}
+.arch-node.dim{opacity:.62;}
+.arch-arrow{text-align:center;color:var(--muted);font-size:12px;margin:2px 0 12px;letter-spacing:.05em;}
+footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center;font-size:12.5px;color:var(--muted);}
+@media (max-width:960px){
+  .layout{grid-template-columns:1fr;padding:30px 20px 60px;gap:0;}
+  .toc{position:static;max-height:none;margin-bottom:30px;display:flex;flex-wrap:wrap;gap:4px 0;}
+  .toc a{width:50%;}.toc-title,.toc .theme-btn{width:100%;}
+  .hero{padding:42px 20px 38px;}.hero h1{font-size:25px;}
+}
+@media print{
+  body{background:#fff;font-size:10.5pt;}
+  .hero{padding:26px 0;background:#fff !important;color:#000 !important;}
+  .hero .sub,.meta span{color:#333 !important;}
+  .meta span{border-color:#ccc !important;background:none !important;}
+  .kicker{color:#000 !important;border-color:#000 !important;}
+  .toc{display:none !important;}
+  .layout{display:block;padding:0;max-width:none;}
+  .card,.tbl-wrap,.stat,.arch{box-shadow:none;page-break-inside:avoid;}
+  h2{page-break-after:avoid;}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <div class="kicker">Tech Stack Assessment · B2B SEO Site</div>
+    <h1>Astro + Cloudflare Pages + D1<br>品牌产品站架构方案</h1>
+    <p class="sub">本方案基于 soukacatv 全站 462 个 URL 的实测结论撰写：先判断那套方案哪些值得学、哪些是反面教材，再给出当前选定的部署与数据方案。核心结论放在最前面——<strong>Astro 静态产物直接托管到 Cloudflare Pages，交互数据存进 Cloudflare D1，由 Wrangler CLI 保存与读写；无需管理服务器，也没有运行期服务端。</strong></p>
+    <div class="meta">
+      <span class="hot">技术选型评估</span>
+      <span class="hot">Cloudflare Pages 托管</span>
+      <span class="hot">D1 交互数据 + Wrangler</span>
+      <span>十项落地要点</span>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+<aside class="toc">
+  <div class="toc-title">目录</div>
+  <a href="#c0">0 · 结论先行</a>
+  <a href="#c1">1 · 那套方案该学什么</a>
+  <a href="#c2">2 · 核心思路拆解</a>
+  <a href="#c3">3 · 技术组合适用性</a>
+  <a href="#c4">4 · 架构与选型</a>
+  <a href="#c5">5 · 关键环节落地</a>
+  <a href="#c6">6 · 风险清单</a>
+  <a href="#c7">7 · 上线前检查</a>
+  <button class="theme-btn" id="themeBtn">切换到深色</button>
+</aside>
+
+<main>
+
+<!-- 0 -->
+<section id="c0">
+  <div class="s-num">SECTION 00</div>
+  <h2>结论先行</h2>
+  <p class="lead">五条判断，先说清楚，后面再论证。</p>
+
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:230px">判断</th><th style="width:110px">结论</th><th>理由</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>soukacatv 的架构思路值得全盘学</strong></td>
+          <td><span class="tag t">值得</span></td>
+          <td>双轴信息架构（品类 13 + 场景 5）+ CPT 化内容模型，是它撑住 462 页还保持清晰的根本原因。这套思路与 CMS 无关，换成任何技术栈都成立。</td>
+        </tr>
+        <tr>
+          <td><strong>它的工程实现不要学</strong></td>
+          <td><span class="tag r">反面</span></td>
+          <td>Title 达标率 21%、Product schema 0/88、227 页无页面级实体、图片尺寸覆盖 0.37%、HTML 零缓存头。<strong>全部是「用默认配置代替按价值分级配置」的后果。</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Astro 静态产物 + Cloudflare Pages 是唯一部署形态</strong></td>
+          <td><span class="tag t">推荐</span></td>
+          <td>构建期产出纯文件，Pages 负责全球边缘分发、自动 HTTPS、预览部署与按版本回滚。没有服务器要打补丁、没有证书要续期、没有站点配置文件要覆盖同步。</td>
+        </tr>
+        <tr>
+          <td><strong>交互数据落 D1，Wrangler 是唯一读写入口</strong></td>
+          <td><span class="tag b">数据</span></td>
+          <td>询盘与运营记录存 Cloudflare D1（SQLite 兼容的 SQL 库），运维用 <code>wrangler d1 execute</code> 写入与查询、<code>wrangler d1 export</code> 导出备份。<strong>站点代码不连库，表单仍是纯前端 mailto。</strong></td>
+        </tr>
+        <tr>
+          <td><strong>路由规则随产物走，不写在服务器里</strong></td>
+          <td><span class="tag b">规则</span></td>
+          <td>缓存头、404 直访、旧链接 301 由 <code>public/_headers</code> 与 <code>public/_redirects</code> 承担，构建时复制进 <code>dist/</code>，与页面同版本发布、可回滚。</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note">
+    <strong>一句话概括：</strong>soukacatv 证明了「这套内容架构在 B2B 工业品出口领域跑得通」，同时证明了「用默认配置去承载它，工程层会全面失守」。<strong>你要做的是继承前者、替换后者——把每个环节都变成构建期强制校验，把部署与数据收敛到 Cloudflare 一套托管服务里。</strong>
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="c1">
+  <div class="s-num">SECTION 01</div>
+  <h2>那套方案该学什么、不该学什么</h2>
+  <p class="lead">按「架构 / 内容 / 工程」三层拆开看，每层的结论完全不同。</p>
+
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:100px">层次</th><th style="width:200px">对象</th><th style="width:90px">结论</th><th>实测依据</th></tr></thead>
+      <tbody>
+        <tr><td rowspan="4"><strong>架构</strong></td>
+          <td>双轴分类模型</td><td><span class="tag t">学</span></td>
+          <td>品类轴 13 个（3 一级 + 10 二级）覆盖「我要买什么」，场景轴 5 个方案覆盖「我要解决什么问题」。两种搜索意图各有落点，经 sitemap 与导航双重验证成立</td></tr>
+        <tr><td>CPT 化内容模型</td><td><span class="tag t">学</span></td>
+          <td>product / product_cat / solution / case / faq / download / video 各自独立，而非全塞进「文章」。这是 462 页仍结构清晰的根本原因</td></tr>
+        <tr><td>sitemap 按类型拆分</td><td><span class="tag t">学</span></td>
+          <td>9 个独立 sitemap 各有 lastmod，便于分类型监控索引率</td></tr>
+        <tr><td>URL 平铺根目录</td><td><span class="tag r">不学</span></td>
+          <td>462 个 URL 中 450+ 是一级路径，产品、FAQ、博客、案例全在同一层级，靠 slug 区分。扩到 2000 页会失控</td></tr>
+
+        <tr><td rowspan="3"><strong>内容</strong></td>
+          <td>品类页内容密度</td><td><span class="tag t">学</span></td>
+          <td>抽样 3 个品类页实测 3,747–4,221 词，含应用场景、选型逻辑、参数对比维度</td></tr>
+        <tr><td>FAQ 长尾矩阵</td><td><span class="tag t">学</span></td>
+          <td>194 个问句式页面独立成页，覆盖「how many / can I / what is」类长尾。是它最有价值的资产</td></tr>
+        <tr><td>公司通稿混入博客</td><td><span class="tag r">不学</span></td>
+          <td>118 篇中约 44 篇为节日/展会/沙龙稿（37%），稀释了博客的主题集中度</td></tr>
+
+        <tr><td rowspan="4"><strong>工程</strong></td>
+          <td>元标签人工填写</td><td><span class="tag r">不学</span></td>
+          <td>无任何长度校验，全站 Title 达标率仅 21%，FAQ 最长 124 字符，下载页 13/14 短于 30</td></tr>
+        <tr><td>schema 按 CPT 一刀切</td><td><span class="tag r">不学</span></td>
+          <td>Product 0/88、FAQPage 0/194、ItemList 0/13；227 页只有面包屑，无 WebPage / Organization</td></tr>
+        <tr><td>图片交给主题处理</td><td><span class="tag r">不学</span></td>
+          <td>7,492 张图中仅 0.37% 有 width 属性，1.55% 有 lazy</td></tr>
+        <tr><td>CDN 缓存靠默认</td><td><span class="tag r">不学</span></td>
+          <td>HTML 无 Cache-Control / ETag / Expires，每次请求都穿透回源。托管到 Pages 后按资源类型在 <code>_headers</code> 里显式分级</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warn">
+    <strong>最重要的一课，不在上表里：</strong>它的缺陷几乎全部来自同一个动作——<strong>把「系统默认」当成「配置完成」</strong>。Rank Math 装了、CPT 建了、CDN 上了，每一项都"做了"，但没有一项按页面价值去分级配置。<br><br>
+    这意味着：<strong>换 Astro、换托管平台都不会自动解决这个问题</strong>。真正要继承的是「每个环节都要有强制校验」这个习惯。
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="c2">
+  <div class="s-num">SECTION 02</div>
+  <h2>核心思路拆解</h2>
+  <p class="lead">六条可以直接迁移到任何技术栈的设计原则。</p>
+
+  <h3>2.1 双轴：产品轴 × 场景轴</h3>
+  <p>B2B 工业品的搜索意图天然分成两类，必须用两套 URL 承接：</p>
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:150px">意图</th><th style="width:230px">用户在想什么</th><th style="width:230px">对应的页面类型</th><th>示例</th></tr></thead>
+      <tbody>
+        <tr><td><strong>产品轴</strong></td><td>「我需要一个 X 设备，参数要满足 Y」</td><td>品类页 → 产品详情页</td><td><code>/products/digital-modulator/</code> → <code>/products/digital-modulator/skd2618/</code></td></tr>
+        <tr><td><strong>场景轴</strong></td><td>「我要做一个酒店电视系统，怎么配」</td><td>方案页（跨品类组合）</td><td><code>/solutions/hotel-iptv/</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p>这两轴的价值在于：<strong>同一批产品可以用两种方式被搜到</strong>。搜「QAM modulator」的人落到品类页，搜「hotel IPTV system design」的人落到方案页，两条路径最终都指向同一组产品，但切入的意图完全不同。</p>
+
+  <h3>2.2 内容模型先行，页面模板后置</h3>
+  <p>它把内容拆成 7 类独立实体（产品 / 品类 / 方案 / 案例 / FAQ / 下载 / 视频），而不是「文章 + 分类」。这个决定的价值在两年后才显现：</p>
+  <ul class="clean">
+    <li>每类实体可以有自己的字段（产品有型号、MOQ、认证；案例有酒店名、房间数、交付时间）</li>
+    <li>每类实体可以有自己的模板与 schema</li>
+    <li>每类实体可以有自己的 sitemap 与索引策略</li>
+  </ul>
+
+  <h3>2.3 用长尾问答铺满采购决策链路</h3>
+  <p>194 个 FAQ 页面覆盖的是采购过程中真实会问的问题：<code>How many hotel televisions can receive one modulated channel?</code>、<code>Can an analog modulator work with an existing coaxial network?</code>。这类问题的搜索量单个不大，但数量足够多、意图足够精准。</p>
+  <div class="note">
+    <strong>但它把这条策略做废了：</strong>194 个 FAQ 页之间互不相链，也没有链回产品与方案页，内链数在所有页面恒为 45（全部来自导航与页脚）。<strong>等于 194 个孤立节点。</strong>这是你必须在第一天就设计好的部分。
+  </div>
+
+  <h3>2.4 内链靠字段而非手写</h3>
+  <p>它的博客做了完整的 Related 模块——每篇文章固定输出 Related Products ×3、Related Solutions ×3、Related Blogs ×3。这个做法本身是对的（用字段关联而非手工插入链接），问题出在案例页：三个不同酒店的案例链出的 6 个产品完全相同，说明关联字段被硬编码了。</p>
+
+  <h3>2.5 内容密度是护城河</h3>
+  <p>品类页 3,747–4,221 词（抽样 3 页），方案页 3,662 词（抽样 1 页）。这个量级在工业品出口站里属于上游。它的价值不在「字数」本身，而在于<strong>把选型逻辑、适用场景、参数对比维度都写在页面上</strong>——这正好是 AI 搜索时代最容易被引用的内容形态。</p>
+
+  <h3>2.6 反面：工程层全线缺位</h3>
+  <p>这一条单独列出来，因为它是本方案要重点解决的问题。第 5 节的落地要点几乎全部由此而来。</p>
+</section>
+
+<!-- 3 -->
+<section id="c3">
+  <div class="s-num">SECTION 03</div>
+  <h2>技术组合适用性评估</h2>
+  <p class="lead">四个组件各管一层，职责边界写死，不多做一件事。</p>
+
+  <h3>3.1 Astro：与需求高度匹配</h3>
+  <div class="g2">
+    <div class="card">
+      <h4>直接消除的缺陷</h4>
+      <ul class="clean">
+        <li>零 JS 默认输出 —— 不会有主题自带的一堆渲染阻塞脚本</li>
+        <li>内容 schema 在构建期强制校验 —— 字段缺失当场中断，不会带着空洞上线</li>
+        <li>目录式产物 + 尾斜杠统一 —— 一个页面只有一个 URL</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>不会自动带来的东西</h4>
+      <ul class="clean">
+        <li>标题长度与唯一性 —— 由 <code>scripts/validate-content.mjs</code> 强制</li>
+        <li>Schema 按页面价值分级 —— 由 <code>lib/seo/schema.ts</code> 显式写</li>
+        <li>缓存头与 404 规则 —— 由 <code>public/_headers</code> / <code>_redirects</code> 显式写</li>
+      </ul>
+    </div>
+  </div>
+  <p>项目保持 <code>output: static</code>，不引入 adapter、不开 SSR：<strong>页面在构建时就全部渲染完，请求路径上不存在任何服务端逻辑。</strong></p>
+
+  <h3>3.2 Cloudflare Pages：静态产物的原生落点</h3>
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:180px">能力</th><th>在本方案里的作用</th></tr></thead>
+      <tbody>
+        <tr><td><strong>全球边缘分发</strong></td><td><code>dist/</code> 直接铺到边缘节点，不存在回源延迟；静态资源带 hash，命中率接近 100%</td></tr>
+        <tr><td><strong>自动 HTTPS</strong></td><td>证书签发与续期由平台承担，不需要自签证书、不需要手工配置 TLS 参数</td></tr>
+        <tr><td><strong>预览部署与回滚</strong></td><td>每次部署是不可变版本，<code>--branch</code> 生成独立预览 URL；出问题在控制台一键回滚</td></tr>
+        <tr><td><strong>配置文件随产物</strong></td><td><code>_headers</code> / <code>_redirects</code> 与 HTML 同版本发布，规则变更可随部署一起回滚，不会出现「代码与部署规则不同步」</td></tr>
+        <tr><td><strong>构建集成</strong></td><td>连接 Git 仓库后自动跑 <code>npm run build</code>，构建守卫（内容体检 + 链接检查）在每次部署都执行</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn">
+    <strong>硬约束：</strong>不要配 SPA fallback，不要写 <code>/* /index.html 200</code> 这类通配兜底。目录式产物里没有登记的路径必须返回真 404，否则每个错误 URL 都会变成首页副本被大量收录。
+  </div>
+
+  <h3>3.3 D1 + Wrangler：交互数据的存取</h3>
+  <p>交互数据（询盘、运营记录）存 <strong>Cloudflare D1</strong>，这是 SQLite 兼容的托管 SQL 库。读写只走 <strong>Wrangler CLI</strong>：</p>
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-node"><div class="n-t">运维 / 运营人员</div><div class="n-d">按表单字段整理记录</div></div>
+      <div class="arch-node hl"><div class="n-t">Wrangler CLI</div><div class="n-d">d1 execute（写 / 查）<br>d1 export（备份）</div></div>
+      <div class="arch-node hl"><div class="n-t">Cloudflare D1</div><div class="n-d">inquiries 表<br><span style="color:var(--teal)">--remote 线上 / --local 本地</span></div></div>
+    </div>
+    <div class="arch-arrow">站点静态产物不连库，两条链路互不干扰</div>
+    <div class="arch-row">
+      <div class="arch-node dim"><div class="n-t">Cloudflare Pages</div><div class="n-d">纯静态页面与表单</div></div>
+      <div class="arch-node dim"><div class="n-t">访客浏览器</div><div class="n-d">mailto 生成邮件草稿</div></div>
+      <div class="arch-node dim"><div class="n-t">邮箱</div><div class="n-d">销售收到询盘</div></div>
+    </div>
+  </div>
+  <div class="good">
+    <strong>为什么这条链路没有性能风险：</strong>写入是运维按需执行的离线操作，不在访客请求路径上。因此不存在连接池被打满、同步写库阻塞、后台报表与写入争抢 IO 这类问题，也不需要异步批量或消息队列来做削峰。
+  </div>
+  <p>Wrangler 配置集中在仓库根目录的 <code>wrangler.toml</code>：<code>name</code> / <code>pages_build_output_dir</code> / <code>compatibility_date</code> 管部署，<code>[[d1_databases]]</code> 声明数据绑定。<code>database_id</code> 首次 <code>wrangler d1 create</code> 后回填。</p>
+
+  <h3>3.4 安全与合规分层</h3>
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:180px">层面</th><th>由谁承担</th></tr></thead>
+      <tbody>
+        <tr><td>流量型攻击 / DDoS</td><td>Cloudflare 边缘网络，带宽型攻击在到达站点前就被吸收</td></tr>
+        <tr><td>应用层访问控制</td><td>Cloudflare WAF 与自定义域规则；<strong>不需要维护回源白名单或站点防火墙规则</strong>，因为没有自管服务器</td></tr>
+        <tr><td>凭证管理</td><td>本地 <code>wrangler login</code>；CI 用 <code>CLOUDFLARE_API_TOKEN</code> / <code>CLOUDFLARE_ACCOUNT_ID</code> 环境变量，不进仓库</td></tr>
+        <tr><td>客户数据</td><td>D1 内，按周期 <code>d1 export</code> 导出到受控位置；导出的 <code>.sql</code> 含客户信息，禁止提交进仓库</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="note">
+    <strong>不要让 404 页、sitemap 与 robots 进入长缓存</strong>——前者会把一次错误响应固化，后者会让新页面迟迟不被发现。三者已在 <code>_headers</code> 里按路径显式设为 <code>no-store</code>；HTML 页面沿用 Pages 默认缓存，不额外配置规则。
+  </div>
+
+  <h3>3.5 这套架构对 SEO 的影响面</h3>
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:190px">SEO 要求</th><th>落地位置</th></tr></thead>
+      <tbody>
+        <tr><td>不存在的路径返回真 404</td><td>静态产物不含多余路径 + <code>_redirects</code> 不设兜底</td></tr>
+        <tr><td>一个页面一个 URL</td><td><code>trailingSlash: 'always'</code> + 目录式产物，Pages 自动补齐尾斜杠</td></tr>
+        <tr><td>404 页不被收录</td><td>页面本身 <code>noindex</code>；404 产物 <code>no-store</code>；直访 301 到首页</td></tr>
+        <tr><td>分语言错误页</td><td>Pages 按语言前缀就近查找 <code>&lt;前缀&gt;/404.html</code>；构建守卫按 <code>LOCALES</code> 从 <code>&lt;前缀&gt;/404/index.html</code> 复制</td></tr>
+        <tr><td>新页面及时被发现</td><td>sitemap / robots 不缓存；<code>lastmod</code> 取源文件最后提交时间（Git 集成构建需完整历史）</td></tr>
+        <tr><td>canonical / hreflang 一致</td><td>域名唯一来源是 <code>astro.config.mjs</code> 的 <code>site</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 4 -->
+<section id="c4">
+  <div class="s-num">SECTION 04</div>
+  <h2>架构与选型</h2>
+  <p class="lead">选定单一形态：托管静态站 + 托管 SQL 库，无需管理服务器。</p>
+
+  <h3>4.1 数据流</h3>
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-node"><div class="n-t">Git 仓库</div><div class="n-d">内容、代码、_headers、_redirects 同仓</div></div>
+      <div class="arch-node"><div class="n-t">构建流水线</div><div class="n-d">npm run build<br>内容体检 + 链接检查</div></div>
+      <div class="arch-node hl"><div class="n-t">Cloudflare Pages</div><div class="n-d">dist/ 静态产物 + 边缘 CDN<br>自动 HTTPS · 预览 · 回滚</div></div>
+    </div>
+    <div class="arch-arrow">↓ 访客访问页面　　↓ 运维按需读写数据（两条独立链路）</div>
+    <div class="arch-row">
+      <div class="arch-node dim"><div class="n-t">访客浏览器</div><div class="n-d">页面 + mailto 询价表单</div></div>
+      <div class="arch-node hl"><div class="n-t">Wrangler CLI</div><div class="n-d">d1 execute / d1 export</div></div>
+      <div class="arch-node hl"><div class="n-t">Cloudflare D1</div><div class="n-d">inquiries 表 · 只增不改为主</div></div>
+    </div>
+  </div>
+
+  <h3>4.2 为什么不选自托管</h3>
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:150px">对比项</th><th style="width:250px">Cloudflare Pages + D1（选定）</th><th>自托管服务器 + 自建数据库</th></tr></thead>
+      <tbody>
+        <tr><td>起步速度</td><td><span class="tag t">半天</span> 创建项目、建 D1 表、部署</td><td><span class="tag a">2–3 天</span> 装环境、配站点、调证书与缓存</td></tr>
+        <tr><td>运维负担</td><td><span class="tag t">近乎为零</span> 无补丁、无证书续期、无日志轮转</td><td><span class="tag a">需专人</span> 系统升级、配置漂移、监控告警</td></tr>
+        <tr><td>性能上限</td><td><span class="tag t">极佳</span> 产物直接在边缘，无需回自建服务器</td><td><span class="tag t">好</span> 需要调优缓存与服务器参数</td></tr>
+        <tr><td>数据落点</td><td>Cloudflare D1，Wrangler 读写与导出</td><td>自托管数据库，需自行备份、扩容、限流</td></tr>
+        <tr><td>故障面</td><td>只有平台与配置两个变量</td><td>服务器、站点配置、数据库、缓存层都可能出问题</td></tr>
+        <tr><td>规则一致性</td><td><span class="tag t">强</span> 路由规则与页面同版本发布、可回滚</td><td><span class="tag r">弱</span> 配置独立于仓库，改代码与改配置容易不同步</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="good">
+    <strong>选定结论：</strong>交互数据不要求落在自托管数据库，D1 + Wrangler 完全够用，因此没有理由为一台自托管服务器付出长期运维成本。判断标准只有一条：<strong>数据最终要存在哪里、谁要读它。</strong>
+  </div>
+
+  <h3>4.3 运行期能力的边界</h3>
+  <p><code>wrangler.toml</code> 已配置 <code>[[d1_databases]]</code> 的 <code>binding = "DB"</code>，但当前静态产物不读取它——交互数据只由运维通过 Wrangler CLI 写入与查询。</p>
+  <p>若将来要让表单自动入库，才需要引入 Pages Functions 承接 <code>POST</code> 并使用这个 binding，同时补人机验证与限流。<strong>这一步不在当前方案范围内</strong>：站点保持纯静态构建、无运行期服务端，内容模型与校验链路均不改动。</p>
+</section>
+
+<!-- 5 -->
+<section id="c5">
+  <div class="s-num">SECTION 05</div>
+  <h2>关键环节落地要点</h2>
+  <p class="lead">十项。目标是让第 1 节列出的工程缺陷在新架构里<strong>不可能再发生</strong>。</p>
+
+  <h3>5.1 URL 与路由：用目录把层级写死</h3>
+  <p>所有 URL 末尾带斜杠（<code>trailingSlash: 'always'</code>），产物是目录式 <code>/path/index.html</code>。Pages 默认的 <code>auto-trailing-slash</code> 会自动补齐缺斜杠的请求，不产生重复 URL。旧链接 301 在 <code>_redirects</code> 里用精确路径逐条登记，<strong>不要用正则或通配，避免误伤正常页面</strong>。</p>
+
+  <h3>5.2 内容模型：用 schema 卡住字段</h3>
+  <p>7 个内容集合的 schema 集中在 <code>src/content.config.ts</code>：型号必须有 5 项关键参数、品类 <code>intro</code> 不少于 300 字、译文 <code>intro</code> 不少于 150 字。<code>draft: true</code> 的条目不生成路由、不进列表；已发布条目引用草稿会在体检阶段报错。</p>
+
+  <h3>5.3 元标签：三段式模板 + 构建期体检</h3>
+  <p>标题（含品牌后缀后）50–60、描述 140–158，按显示宽度计（全角计 2）。标题全站唯一，内容里的 <code>seoTitle</code> 只写标题本体，后缀由 <code>lib/seo/branding.ts</code> 单点拼接。<strong>区间下限不是排版偏好，而是信息完整度的代理指标</strong>——低于 50 字符通常意味着少了量程、精度或认证中的一项。</p>
+
+  <h3>5.4 Schema：按页面价值分级</h3>
+  <p>品类页、型号页、FAQ 页、案例页各有自己的结构化数据，不做「一刀切套同一个类型」。每页唯一 <code>&lt;h1&gt;</code>，每个内容页有可见面包屑，且面包屑组件与 <code>breadcrumbSchema</code> 共用同一个 <code>crumbs</code> 数组。</p>
+
+  <h3>5.5 图片管线：显式声明尺寸</h3>
+  <p>图片放 <code>public/images/…</code>，由运营同名维护；任何 <code>&lt;img&gt;</code> 必须带 <code>width</code> / <code>height</code> / <code>alt</code> / <code>loading</code>，由校验脚本扫描（扫描前先屏蔽注释）。构建时不处理图片，避免引入图片服务依赖。</p>
+
+  <h3>5.6 缓存与边缘：一份配置说清楚</h3>
+  <p>规则全文以 <code>public/_headers</code> 为唯一来源（随 <code>dist/</code> 发布），本节只记设计约束，不复制内容：</p>
+  <ul class="clean">
+    <li>带 hash 的构建资源长缓存一年；404 产物、sitemap 与 robots 一律 <code>no-store</code>；HTML 沿用 Pages 默认缓存，不额外配置</li>
+    <li>只写 <code>Cache-Control</code>、不叠加 <code>expires</code>；同一路径被两条规则匹配时响应头会合并（如 <code>no-store, no-store</code>），故 sitemap 只保留通配 <code>/sitemap-*.xml</code> 一条</li>
+    <li><code>deploy/cloudflare/README.md</code> 第 6 节列出规则清单与逐条作用，改规则时两处同步</li>
+  </ul>
+
+  <h3>5.7 表单与询盘：静态站不必强行接后端</h3>
+  <p>询价页是纯前端表单：必填项与邮箱格式校验、防重复提交，然后按 <code>data-mailto</code> 组装邮件草稿；没有默认邮件客户端时，页面保留可复制的询价内容与备用邮箱地址。</p>
+  <div class="note">
+    <strong>数据怎么进 D1：</strong>由运维把收到的询盘按字段整理，用 <code>wrangler d1 execute … --command "INSERT …"</code> 录入或批量 <code>--file</code> 导入。表单<strong>不会</strong>自动写入 D1，站点代码也没有任何数据上报逻辑。这条边界要写进运维手册，避免误以为「上线即有线索库」。
+  </div>
+
+  <h3>5.8 交互数据链路：D1 表 + Wrangler 读写</h3>
+  <p>D1 表 <code>inquiries</code> 存放询盘记录。表单的 <code>name</code> 字段存为 <code>contact_name</code>（列名避免与其它「名称」混淆），另加 <code>id</code> / <code>created_at</code> / <code>locale</code> / <code>source</code> / <code>status</code> 由默认值或运维填充。<strong>建表语句、字段映射表与全部读写命令以 <code>deploy/cloudflare/README.md</code> 第 2、4 节为唯一来源</strong>，本文不复制 SQL 或命令清单。</p>
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:150px">能力</th><th>设计要点</th></tr></thead>
+      <tbody>
+        <tr><td><strong>保存</strong></td><td><code>wrangler d1 execute --remote</code>；写入是运维按需执行的离线操作，不在访客请求路径上</td></tr>
+        <tr><td><strong>读取</strong></td><td>SQL 条件查询，可加 <code>--json</code> 交给脚本处理</td></tr>
+        <tr><td><strong>演练</strong></td><td><code>--local</code> 落在 <code>.wrangler/</code>（已忽略），不碰线上库</td></tr>
+        <tr><td><strong>备份</strong></td><td><code>wrangler d1 export</code> 周期性导出；Pages 部署回滚不含数据，需单独按备份恢复</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn">
+    <strong>纪律：</strong>带 <code>--remote</code> 才是线上库；导出的 <code>.sql</code> 含客户邮箱与公司名称，禁止提交进仓库（<code>.gitignore</code> 已忽略 <code>*.sql</code>）。
+  </div>
+
+  <h3>5.9 多语言：起步就预留，别等以后再改</h3>
+  <p>语言与路径映射只有 <code>src/i18n/routing.ts</code> 一个来源，Astro 与 sitemap 的 i18n 配置直接导入它的常量。新增语言时 <code>[lang]/404.astro</code> 按 <code>LOCALES</code> 自动产出该语言 404，构建守卫 <code>build-guard.mjs</code> 同步按 <code>LOCALES</code> 复制 404 产物，两者都不需要改；只需给 <code>_headers</code> 与 <code>_redirects</code> 各补 2 条对应前缀的规则。</p>
+  <p>译文按内容形态分两类：参数型内容写在条目的 <code>locales</code> 键下，正文型按 <code>zh/</code> 子目录分文件。<strong>整块缺译或必填字段缺失直接判错</strong>，不做「英文正文 + 中文标题」的假中文页。</p>
+
+  <h3>5.10 监控：把审计变成常态</h3>
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:200px">监控项</th><th style="width:170px">手段</th><th>频率</th></tr></thead>
+      <tbody>
+        <tr><td>标题长度与唯一性、对比表键名、缺译、图片属性</td><td>构建期脚本（每次部署自动跑）</td><td>每次部署</td></tr>
+        <tr><td>站内断链与语言版本配对</td><td><code>scripts/check-links.mjs</code>（构建守卫）</td><td>每次部署</td></tr>
+        <tr><td>抓取趋势、访问量、边缘命中率</td><td>Cloudflare Web Analytics</td><td>每周</td></tr>
+        <tr><td>404 / 301 规则是否仍生效</td><td><code>deploy/cloudflare/README.md</code> 的 5 条 <code>curl</code> 实测</td><td>每次改配置后</td></tr>
+        <tr><td>D1 数据增长与备份</td><td><code>SELECT count(*)</code> + <code>d1 export</code></td><td>按固定周期</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="c6">
+  <div class="s-num">SECTION 06</div>
+  <h2>风险清单</h2>
+  <p class="lead">按「发生概率 × 影响面」排，前四条是本项目最容易踩的。</p>
+
+  <div class="tbl-wrap">
+    <table class="wide">
+      <thead><tr><th style="width:200px">风险</th><th style="width:90px">等级</th><th>缓解措施</th></tr></thead>
+      <tbody>
+        <tr><td>误配通配 200 rewrite，任意路径返回首页副本</td><td><span class="tag r">高</span></td><td><code>_redirects</code> 禁止 SPA fallback；部署后第 ① 条 <code>curl</code> 验真 404</td></tr>
+        <tr><td>404 产物被边缘缓存固化或被直访收录</td><td><span class="tag r">高</span></td><td><code>_headers</code> 设 <code>no-store</code>、<code>_redirects</code> 挡直访、页面自带 <code>noindex</code></td></tr>
+        <tr><td>新增语言后该语言路径的 404 变成英文页</td><td><span class="tag a">中</span></td><td>构建守卫按 <code>LOCALES</code> 复制 <code>&lt;prefix&gt;/404.html</code>；新增语言只需给两份规则文件各补 2 条</td></tr>
+        <tr><td>导出文件含客户信息被提交进仓库</td><td><span class="tag r">高</span></td><td>备份另存受控位置；仓库内只保留建表语句与命令示例，不存真实数据</td></tr>
+        <tr><td>凭证泄露</td><td><span class="tag r">高</span></td><td>本地 <code>wrangler login</code>，CI 用环境变量；<code>.env</code> 与 <code>.wrangler/</code> 已忽略</td></tr>
+        <tr><td>占位 <code>database_id</code> 忘了回填</td><td><span class="tag a">中</span></td><td>写进上线前检查表，<code>d1 create</code> 后立即回填 <code>wrangler.toml</code></td></tr>
+        <tr><td>占位域名跟着产物上线</td><td><span class="tag a">中</span></td><td><code>CI=true</code> 或 <code>REQUIRE_REAL_DOMAIN=1</code> 时构建直接失败</td></tr>
+        <tr><td>「上线即有线索库」的误解</td><td><span class="tag a">中</span></td><td>运维手册写明表单走 mailto，数据由 Wrangler 按需录入</td></tr>
+        <tr><td>Git 集成构建为浅克隆，逐页 <code>lastmod</code> 被静默省略</td><td><span class="tag a">中</span></td><td>Pages 构建配置使用完整 git 历史；部署前抽查 sitemap 的 <code>lastmod</code></td></tr>
+        <tr><td>构建时长随页面数增长</td><td><span class="tag g">低</span></td><td>监控单次构建时长；内容随代码同仓，静态产物可预生成</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warn">
+    <strong>不要开 SPA fallback；不要给 404 配长缓存；不要提交含客户数据的 <code>.sql</code>。</strong>这三条是本方案里为数不多「配错了不会立刻报错、但会持续损害 SEO 或合规」的地方。
+  </div>
+</section>
+
+<!-- 7 -->
+<section id="c7">
+  <div class="s-num">SECTION 07</div>
+  <h2>上线前必须过的检查</h2>
+  <p class="lead">十项<strong>状态验证</strong>，逐条打勾再发生产。占位资产与部署配置的<strong>替换清单</strong>另见 <code>deploy/cloudflare/README.md</code> 第 7 节（唯一权威）；本节只验结果，不重复列配置。</p>
+
+  <ul class="check">
+    <li class="ok"><code>astro.config.mjs</code> 的 <code>site</code> 已换成真实域名，Pages 自定义域已绑定</li>
+    <li class="ok"><code>wrangler.toml</code> 的 <code>name</code> 与 Pages 项目名一致</li>
+    <li class="ok"><code>database_id</code> 已回填 <code>d1 create</code> 输出的真实值</li>
+    <li class="ok">线上 D1 已执行建表语句与索引，<code>--remote</code> 查询能返回空表</li>
+    <li class="ok">不存在的路径返回 404；404 产物直访被 301；缺尾斜杠被自动补齐而非返回 200</li>
+    <li class="ok">中文路径的 404 返回中文页（<code>&lt;html lang="zh-CN"&gt;</code>）</li>
+    <li class="ok"><code>_headers</code> 生效：带 hash 资源长缓存，404 / sitemap / robots 为 <code>no-store</code></li>
+    <li class="ok">无通配 200 rewrite、无 SPA fallback、无冲突的 <code>Cache-Control</code></li>
+    <li class="ok">若用 Wrangler 直传，<code>CLOUDFLARE_API_TOKEN</code> 仅在环境变量中；仓库无凭证与真实客户数据</li>
+    <li class="ok"><code>npm run validate</code> / <code>check</code> / <code>test</code> / <code>build</code> 全绿，构建守卫未被告警绕过</li>
+  </ul>
+
+  <div class="note">
+    <strong>最后一句判断，回到你的问题：</strong>这套技术组合在能力上完全够用，甚至对 SEO 站来说是偏豪华的配置。真正决定成败的不是选型，而是<strong>你有没有把 soukacatv 那些工程缺陷变成构建期与部署期的强制约束</strong>。<br><br>
+    它用 WordPress 也能做到这些——只是没做。你用 Astro 如果也不做，结果会一样，只是页面加载快一点。
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  Astro + Cloudflare Pages + D1 品牌产品站架构方案<br>
+  依据：soukacatv.com 462 个 URL 全量实测 + 121 页分层抽样（7,492 张图）+ 105 页面包屑与 OG 抽查<br>
+  落地配置：<code>wrangler.toml</code> · <code>public/_headers</code> · <code>public/_redirects</code> · <code>deploy/cloudflare/README.md</code>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement,btn=document.getElementById('themeBtn');
+  btn.addEventListener('click',function(){
+    var d=root.getAttribute('data-theme')==='dark';
+    root.setAttribute('data-theme',d?'light':'dark');
+    btn.textContent=d?'切换到深色':'切换到浅色';
+  });
+})();
+</script>
+</body>
+</html>

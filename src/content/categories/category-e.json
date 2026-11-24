@@ -1,0 +1,59 @@
+{
+  "draft": false,
+  "name": "Category E",
+  "intro": "Category E is a placeholder group that covers replacement and end-of-life handling. One sample item is marked as discontinued so the greyed card state, the badge and the replacement link can be reviewed together; real ranges usually need the same treatment sooner or later. Fields, links and structured data are generated from the entry, so no template change is needed when the real catalog arrives.",
+  "image": "/images/categories/category-e.png",
+  "comparisonParams": [
+    "Input",
+    "Accuracy",
+    "Output",
+    "Power Supply",
+    "IP Rating"
+  ],
+  "selectionPoints": [
+    "Start from the duty point: the range you need sets the measuring scale.",
+    "Then match accuracy and output to what your control system accepts.",
+    "Finally confirm the connection and IP rating suit the installation site."
+  ],
+  "purchaseInfo": {
+    "moq": "10 units",
+    "leadTime": "15–20 days",
+    "payment": "T/T 30% deposit, balance before shipment",
+    "certifications": [
+      "CE",
+      "RoHS"
+    ]
+  },
+  "order": 50,
+  "seoTitle": "Category E — placeholder category and demos",
+  "seoDescription": "Category E placeholder group: 2 demo models for checking cards, tables and detail layouts. Replace this copy before launch. Numbers are samples.",
+  "locales": {
+    "zh": {
+      "name": "产品E",
+      "intro": "产品E 是一组覆盖替代与停产处理的占位品类。其中一个样本条目被标记为已停产，用于同时检查卡片置灰、状态徽标与替代型号链接的表现；真实产品线迟早也需要同样的处理方式。字段、链接与结构化数据均由条目自动生成，真实资料到位时无需改动模板。字段、链接与结构化数据均由条目自动生成，真实资料到位时无需改动模板。",
+      "comparisonParams": [
+        "输入信号",
+        "精度",
+        "输出",
+        "供电方式",
+        "防护等级"
+      ],
+      "selectionPoints": [
+        "先确定工况点：所需量程决定量程档位。",
+        "再按精度与输出匹配控制系统。",
+        "最后确认接口与防护等级能否适配现场。"
+      ],
+      "purchaseInfo": {
+        "moq": "10 台",
+        "leadTime": "15–20 天",
+        "payment": "电汇，30% 定金，余款发货前付清",
+        "certifications": [
+          "CE",
+          "RoHS"
+        ]
+      },
+      "seoTitle": "产品E — 占位品类，用于版式与流程验证，含示例数据",
+      "seoDescription": "产品E 占位品类：2 个演示型号，用于检查卡片、表格与详情页的版式表现。上线前请替换此处文案。规格与数量均为示例。页面结构无需改动。上线前请替换此处文案。"
+    }
+  }
+}

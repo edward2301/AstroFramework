@@ -1,0 +1,201 @@
+{
+  "draft": false,
+  "name": "Model C1",
+  "code": "C1",
+  "category": "category-c",
+  "keyParams": [
+    {
+      "k": "Range",
+      "v": "0–4 m"
+    },
+    {
+      "k": "Accuracy",
+      "v": "±0.25% FS"
+    },
+    {
+      "k": "Output",
+      "v": "4–20 mA"
+    },
+    {
+      "k": "Process Connection",
+      "v": "G1 male"
+    },
+    {
+      "k": "IP Rating",
+      "v": "IP68"
+    }
+  ],
+  "relatedCases": [],
+  "applications": [],
+  "seoTitle": "Model C1 — placeholder item for layout testing",
+  "seoDescription": "Model C1 is a placeholder item in Category C. It keeps the layout, cards and tables exercised while the real catalog is being prepared. CE marked.",
+  "image": "/images/models/c1.png",
+  "locales": {
+    "zh": {
+      "name": "型号C1",
+      "keyParams": [
+        {
+          "k": "量程",
+          "v": "0–4 m"
+        },
+        {
+          "k": "精度",
+          "v": "±0.25% FS"
+        },
+        {
+          "k": "输出",
+          "v": "4–20 mA"
+        },
+        {
+          "k": "过程连接",
+          "v": "G1 外螺纹"
+        },
+        {
+          "k": "防护等级",
+          "v": "IP68"
+        }
+      ],
+      "seoTitle": "型号C1 — 占位产品，用于版式与流程验证，含示例数据",
+      "seoDescription": "型号C1是产品C中的占位产品，用于在真实资料录入前验证页面版式、卡片与表格的展示效果。通过 CE 认证。符合 RoHS。随货提供检验记录。规格书含尺寸图。",
+      "specGroups": [
+        {
+          "title": "性能",
+          "rows": [
+            {
+              "k": "测量量程",
+              "v": "0–10 MPa"
+            },
+            {
+              "k": "过载压力",
+              "v": "20 MPa"
+            },
+            {
+              "k": "精度",
+              "v": "±0.5% FS（25 °C）"
+            },
+            {
+              "k": "响应时间",
+              "v": "≤ 5 ms"
+            },
+            {
+              "k": "长期漂移",
+              "v": "≤ 0.2% FS/年"
+            }
+          ]
+        },
+        {
+          "title": "电气",
+          "rows": [
+            {
+              "k": "输出信号",
+              "v": "4–20 mA（两线制）"
+            },
+            {
+              "k": "供电电压",
+              "v": "12–36 V DC"
+            },
+            {
+              "k": "负载电阻",
+              "v": "≤ (U-12)/0.02 Ω"
+            }
+          ]
+        },
+        {
+          "title": "机械与环境",
+          "rows": [
+            {
+              "k": "过程连接",
+              "v": "G1/4 外螺纹"
+            },
+            {
+              "k": "接触材质",
+              "v": "316L 不锈钢"
+            },
+            {
+              "k": "工作温度",
+              "v": "-20 至 85 °C"
+            },
+            {
+              "k": "防护等级",
+              "v": "IP65"
+            }
+          ]
+        }
+      ],
+      "interface": "G1 male",
+      "dimensions": "48 × 48 × 96 mm（开孔 45 × 45 mm）"
+    }
+  },
+  "specGroups": [
+    {
+      "title": "Performance",
+      "rows": [
+        {
+          "k": "Measuring range",
+          "v": "0–10 MPa"
+        },
+        {
+          "k": "Overload pressure",
+          "v": "20 MPa"
+        },
+        {
+          "k": "Accuracy",
+          "v": "±0.5% FS (25 °C)"
+        },
+        {
+          "k": "Response time",
+          "v": "≤ 5 ms"
+        },
+        {
+          "k": "Long-term drift",
+          "v": "≤ 0.2% FS per year"
+        }
+      ]
+    },
+    {
+      "title": "Electrical",
+      "rows": [
+        {
+          "k": "Output signal",
+          "v": "4–20 mA (two-wire)"
+        },
+        {
+          "k": "Supply voltage",
+          "v": "12–36 V DC"
+        },
+        {
+          "k": "Load resistance",
+          "v": "≤ (U-12)/0.02 Ω"
+        }
+      ]
+    },
+    {
+      "title": "Mechanical and environment",
+      "rows": [
+        {
+          "k": "Process connection",
+          "v": "G1/4 male"
+        },
+        {
+          "k": "Wetted material",
+          "v": "316L stainless steel"
+        },
+        {
+          "k": "Operating temperature",
+          "v": "-20 to 85 °C"
+        },
+        {
+          "k": "Ingress protection",
+          "v": "IP65"
+        }
+      ]
+    }
+  ],
+  "status": "active",
+  "interface": "G1 male",
+  "dimensions": "48 × 48 × 96 mm (panel cut-out 45 × 45 mm)",
+  "certifications": [
+    "CE",
+    "RoHS"
+  ]
+}

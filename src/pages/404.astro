@@ -1,0 +1,50 @@
+---
+/**
+ * 404 落点（默认语言）。
+ *
+ * 分语言是怎么做到的：
+ *
+ *   · 开发（astro dev）：/zh/ 下的错误路径会回落到本文件渲染的英文 404。
+ *     这是 Astro 7.4.2 的框架缺陷，与项目文件形式无关（用 [lang]/404.astro 或
+ *     字面量 zh/404.astro 实测均不命中）：i18n/error-routes.js 的 getErrorRoutePath
+ *     在 trailingSlash: 'always' 时返回带尾斜杠的 /zh/404/，而路由表 route 字段
+ *     无尾斜杠，find 失败后 getCustom404Route 的正则 /^\/404\/?$/ 又只认根 404。
+ *     本地预览中文 404 直接访问 /zh/404/（内容为中文，状态码 200）。
+ *     已具备向 Astro 上报的完整证据链；线上不受影响（见下）。
+ *
+ *   · 线上（静态产物）：Cloudflare Pages 按路径前缀就近查找 404.html，
+ *     默认语言落到 dist/404.html，其余语言落到 dist/<prefix>/404.html
+ *     （构建守卫 build-guard.mjs 按 LOCALES 从 dist/<prefix>/404/index.html 复制而来），
+ *     /zh/ 下的错误路径返回中文页，已用 wrangler pages dev dist 实测确认。
+ *
+ *   · 每种语言一份完整页面，而不是一份页面加客户端脚本换文案：
+ *     后者的页眉、页脚、html lang、页面标题都还是英文，只有正文变了，
+ *     会出现「导航英文、正文中文」的混排。
+ *
+ * 本文件只负责默认语言的 dist/404.html 约定；其余语言的 404 由
+ * pages/[lang]/404.astro 按 LOCALES 自动产出（独立成路由，404 专用样式
+ * 才不会被打进全站公共 CSS）。
+ * 新增语言时不需要建页面文件，构建守卫按 LOCALES 自动复制 404 产物；
+ * 只需给 public/_headers 与 public/_redirects 各补 2 条对应前缀的 404 规则。
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import NotFoundBody from '../components/pages/NotFoundBody.astro';
+import { buildMeta } from '../lib/seo/meta';
+import { pageSeo } from '../data/pages';
+
+const locale = 'en' as const;
+
+const seo = pageSeo('notFound', locale);
+const meta = buildMeta(seo.title, seo.description, `404:${locale}`);
+---
+
+<BaseLayout
+  locale={locale}
+  path="/404/"
+  title={meta.title}
+  description={meta.description}
+  noindex={true}
+  switchPath="/"
+>
+  <NotFoundBody locale={locale} />
+</BaseLayout>

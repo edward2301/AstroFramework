@@ -1,0 +1,45 @@
+{
+  "draft": false,
+  "title": "Standardized spares across sites",
+  "background": "Five plants kept separate spare-part lists, which made emergency swaps slow and expensive.",
+  "requirements": [
+    "One common part number.",
+    "Same accuracy class.",
+    "Clear lead time per site."
+  ],
+  "selection": "A single accuracy class was chosen across sites; the range variant differs only where the duty point requires it.",
+  "config": [
+    "b1",
+    "b2",
+    "a3"
+  ],
+  "results": [
+    "Spare stock halved.",
+    "Any site can borrow from another.",
+    "One document set to maintain.",
+    "One document set now serves all five sites."
+  ],
+  "date": "2026-06-22",
+  "seoTitle": "Standardized spares across sites — deployment note",
+  "seoDescription": "Standardized spares across sites: constraints, models chosen and measurable results. A short deployment note for engineers comparing similar setups.",
+  "locales": {
+    "zh": {
+      "title": "多站点统一备件",
+      "background": "五个工厂各自维护备件清单，紧急替换既慢又贵。",
+      "requirements": [
+        "统一的料号。",
+        "相同的精度等级。",
+        "各站点交期明确。"
+      ],
+      "selection": "各站点统一精度等级，仅在工况点不同的位置保留量程差异。",
+      "results": [
+        "备件库存减半。",
+        "站点之间可互相调拨。",
+        "只需维护一套技术文件。",
+        "五个站点共用一套技术文件。"
+      ],
+      "seoTitle": "五站点统一备件：料号收敛与跨站调拨现场可用。",
+      "seoDescription": "五个站点统一备件的做法：各站点采用相同精度等级，仅在工况点不同处保留量程差异，备件库存减半并可跨站调拨，同时记录料号收敛与维护文件的变化。现场可用。"
+    }
+  }
+}

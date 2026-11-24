@@ -1,0 +1,42 @@
+{
+  "draft": false,
+  "name": "High vibration mounting",
+  "condition": "Pump outlet, compressor skid or conveyor frame where the mounting point vibrates continuously.",
+  "criteria": [
+    "Threaded connection must be torque-limited.",
+    "Prefer a rigid housing over a plastic one.",
+    "Route the cable with a service loop.",
+    "Photograph the installed routing so the next maintenance can restore it."
+  ],
+  "recommended": [
+    "a4",
+    "d1",
+    "d2"
+  ],
+  "cautions": [
+    "Avoid mounting directly on a resonating panel.",
+    "Re-torque after the first week.",
+    "Re-check zero after the first thermal cycle; vibration plus heat loosens joints."
+  ],
+  "seoTitle": "High vibration mounting — selection notes",
+  "seoDescription": "High vibration mounting: torque limits, rigid housings and cable routing for pump outlets, compressor skids and conveyor frames, with re-torque intervals.",
+  "locales": {
+    "zh": {
+      "name": "振动环境安装",
+      "condition": "泵出口、压缩机撬块或输送机机架等持续振动的安装点。",
+      "criteria": [
+        "螺纹连接需限矩安装。",
+        "优先金属外壳而不是塑料外壳。",
+        "线缆需预留服务弯。",
+        "把安装后的走线拍照留存，下次维护才能复原。"
+      ],
+      "cautions": [
+        "不要直接装在共振面板上。",
+        "首周运行后需复紧。",
+        "首次热循环后需复核零点——振动加温升会让接头松动。"
+      ],
+      "seoTitle": "振动环境安装：固定方式、限矩与线缆走向现场可用。",
+      "seoDescription": "振动环境安装建议：螺纹连接需限矩安装，优先选用刚性金属外壳，线缆预留服务弯以避免疲劳断裂，并说明泵出口、压缩机撬块等点位的安装顺序与复紧周期。"
+    }
+  }
+}

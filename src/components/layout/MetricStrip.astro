@@ -1,0 +1,82 @@
+﻿---
+/**
+ * 指标条：3~4 个数字指标横排，用于替代「形容词式的自我介绍」。
+ *
+ * 数字用强调色、说明用次要灰——先给可核对的量，再给解释。
+ * tone="light" 用于白底页面，tone="deep" 用于深色带（深海军蓝底反白）。
+ */
+interface Props {
+  items: { value: string; label: string }[];
+  tone?: 'light' | 'deep';
+}
+
+const { items, tone = 'light' } = Astro.props;
+---
+
+<ul class:list={['metrics', `metrics--${tone}`]}>
+  {
+    items.map((it) => (
+      <li>
+        <strong>{it.value}</strong>
+        <span>{it.label}</span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .metrics {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  .metrics li {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--color-brand-200);
+  }
+
+  .metrics strong {
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--color-brand);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metrics span {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+  }
+
+  /* 深色带：反白，数字用浅蓝，避免在白底页上突兀 */
+  .metrics--deep li {
+    border-left-color: rgb(255 255 255 / 25%);
+  }
+
+  .metrics--deep strong {
+    color: #fff;
+  }
+
+  .metrics--deep span {
+    color: rgb(255 255 255 / 72%);
+  }
+
+  @media (max-width: 767px) {
+    .metrics {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+
+    .metrics strong {
+      font-size: 24px;
+    }
+  }
+</style>

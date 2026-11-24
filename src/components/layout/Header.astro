@@ -1,0 +1,503 @@
+---
+/**
+ * 站点头部。
+ * 数据由 BaseLayout 传入（label 与 href 已按当前语言处理好），组件本身不取数。
+ */
+import { SITE } from '../../data/site';
+import { ROUTES } from '../../data/routes';
+import { t } from '../../i18n/ui';
+import type { MainNavItem } from '../../lib/nav';
+import {
+  LOCALES,
+  LOCALE_LABELS,
+  LOCALE_META,
+  localizePath,
+  switchLocalePath,
+  type Locale,
+} from '../../i18n/routing';
+
+interface Props {
+  locale: Locale;
+  /** 主导航项，已按语言处理并排好序（见 lib/nav.ts） */
+  items: MainNavItem[];
+  categories: { label: string; href: string }[];
+  /** 覆盖切换目标；未传则停留在当前页面的对应语言版本 */
+  switchPath?: string;
+  /**
+   * solid（默认）：白底吸顶，用于内页；
+   * overlay：透明浮层盖在深色 hero 上，白字——参考站首页的做法。
+   */
+  variant?: 'solid' | 'overlay';
+}
+
+const { locale, items: navItems, categories, switchPath, variant = 'solid' } = Astro.props;
+const dict = t(locale);
+const path = Astro.url.pathname;
+
+/**
+ * 语言入口：列出「除当前语言外」的全部语言，每种都给一个链接。
+ *
+ * 这里不写死某一种语言：新增语言时入口自动出现，不需要改这个组件。
+ * 之前是 `locale === 'zh' ? 'en' : 'zh'` —— 只有两种语言时看不出问题，
+ * 加到第三种就会漏掉一种语言的入口，且编译不会报错。
+ *
+ * 切过去之后仍停留在当前页面（`switchPath` 用于 404 这类在目标语言中不存在的页面）。
+ */
+const switches = LOCALES.filter((item) => item !== locale).map((item) => ({
+  locale: item,
+  label: LOCALE_LABELS[item],
+  href:
+    switchPath !== undefined
+      ? localizePath(item, switchPath)
+      : switchLocalePath(item, path),
+}));
+const homeHref = localizePath(locale, '/');
+
+function isActive(href: string): boolean {
+  const base = href.replace(/\/$/, '');
+  if (base === '') return false;
+  // 用路径边界判断，避免 /products 误匹配 /products-archive
+  return path === base || path.startsWith(`${base}/`);
+}
+---
+<header class:list={['site-header', variant === 'overlay' && 'site-header--overlay']}>
+  <div class="container header-inner">
+    <a class="brand" href={homeHref}>{SITE.shortName}</a>
+
+    <nav class="main-nav" aria-label={dict.header.mainNavAria}>
+      <ul>
+        {
+          navItems.map((item) => {
+            const href = item.href;
+            const hasDropdown = item.dynamic === 'categories' && categories.length > 0;
+            return (
+              /* 带下拉的项：nav-group 放在 li 上，链接与其他项同为 li 的直接子级，
+                 否则对齐/颜色规则匹配不到它，页眉里就出现一个位置和颜色都特殊的项 */
+              <li class={hasDropdown ? 'nav-group' : undefined}>
+                <a href={href} class={isActive(href) ? 'active' : ''}>
+                  {item.label}
+                  {hasDropdown && <span class="nav-caret" aria-hidden="true" />}
+                </a>
+                {hasDropdown && (
+                  <ul class="sub-nav">
+                    {categories.map((c) => (
+                      <li>
+                        <a href={c.href} class={isActive(c.href) ? 'active' : ''}>{c.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <details class="mobile-nav">
+      <summary>{dict.header.menu}</summary>
+      <nav aria-label={dict.header.mobileNavAria}>
+        <ul>
+          {
+            navItems.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+                {item.dynamic === 'categories' && categories.length > 0 && (
+                  <ul>
+                    {categories.map((c) => (
+                      <li>
+                        <a href={c.href} class={isActive(c.href) ? 'active' : ''}>{c.label}</a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </details>
+
+    <div class="lang-switch-group">
+      {
+        switches.map((item) => (
+          <a
+            class="lang-switch"
+            href={item.href}
+            hreflang={LOCALE_META[item.locale].htmlLang}
+            lang={LOCALE_META[item.locale].htmlLang}
+            aria-label={dict.header.switchAria(item.label)}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </div>
+
+    <a class="header-cta" href={localizePath(locale, ROUTES.quote)}>{dict.nav.quote}</a>
+  </div>
+</header>
+
+{
+  /* 仅首页浮层需要：滚动后切换成实底，否则白字会压在白底内容上 */
+  variant === 'overlay' && (
+    <script is:inline>
+      (function () {
+        var header = document.querySelector('.site-header--overlay');
+        if (!header) return;
+        function update() {
+          header.classList.toggle('is-scrolled', window.scrollY > 24);
+        }
+        window.addEventListener('scroll', update, { passive: true });
+        update();
+      })();
+    </script>
+  )
+}
+
+<style>
+  /* 页眉配色变量：solid 深字浅底；overlay（首页浮层）覆盖为白字透明底；滚动后还原 */
+  .site-header {
+    --header-fg: var(--color-text);
+    --header-fg-muted: var(--color-text-muted);
+    --header-border: var(--color-border);
+    border-bottom: 1px solid var(--header-border);
+    box-shadow: 0 2px 12px rgb(0 0 0 / 4%);
+    position: sticky;
+    top: 0;
+    background: var(--color-bg);
+    z-index: 50;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    height: 72px;
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    color: var(--header-fg);
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+
+  .main-nav {
+    flex: 1;
+  }
+
+  .main-nav > ul {
+    display: flex;
+    gap: var(--space-6);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .main-nav a {
+    color: var(--color-text);
+    font-size: var(--fs-sm);
+    text-decoration: none;
+  }
+
+  /*
+   * 顶级导航：链接占满页眉高度，指示条贴着页眉底边（与分隔线齐平）。
+   * 悬停/当前页时从左侧展开——这是企业站导航的标准做法，
+   * 之前的「文字下划线」看起来像超链接，「贴着文字的短条」像渲染残留。
+   */
+  .main-nav > ul > li > a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 72px;
+    padding: 0 2px;
+    font-weight: 500;
+    color: var(--header-fg);
+  }
+
+  .main-nav > ul > li > a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    background: var(--color-brand);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.2s ease;
+  }
+
+  .main-nav > ul > li > a:hover::after,
+  .main-nav > ul > li > a.active::after {
+    transform: scaleX(1);
+  }
+
+  .main-nav > ul > li > a:hover,
+  .main-nav > ul > li > a.active {
+    color: var(--color-brand);
+  }
+
+  .main-nav a.active,
+  .main-nav a:hover {
+    color: var(--color-brand);
+  }
+
+  .nav-group {
+    position: relative;
+  }
+
+  /* 下拉指示：小箭头，展开时翻转——否则用户不知道这一项可展开 */
+  .nav-caret {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    margin-left: 6px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: translateY(-2px) rotate(45deg);
+    transition: transform 0.2s ease;
+  }
+
+  .nav-group:hover .nav-caret,
+  .nav-group:focus-within .nav-caret {
+    transform: translateY(1px) rotate(225deg);
+  }
+
+  .sub-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 220px;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    padding: var(--space-2);
+    list-style: none;
+    margin: 0;
+    box-shadow: var(--shadow-md);
+  }
+
+  .nav-group:hover .sub-nav,
+  .nav-group:focus-within .sub-nav {
+    display: block;
+  }
+
+  .sub-nav a {
+    display: block;
+    padding: var(--space-2) var(--space-3);
+    border-radius: 4px;
+  }
+
+  .sub-nav a:hover {
+    background: var(--color-brand-soft);
+  }
+
+  /* 当前所在品类：浅蓝底 + 品牌色，层级低于顶级导航的激活态 */
+  .sub-nav a.active {
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-weight: 500;
+  }
+
+  .header-cta {
+    flex-shrink: 0;
+    /* 透明边框占位：overlay 态切描边时不产生 1px 尺寸跳动 */
+    border: 1px solid transparent;
+    background: var(--color-brand);
+    color: #fff;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    text-decoration: none;
+    box-shadow: 0 4px 14px rgb(24 99 220 / 35%);
+    transition: background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  }
+
+  .header-cta:hover {
+    background: var(--color-brand-hover);
+    box-shadow: 0 6px 18px rgb(24 99 220 / 45%);
+    text-decoration: none;
+  }
+
+  /*
+   * 首页透明浮层上把 CTA 降权为白描边：首屏只留「浏览产品」一个蓝色主按钮，
+   * 页眉不与 hero 抢焦点。滚动变实底（.is-scrolled）后恢复品牌蓝实底。
+   */
+  .site-header--overlay .header-cta {
+    background: transparent;
+    border-color: rgb(255 255 255 / 55%);
+    box-shadow: none;
+  }
+
+  .site-header--overlay .header-cta:hover {
+    background: rgb(255 255 255 / 12%);
+    border-color: #fff;
+  }
+
+  .site-header--overlay.is-scrolled .header-cta {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    box-shadow: 0 4px 14px rgb(24 99 220 / 35%);
+  }
+
+  .site-header--overlay.is-scrolled .header-cta:hover {
+    background: var(--color-brand-hover);
+    border-color: var(--color-brand-hover);
+  }
+
+  /* 语言入口：与 CTA 视觉区分，用文字链而不是按钮，避免多个主按钮争焦点 */
+  .lang-switch-group {
+    display: flex;
+    gap: var(--space-2);
+    flex-shrink: 0;
+  }
+
+  .lang-switch {
+    flex-shrink: 0;
+    font-size: var(--fs-sm);
+    color: var(--header-fg-muted);
+    border: 1px solid var(--header-border);
+    border-radius: var(--radius);
+    padding: 9px 14px;
+    text-decoration: none;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .lang-switch:hover {
+    color: var(--header-fg);
+    border-color: var(--header-fg);
+    text-decoration: none;
+  }
+
+  /*
+   * 首页变体：透明浮层盖在深色 hero 上，白字（参考站首页的做法）。
+   * 滚动超过阈值后加 .is-scrolled 还原为 solid 配色——否则白字压在白底内容上，
+   * 且 fixed 元素会一直叠在后续内容上（参考站 is-scrolled 的做法）。
+   * 两种状态的配色差异全部走 --header-* 变量，这里只改容器背景与变量值；
+   * 悬停/当前页的品牌色对两种状态相同，沿用上面的基础规则。
+   */
+  .site-header--overlay {
+    --header-fg: #fff;
+    --header-fg-muted: rgb(255 255 255 / 72%);
+    --header-border: rgb(255 255 255 / 35%);
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .site-header--overlay.is-scrolled {
+    --header-fg: var(--color-text);
+    --header-fg-muted: var(--color-text-muted);
+    --header-border: var(--color-border);
+    background: var(--color-bg);
+    border-bottom-color: var(--color-border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* 浮层上不显示指示条（页眉底边贴着的是 hero，不是分隔线） */
+  .site-header--overlay .main-nav > ul > li > a::after {
+    display: none;
+  }
+
+  /* 导航项禁止内部折行；中等宽度收窄间距，避免把「产品中心」这类词挤断行 */
+  .main-nav > ul > li > a {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 1150px) {
+    .main-nav > ul {
+      gap: var(--space-4);
+    }
+  }
+
+  .mobile-nav {
+    display: none;
+  }
+
+  /* 极窄屏：语言钮让位给主 CTA，避免页眉溢出（语言入口仍在页脚） */
+  @media (max-width: 480px) {
+    .lang-switch-group {
+      display: none;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .main-nav {
+      display: none;
+    }
+
+    /* 移动端页眉压缩到 60px：72px 在小屏上占掉过多首屏 */
+    .header-inner {
+      justify-content: space-between;
+      gap: var(--space-3);
+      height: 60px;
+    }
+
+    .mobile-nav {
+      display: block;
+      margin-left: auto;
+    }
+
+    .mobile-nav summary {
+      cursor: pointer;
+      list-style: none;
+      padding: 8px 12px;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: var(--fs-sm);
+    }
+
+    .mobile-nav summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .mobile-nav nav {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+      background: var(--color-bg);
+      border-bottom: 1px solid var(--color-border);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      padding: var(--space-4);
+      z-index: 60;
+    }
+
+    .mobile-nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .mobile-nav > nav > ul > li {
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .mobile-nav > nav > ul > li:last-child {
+      border-bottom: 0;
+    }
+
+    .mobile-nav > nav > ul > li > ul {
+      padding-left: var(--space-4);
+      margin-top: var(--space-2);
+      font-size: var(--fs-sm);
+    }
+
+    .mobile-nav > nav > ul > li > ul li {
+      padding: 2px 0;
+    }
+  }
+</style>

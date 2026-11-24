@@ -1,0 +1,83 @@
+---
+/**
+ * 404 正文。
+ *
+ * 被默认语言的 404 页与各语言的 404 页共用，因此不写死任何文案与链接前缀，
+ * 全部取自当前语言的字典与 localizePath。
+ *
+ * 页面外壳（页眉、页脚、html lang、元标签）由 BaseLayout 按 locale 渲染，
+ * 新增语言时只要多一处调用，页眉页脚自动跟随，无需改这里。
+ */
+import { localizePath, type Locale } from '../../i18n/routing';
+import { ROUTES } from '../../data/routes';
+import { t } from '../../i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const dict = t(locale);
+---
+
+<section class="section">
+  <div class="container">
+    <p class="code">404</p>
+    <h1>{dict.notFound.h1}</h1>
+    <p class="lead">{dict.notFound.lead}</p>
+    <p class="actions">
+      <a class="btn" href={localizePath(locale, ROUTES.products)}>
+        {dict.notFound.browseProducts}
+      </a>
+      <a class="btn btn-secondary" href={localizePath(locale, ROUTES.quote)}>
+        {dict.notFound.requestQuote}
+      </a>
+    </p>
+  </div>
+</section>
+
+<style>
+  .code {
+    margin: 0 0 var(--space-2);
+    font-size: var(--fs-sm);
+    letter-spacing: 0.12em;
+    color: var(--color-text-muted);
+  }
+
+  .lead {
+    max-width: 640px;
+    color: var(--color-text-muted);
+  }
+
+  .actions {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    margin-top: var(--space-5);
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--color-brand);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: var(--fs-sm);
+    text-decoration: none;
+  }
+
+  .btn:hover {
+    background: var(--color-brand-hover);
+    text-decoration: none;
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-text-muted);
+  }
+</style>

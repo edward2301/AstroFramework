@@ -1,0 +1,18 @@
+# Cloudflare Pages 项目配置（Wrangler 4 读取本文件）
+# 站点是 Astro 静态产物，不需要 adapter、不需要 SSR；操作指引见 deploy/cloudflare/README.md。
+
+# Pages 项目名：与控制台里的项目一致，wrangler pages deploy 按此名创建/匹配。
+name = "astro-framework"
+
+# 静态产物目录：wrangler pages deploy 不带目录参数时上传这里。
+pages_build_output_dir = "dist"
+
+compatibility_date = "2025-01-01"
+
+# 交互数据存放在 Cloudflare D1，由运维通过 Wrangler CLI 保存与读写。
+# 站点代码不连库（纯静态、无运行期服务端）；binding 供后续 Pages Functions 使用。
+[[d1_databases]]
+binding = "DB"
+database_name = "astro-framework-interactions"
+# 占位 ID：首次执行 wrangler d1 create astro-framework-interactions 后回填真实值。
+database_id = "00000000-0000-0000-0000-000000000000"

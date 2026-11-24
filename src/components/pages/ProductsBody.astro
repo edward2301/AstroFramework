@@ -1,0 +1,74 @@
+---
+/**
+ * 产品总览主体。只负责渲染，数据由路由层准备。
+ */
+import PageHeader from '../layout/PageHeader.astro';
+import CtaBand from '../layout/CtaBand.astro';
+import CategoryRow from '../cards/CategoryRow.astro';
+import { t } from '../../i18n/ui';
+import { localizePath, type Locale } from '../../i18n/routing';
+import { detailPath } from '../../data/routes';
+import type { Crumb } from '../../lib/seo/breadcrumb';
+
+interface Props {
+  locale: Locale;
+  crumbs: Crumb[];
+  categories: {
+    id: string;
+    name: string;
+    intro: string;
+    modelCount: number;
+    /** 品类封面 = 该品类首个型号的主图（public/ 下路径） */
+    image?: string;
+  }[];
+  totalModels: number;
+}
+
+const { locale, crumbs, categories, totalModels } = Astro.props;
+const dict = t(locale);
+---
+
+<section class="section">
+  <div class="container">
+    <PageHeader locale={locale} crumbs={crumbs} title={dict.products.h1} />
+    <p class="lead">{dict.products.lead(categories.length, totalModels)}</p>
+
+    <div class="category-rows">
+      {
+        categories.map((c, i) => (
+          <CategoryRow
+            href={localizePath(locale, detailPath.category(c.id))}
+            name={c.name}
+            intro={`${c.intro.slice(0, 150)}…`}
+            linkLabel={dict.products.browseModels(c.modelCount)}
+            image={c.image}
+            flip={i % 2 === 1}
+          />
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<CtaBand locale={locale} />
+
+<style>
+  .lead {
+    max-width: 700px;
+    color: var(--color-text-muted);
+  }
+
+  /* 品类行之间用细线分隔：比纯留白更有目录节奏，也便于滚动时定位 */
+  .category-rows {
+    display: grid;
+    gap: var(--space-7);
+    margin-top: var(--space-6);
+  }
+
+  .category-rows > * + * {
+    position: relative;
+    padding-top: var(--space-7);
+    /* 分隔线比正文边框更淡：只做节奏提示，不抢视线 */
+    border-top: 1px solid var(--color-border-soft);
+  }
+</style>

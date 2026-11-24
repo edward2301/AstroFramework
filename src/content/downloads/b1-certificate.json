@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "B1 — declaration of conformity",
+  "docType": "certificate",
+  "version": "v1.0",
+  "updated": "2026-09-25",
+  "model": "b1",
+  "gated": true,
+  "file": "/downloads/b1-certificate.pdf",
+  "locales": {
+    "zh": {
+      "title": "B1 — 合格声明"
+    }
+  }
+}

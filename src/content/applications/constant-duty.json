@@ -1,0 +1,42 @@
+{
+  "draft": false,
+  "name": "Constant duty operation",
+  "condition": "Stable temperature, clean medium, continuous operation on a fixed duty point.",
+  "criteria": [
+    "Range chosen at 1.5x the working value.",
+    "Output matched to the control input.",
+    "IP rating matched to indoor installation.",
+    "Record the duty point on the drawing so a later replacement is sized the same way."
+  ],
+  "recommended": [
+    "a1",
+    "a2",
+    "a3"
+  ],
+  "cautions": [
+    "Do not size the range at the working value exactly.",
+    "Recheck accuracy after a medium change.",
+    "A range that fits today can be too tight after a process change; leave margin."
+  ],
+  "seoTitle": "Constant duty operation — selection notes",
+  "seoDescription": "Constant duty operation: how to size the range, match the output and pick the right IP rating for a fixed duty point.The checklist is written for field use.",
+  "locales": {
+    "zh": {
+      "name": "恒定工况运行",
+      "condition": "温度稳定、介质洁净、长期运行在固定工况点。",
+      "criteria": [
+        "量程按工作值的 1.5 倍选取。",
+        "输出信号与控制系统输入匹配。",
+        "防护等级按室内安装选择。",
+        "把工况点标在图纸上，后续替换按同一口径选型。"
+      ],
+      "cautions": [
+        "不要按工作值上限精确选取量程。",
+        "更换介质后需复核精度。",
+        "今天合适的量程，工艺变更后可能就偏紧，需留余量。"
+      ],
+      "seoTitle": "恒定工况运行：量程、输出与防护等级怎么定",
+      "seoDescription": "恒定工况下的选型顺序：先按工作值确定量程并留出余量，再核对输出与控制系统匹配，最后按安装位置确定防护等级，避免量程选窄导致早期失效。所有参数以型号页标注为准。"
+    }
+  }
+}

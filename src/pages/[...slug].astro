@@ -1,0 +1,134 @@
+---
+/**
+ * 全站唯一页面路由（rest 分发器）。
+ *
+ * 路由来源只有两处，都不在这里手写：
+ *   · 静态页 —— `src/data/pages/index.ts` 汇总的页面条目，条目自带 path，
+ *     新增一个栏目页只是在 entries/ 加一个文件，本文件零改动；
+ *   · 详情页 —— 内容集合（品类 / 型号 / 应用 / 案例 / 指南 / 问答），
+ *     录入内容即自动产出。
+ *
+ * 语言维度只由 `LOCALES` 驱动：新增语言时这里与 loadPage 都不需要改。
+ *
+ * 404 的落点约定（Cloudflare Pages 按路径前缀就近查找 404.html）：
+ *   · 默认语言 → dist/404.html，由 pages/404.astro 按 404.html 约定产出；
+ *   · 其余语言 → dist/<prefix>/404/index.html，由 pages/[lang]/404.astro 产出，
+ *     构建守卫按 LOCALES 复制成 dist/<prefix>/404.html 供 Pages 就近查找。
+ * 两者都不经过本文件：404 专用组件的样式一旦被本文件 import，
+ * 就会随唯一页面组件进入全站公共 CSS。
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HomeBody from '../components/pages/HomeBody.astro';
+import AboutBody from '../components/pages/AboutBody.astro';
+import SectionBody from '../components/pages/SectionBody.astro';
+import ProductsBody from '../components/pages/ProductsBody.astro';
+import CategoryBody from '../components/pages/CategoryBody.astro';
+import ModelBody from '../components/pages/ModelBody.astro';
+import ApplicationDetailBody from '../components/pages/ApplicationDetailBody.astro';
+import CaseDetailBody from '../components/pages/CaseDetailBody.astro';
+import GuideDetailBody from '../components/pages/GuideDetailBody.astro';
+import FaqDetailBody from '../components/pages/FaqDetailBody.astro';
+import QuoteBody from '../components/pages/QuoteBody.astro';
+import { LOCALES, bareSlug, type Locale } from '../i18n/routing';
+import { getAllCategories } from '../lib/content/categories';
+import { getAllModels } from '../lib/content/models';
+import { getAllApplications } from '../lib/content/applications';
+import { getAllCases } from '../lib/content/cases';
+import { getAllGuides } from '../lib/content/guides';
+import { getAllFaqs } from '../lib/content/faqs';
+import { loadPage, toSlug, type PageInput } from '../lib/pages/render';
+import { publishedPageEntries } from '../data/pages';
+import { detailPath } from '../data/routes';
+
+export const getStaticPaths = (async () => {
+  const entries: { params: { slug?: string }; props: PageInput }[] = [];
+  const push = (locale: Locale, path: string, props: PageInput) =>
+    entries.push({ params: { slug: toSlug(locale, path) }, props });
+
+  // 与语言无关的取数只做一次：语言循环里只拼前缀，不重复查集合
+  const staticPages = publishedPageEntries();
+  const categories = await getAllCategories();
+  // 含停产型号：停产页要保留站内入口，否则只在 sitemap 里存在
+  const models = await getAllModels(true);
+  const applications = await getAllApplications();
+  const cases = await getAllCases();
+
+  for (const locale of LOCALES) {
+    // 静态页：由页面条目自行声明路径，新增页面不需要改这里
+    for (const { id, def } of staticPages) {
+      // 404 不经过分发器：默认语言由 pages/404.astro 产出，
+      // 其余语言由 pages/[lang]/404.astro 产出。
+      // 它必须独立成路由，否则这个只有 404 用得到的组件会把自己的样式
+      // 带进全站公共 CSS（曾让 122 个页面各多下 12.8 KB）。
+      if (def.layout === 'notFound') continue;
+      push(locale, def.path, { kind: 'static', pageId: id, locale });
+    }
+
+    for (const c of categories) {
+      push(locale, detailPath.category(c.id), { kind: 'category', categoryId: c.id, locale });
+    }
+
+    for (const m of models) {
+      push(locale, detailPath.model(m.data.category.id, m.id), {
+        kind: 'model',
+        categoryId: m.data.category.id,
+        modelId: m.id,
+        locale,
+      });
+    }
+
+    // 详情条目路由：集合为空时自然产出 0 条，录入内容后自动生效
+    for (const a of applications) {
+      push(locale, detailPath.application(a.id), { kind: 'application', entryId: a.id, locale });
+    }
+
+    for (const c of cases) {
+      push(locale, detailPath.caseStudy(c.id), { kind: 'caseStudy', entryId: c.id, locale });
+    }
+
+    // 指南与问答按目录分语言（guides/zh/*.md），只从本语言的条目产出路由。
+    // 缺译时不生成页面 —— 不做「英文正文 + 中文标题」的假中文页。
+    const guides = await getAllGuides(locale);
+    for (const g of guides) {
+      const slug = bareSlug(g.id);
+      push(locale, detailPath.guide(slug), { kind: 'guide', entryId: slug, locale });
+    }
+
+    const faqs = await getAllFaqs(locale);
+    for (const f of faqs) {
+      const slug = bareSlug(f.id);
+      push(locale, detailPath.faq(slug), { kind: 'faqDetail', entryId: slug, locale });
+    }
+  }
+
+  return entries;
+}) satisfies GetStaticPaths;
+
+const page = await loadPage(Astro.props as PageInput);
+---
+
+<BaseLayout
+  locale={page.locale}
+  path={page.path}
+  title={page.title}
+  description={page.description}
+  image={page.image}
+  ogType={page.ogType}
+  noindex={page.noindex}
+  switchPath={page.switchPath}
+  schemas={page.schemas}
+  overlay={page.body === 'home'}
+>
+  {page.body === 'home' && <HomeBody {...page.bodyProps} />}
+  {page.body === 'about' && <AboutBody {...page.bodyProps} />}
+  {page.body === 'section' && <SectionBody {...page.bodyProps} />}
+  {page.body === 'products' && <ProductsBody {...page.bodyProps} />}
+  {page.body === 'category' && <CategoryBody {...page.bodyProps} />}
+  {page.body === 'model' && <ModelBody {...page.bodyProps} />}
+  {page.body === 'application' && <ApplicationDetailBody {...page.bodyProps} />}
+  {page.body === 'caseStudy' && <CaseDetailBody {...page.bodyProps} />}
+  {page.body === 'guide' && <GuideDetailBody {...page.bodyProps} />}
+  {page.body === 'faqDetail' && <FaqDetailBody {...page.bodyProps} />}
+  {page.body === 'quote' && <QuoteBody {...page.bodyProps} />}
+</BaseLayout>

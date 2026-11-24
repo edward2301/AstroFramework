@@ -1,0 +1,15 @@
+{
+  "draft": false,
+  "title": "B series — EU declaration of conformity",
+  "docType": "certificate",
+  "version": "v2.1",
+  "updated": "2026-10-02",
+  "gated": true,
+  "file": "/downloads/b-series-ce-doc.pdf",
+  "model": "b1",
+  "locales": {
+    "zh": {
+      "title": "B 系列 — 欧盟合格声明"
+    }
+  }
+}

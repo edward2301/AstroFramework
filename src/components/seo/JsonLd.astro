@@ -1,0 +1,26 @@
+---
+/**
+ * 结构化数据输出。
+ * 接收若干 schema 对象，序列化后以单个 script 注入。
+ * 序列化时转义 < 与 >，避免内容中出现标签导致解析中断。
+ */
+interface Props {
+  schemas: unknown[];
+}
+
+const { schemas } = Astro.props;
+
+/**
+ * 始终包成 @graph：节点函数不各自携带 @context，
+ * 单一节点也走同一形状，调用方无需关心节点数量。
+ */
+const payload = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@graph': schemas,
+})
+  .replace(/</g, '\\u003c')
+  .replace(/>/g, '\\u003e')
+  .replace(/\u2028/g, '\\u2028')
+  .replace(/\u2029/g, '\\u2029');
+---
+<script type="application/ld+json" is:inline set:html={payload} />

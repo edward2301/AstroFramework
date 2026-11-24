@@ -1,0 +1,457 @@
+﻿---
+/**
+ * 询价页主体：左侧询价表单 + 提交前清单，右侧直接联系卡。
+ *
+ * 表单不依赖后端：校验通过后组装 mailto 并打开邮件客户端，
+ * 所有字段都有可见标签与错误提示，未填必填项时不提交。
+ * 交互记录不在这里落库：由运维用 Wrangler 写入 Cloudflare D1，见 deploy/cloudflare/README.md。
+ */
+import PageHeader from '../layout/PageHeader.astro';
+import { localizePath, type Locale } from '../../i18n/routing';
+import { ROUTES } from '../../data/routes';
+import { t } from '../../i18n/ui';
+import type { Crumb } from '../../lib/seo/breadcrumb';
+
+interface Props {
+  locale: Locale;
+  crumbs: Crumb[];
+  mailto: string;
+  org: {
+    email: string;
+    telephone: string;
+    address: { street: string; city: string; region: string; postalCode: string; country: string };
+  };
+}
+
+const { locale, crumbs, mailto, org } = Astro.props;
+const dict = t(locale);
+
+/** 邮件正文的字段标签：直接复用表单文案，避免中文站点发出英文标签 */
+const mailLabels = {
+  model: dict.quote.fModel,
+  qty: dict.quote.fQty,
+  conditions: dict.quote.fConditions,
+  company: dict.quote.fCompany,
+  contact: dict.quote.fName,
+  email: dict.quote.fEmail,
+  notes: dict.quote.fNotes,
+};
+---
+
+<section class="section">
+  <div class="container">
+    <PageHeader locale={locale} crumbs={crumbs} title={dict.quote.h1} />
+    <p class="lead">{dict.quote.lead}</p>
+
+    <ol class="steps">
+      {
+        dict.quote.steps.map((step, i) => (
+          <li>
+            <span class="step-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+            <p>{step}</p>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="quote-grid">
+      <div class="quote-main">
+        <h2>{dict.quote.whatToInclude}</h2>
+        <ul class="checklist">
+          {dict.quote.items.map((item) => <li>{item}</li>)}
+        </ul>
+
+        <h2>{dict.quote.formTitle}</h2>
+        <form
+          class="quote-form"
+          data-mailto={mailto}
+          data-msg-required={dict.quote.errRequired}
+          data-msg-email={dict.quote.errEmail}
+          data-mail-labels={JSON.stringify(mailLabels)}
+          novalidate
+        >
+          <div class="field">
+            <label for="q-model">{dict.quote.fModel} *</label>
+            <input id="q-model" name="model" type="text" required autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="q-qty">{dict.quote.fQty} *</label>
+            <input id="q-qty" name="qty" type="text" required inputmode="numeric" />
+          </div>
+          <div class="field field-wide">
+            <label for="q-cond">{dict.quote.fConditions}</label>
+            <input id="q-cond" name="conditions" type="text" />
+          </div>
+          <div class="field field-wide">
+            <label for="q-company">{dict.quote.fCompany}</label>
+            <input id="q-company" name="company" type="text" autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="q-name">{dict.quote.fName} *</label>
+            <input id="q-name" name="name" type="text" required autocomplete="name" />
+          </div>
+          <div class="field">
+            <label for="q-email">{dict.quote.fEmail} *</label>
+            <input id="q-email" name="email" type="email" required autocomplete="email" />
+          </div>
+          <div class="field field-wide">
+            <label for="q-notes">{dict.quote.fNotes}</label>
+            <textarea id="q-notes" name="notes" rows="3"></textarea>
+          </div>
+
+          <p class="form-hint">{dict.quote.formHint}</p>
+          <p class="form-error" id="quote-error" role="alert" hidden></p>
+
+          <div class="form-actions">
+            <button type="submit" class="btn">{dict.quote.submit}</button>
+            <a class="link" href={localizePath(locale, ROUTES.products)}>{dict.quote.browseFirst} →</a>
+          </div>
+
+          {/* 兜底：系统没有默认邮件客户端时，让用户仍能拿到可复制的询价内容 */}
+          <div class="mail-fallback" hidden>
+            <p>{dict.quote.fallbackHint}</p>
+            <pre class="mail-fallback-text"></pre>
+          </div>
+        </form>
+      </div>
+
+      <aside class="contact-card">
+        <h2>{dict.quote.directContact}</h2>
+        <dl>
+          <dt>{dict.quote.emailLabel}</dt>
+          <dd><a href={`mailto:${org.email}`}>{org.email}</a></dd>
+          <dt>{dict.quote.telLabel}</dt>
+          <dd><a href={`tel:${org.telephone}`}>{org.telephone}</a></dd>
+          <dt>{dict.quote.addressLabel}</dt>
+          <dd>
+            {org.address.street}{locale === 'zh' ? ' ' : ', '}{org.address.city}{locale === 'zh' ? ' ' : ', '}{' '}
+            {org.address.region} {org.address.postalCode},{' '}
+            {org.address.country}
+          </dd>
+        </dl>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<script>
+  /* 泛型查询代替 as 断言：类型如实反映可空性，后续改动不会踩空 */
+  const form = document.querySelector<HTMLFormElement>('.quote-form');
+  if (form) {
+    const err = form.querySelector<HTMLElement>('.form-error');
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const fallback = form.querySelector<HTMLElement>('.mail-fallback');
+    const fallbackText = form.querySelector<HTMLElement>('.mail-fallback-text');
+    const mailtoBase = form.dataset.mailto ?? 'mailto:';
+    /* 防重入：双击会打开两次邮件客户端，提交后短暂锁定按钮 */
+    let sending = false;
+
+    const clearInvalid = () => {
+      form.querySelectorAll<HTMLElement>('[aria-invalid="true"]').forEach((el) => {
+        el.removeAttribute('aria-invalid');
+        el.removeAttribute('aria-describedby');
+      });
+    };
+
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (sending) return;
+
+      const data = new FormData(form);
+      const get = (k: string) => String(data.get(k) ?? '').trim();
+
+      const required = ['model', 'qty', 'name', 'email'];
+      const missing = required.filter((k) => !get(k));
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(get('email'));
+
+      const dict = {
+        required: form.dataset.msgRequired ?? 'Please fill in the required fields.',
+        email: form.dataset.msgEmail ?? 'Please enter a valid email address.',
+      };
+
+      clearInvalid();
+
+      if (missing.length || !emailOk) {
+        if (err) {
+          err.textContent = !emailOk && get('email') ? dict.email : dict.required;
+          err.hidden = false;
+        }
+        /* 无效字段标记：读屏能听到「无效」并关联到错误提示 */
+        const bad = missing.length ? missing : ['email'];
+        bad.forEach((name) => {
+          const el = form.querySelector<HTMLElement>(`[name="${name}"]`);
+          if (el) {
+            el.setAttribute('aria-invalid', 'true');
+            el.setAttribute('aria-describedby', 'quote-error');
+          }
+        });
+        form.querySelector<HTMLElement>(`[name="${bad[0]}"]`)?.focus();
+        return;
+      }
+
+      if (err) err.hidden = true;
+
+      /* 标签来自页面语言；解析失败时回退为字段名，保证邮件仍可生成 */
+      let labels: Record<string, string> = {};
+      try {
+        labels = JSON.parse(form.dataset.mailLabels ?? '{}');
+      } catch {
+        labels = {};
+      }
+      const label = (k: string, fallbackLabel: string) => labels[k] ?? fallbackLabel;
+
+      const lines = [
+        `${label('model', 'Model')}: ${get('model')}`,
+        `${label('qty', 'Quantity')}: ${get('qty')}`,
+        get('conditions') && `${label('conditions', 'Conditions')}: ${get('conditions')}`,
+        get('company') && `${label('company', 'Company')}: ${get('company')}`,
+        `${label('contact', 'Contact')}: ${get('name')}`,
+        `${label('email', 'Email')}: ${get('email')}`,
+        get('notes') && `${label('notes', 'Notes')}: ${get('notes')}`,
+      ].filter(Boolean) as string[];
+
+      const sep = mailtoBase.includes('?') ? '&' : '?';
+      const text = lines.join('\n');
+      const url = `${mailtoBase}${sep}body=${encodeURIComponent(text)}`;
+      window.location.href = url;
+
+      /* 没有默认邮件客户端时 location 赋值会静默失败：把内容留在页面上可复制 */
+      if (fallback && fallbackText) {
+        fallbackText.textContent = text;
+        fallback.hidden = false;
+      }
+
+      sending = true;
+      if (submit) {
+        submit.disabled = true;
+        window.setTimeout(() => {
+          sending = false;
+          submit.disabled = false;
+        }, 1500);
+      }
+    });
+  }
+</script>
+
+<style>
+  .lead {
+    max-width: 760px;
+    color: var(--color-text-muted);
+  }
+
+  /* 三步流程：横排，数字用强调色，形成从提交到确认的视觉动线 */
+  .steps {
+    list-style: none;
+    margin: 0 0 var(--space-7);
+    padding: var(--space-5) 0 0;
+    border-top: 2px solid var(--color-brand-100);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-6);
+  }
+
+  .steps li {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .step-num {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .steps p {
+    margin: 0;
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+  }
+
+  .quote-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .checklist {
+    margin: 0 0 var(--space-6);
+    padding-left: var(--space-5);
+    color: var(--color-text-muted);
+  }
+
+  .checklist li {
+    margin-bottom: var(--space-2);
+  }
+
+  .quote-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+    max-width: 760px;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .field-wide {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+  }
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 10px 12px;
+    font: inherit;
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+    background: var(--color-bg);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 18%, transparent);
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .form-hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+  }
+
+  .form-error {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: var(--space-3);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, #d93025 12%, transparent);
+    color: #b3261e;
+    font-size: var(--fs-sm);
+  }
+
+  /* 兜底面板：浅底 + 等宽正文，方便整段选中复制 */
+  .mail-fallback {
+    grid-column: 1 / -1;
+    padding: var(--space-4);
+    background: var(--color-brand-50);
+    border: 1px solid var(--color-brand-100);
+    border-radius: var(--radius);
+  }
+
+  .mail-fallback p {
+    margin: 0 0 var(--space-2);
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+  }
+
+  .mail-fallback-text {
+    margin: 0;
+    padding: var(--space-3);
+    background: var(--color-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    line-height: 1.6;
+    color: var(--color-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .btn[disabled] {
+    opacity: 0.6;
+    cursor: default;
+  }
+
+  .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: var(--color-brand);
+    color: #fff;
+    border: 0;
+    border-radius: var(--radius);
+    font: inherit;
+    font-size: var(--fs-sm);
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .btn:hover {
+    background: var(--color-brand-hover);
+  }
+
+  .link {
+    font-size: var(--fs-sm);
+  }
+
+  .contact-card {
+    padding: var(--space-5);
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .contact-card h2 {
+    font-size: var(--fs-h3);
+  }
+
+  .contact-card dl {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .contact-card dt {
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+  }
+
+  .contact-card dd {
+    margin: 0 0 var(--space-2);
+  }
+
+  @media (max-width: 1024px) {
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-4);
+    }
+
+    .quote-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+
+    .quote-form {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

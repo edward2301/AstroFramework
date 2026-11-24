@@ -1,0 +1,59 @@
+{
+  "draft": false,
+  "name": "Category D",
+  "intro": "Category D is a placeholder group that focuses on delivery and packaging notes. The items differ only in sample values, which is enough to check how shipping terms, lead-time statements and packaging details sit next to technical specifications without crowding them or breaking the column rhythm. Fields, links and structured data are generated from the entry, so no template change is needed when the real catalog arrives.",
+  "image": "/images/categories/category-d.png",
+  "comparisonParams": [
+    "Range",
+    "Accuracy",
+    "Output",
+    "Process Connection",
+    "IP Rating"
+  ],
+  "selectionPoints": [
+    "Start from the duty point: the range you need sets the measuring scale.",
+    "Then match accuracy and output to what your control system accepts.",
+    "Finally confirm the connection and IP rating suit the installation site."
+  ],
+  "purchaseInfo": {
+    "moq": "10 units",
+    "leadTime": "15–20 days",
+    "payment": "T/T 30% deposit, balance before shipment",
+    "certifications": [
+      "CE",
+      "RoHS"
+    ]
+  },
+  "order": 40,
+  "seoTitle": "Category D — placeholder category and demos",
+  "seoDescription": "Category D placeholder group: 6 demo models for checking cards, tables and detail layouts. Replace this copy before launch. Numbers are samples.",
+  "locales": {
+    "zh": {
+      "name": "产品D",
+      "intro": "产品D 是一组侧重交付与包装说明的占位品类。条目只在示例数值上有所区别，足以检查交期说明、包装明细与技术参数并排时的疏密关系，避免信息堆叠或破坏列间节奏。字段、链接与结构化数据均由条目自动生成，真实资料到位时无需改动模板。字段、链接与结构化数据均由条目自动生成，真实资料到位时无需改动模板。字段、链接与结构化数据均由条目自动生成，真实资料到位时无需改动模板。",
+      "comparisonParams": [
+        "量程",
+        "精度",
+        "输出",
+        "过程连接",
+        "防护等级"
+      ],
+      "selectionPoints": [
+        "先确定工况点：所需量程决定量程档位。",
+        "再按精度与输出匹配控制系统。",
+        "最后确认接口与防护等级能否适配现场。"
+      ],
+      "purchaseInfo": {
+        "moq": "10 台",
+        "leadTime": "15–20 天",
+        "payment": "电汇，30% 定金，余款发货前付清",
+        "certifications": [
+          "CE",
+          "RoHS"
+        ]
+      },
+      "seoTitle": "产品D — 占位品类，用于版式与流程验证，含示例数据",
+      "seoDescription": "产品D 占位品类：6 个演示型号，用于检查卡片、表格与详情页的版式表现。上线前请替换此处文案。规格与数量均为示例。页面结构无需改动。上线前请替换此处文案。"
+    }
+  }
+}

@@ -1,0 +1,85 @@
+---
+import type { RenderedContent } from '../../lib/content/guides';
+/**
+ * 问答详情主体。
+ *
+ * 问题与答案都来自本语言的那一份文件（faqs/*.md 或 faqs/zh/*.md），
+ * 不涉及跨语言回落：中文页取到的就是中文问题与中文答案。
+ */
+import PageHeader from '../layout/PageHeader.astro';
+import { t } from '../../i18n/ui';
+import { localizePath, type Locale } from '../../i18n/routing';
+import { detailPath } from '../../data/routes';
+import type { Crumb } from '../../lib/seo/breadcrumb';
+
+interface Props {
+  locale: Locale;
+  crumbs: Crumb[];
+  question: string;
+  /** astro:content render() 产出的正文组件 */
+  Content: RenderedContent;
+  models: { id: string; categoryId: string; code: string; name: string }[];
+  related: { id: string; question: string }[];
+}
+
+const { locale, crumbs, question, Content, models, related } = Astro.props;
+const dict = t(locale);
+---
+
+<section class="section">
+  <div class="container narrow">
+    <PageHeader locale={locale} crumbs={crumbs} title={question} />
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      models.length > 0 && (
+        <>
+          <h2>{dict.detail.relatedModels}</h2>
+          <ul class="model-links">
+            {models.map((m) => (
+              <li>
+                <a href={localizePath(locale, detailPath.model(m.categoryId, m.id))}>
+                  {m.code} — {m.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+    {
+      related.length > 0 && (
+        <>
+          <h2>{dict.detail.relatedFaqs}</h2>
+          <ul class="model-links">
+            {related.map((f) => (
+              <li>
+                <a href={localizePath(locale, detailPath.faq(f.id))}>{f.question}</a>
+              </li>
+            ))}
+          </ul>
+        </>
+      )
+    }
+
+  </div>
+</section>
+
+<style>
+  .prose {
+    max-width: 760px;
+  }
+
+  .model-links {
+    max-width: 760px;
+  }
+
+  .model-links a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

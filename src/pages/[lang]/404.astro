@@ -1,0 +1,49 @@
+---
+/**
+ * 404 落点（默认语言之外的各语言）。
+ *
+ * 为什么单独一个页面文件，而不是继续由 `[...slug].astro` 分发器产出：
+ *
+ *   分发器是全站唯一的页面组件，它 import 的组件，其 `<style>` 会打进
+ *   **所有**页面的公共 CSS。`NotFoundBody` 只有 404 用得上，却让 122 个页面
+ *   各自多下载 12,866 B 的 404 样式。把 404 拆成独立路由后，那份样式只出现在
+ *   404 产物里。
+ *
+ * 为什么用 `[lang]` 而不是为每种语言建一个文件：
+ *   语言维度仍由 `LOCALES` 驱动 —— 新增语言时本文件零改动，
+ *   与「新增语言只改 routing.ts」的约定保持一致。
+ *
+ * 默认语言那一份仍由 `pages/404.astro` 产出（`dist/404.html` 是 Cloudflare Pages 根目录 404 约定），
+ * 因此这里用 getStaticPaths 排除默认语言；本文件产出的 `404/index.html`
+ * 由构建守卫 `build-guard.mjs` 按 `LOCALES` 复制成 `<前缀>/404.html`
+ * 供 Pages 按前缀就近查找。
+ */
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NotFoundBody from '../../components/pages/NotFoundBody.astro';
+import { buildMeta } from '../../lib/seo/meta';
+import { pageSeo } from '../../data/pages';
+import { DEFAULT_LOCALE, LOCALES, type Locale } from '../../i18n/routing';
+
+export const getStaticPaths = (() =>
+  LOCALES.filter((locale) => locale !== DEFAULT_LOCALE).map((locale) => ({
+    params: { lang: locale },
+    props: { locale },
+  }))) satisfies GetStaticPaths;
+
+const { locale } = Astro.props as { locale: Locale };
+
+const seo = pageSeo('notFound', locale);
+const meta = buildMeta(seo.title, seo.description, `404:${locale}`);
+---
+
+<BaseLayout
+  locale={locale}
+  path="/404/"
+  title={meta.title}
+  description={meta.description}
+  noindex={true}
+  switchPath="/"
+>
+  <NotFoundBody locale={locale} />
+</BaseLayout>

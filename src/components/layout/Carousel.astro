@@ -1,0 +1,471 @@
+---
+/**
+ * 通用轮播：横向滚动的卡片行 + 左右箭头 + 页码。
+ *
+ * 内容由调用方通过默认 slot 传入（每个直接子元素是一张「页片」），
+ * 组件只提供结构（工具行 / 轨道 / 分页）、滚动状态机与样式。
+ * 所有卡片都在服务端 HTML 里，脚本只控制「看哪几张」——
+ * 不加载内容、不产生新 URL，对爬虫可见的内容不变。
+ *
+ * 每屏项数由 `--per-view` 控制：简单场景用 `perView` 属性给固定值；
+ * 需要响应式断点时由调用方在自己的样式里覆盖根元素上的该变量（见 HomeBody）。
+ * 无 JS 时箭头与分页隐藏，卡片仍可横向滑动（纯 CSS scroll-snap）。
+ */
+interface Props {
+  class?: string;
+  /** 每屏显示的项数（固定值）；响应式断点建议由调用方通过 --per-view 覆盖 */
+  perView?: number;
+  /**
+   * 翻页形式：numbers = 数字页码（页数多、可跳页）；
+   * segments = 分段指示条（每页一段，当前段高亮，可点击跳页）；
+   * progress = 滚动进度条（连续）。
+   */
+  pagination?: 'numbers' | 'segments' | 'progress';
+  labelPrev?: string;
+  labelNext?: string;
+  labelPages?: string;
+}
+
+const {
+  class: className,
+  perView,
+  pagination = 'numbers',
+  labelPrev = 'Previous',
+  labelNext = 'Next',
+  labelPages = 'Pages',
+} = Astro.props;
+---
+
+<div class:list={['carousel', className]} style={perView ? `--per-view: ${perView}` : undefined}>
+  <div class="carousel-frame">
+    <button
+      class="carousel-arrow"
+      type="button"
+      data-direction="-1"
+      aria-label={labelPrev}
+      aria-disabled="true"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+    </button>
+    <ul class="carousel-track">
+      <slot />
+    </ul>
+    <button
+      class="carousel-arrow"
+      type="button"
+      data-direction="1"
+      aria-label={labelNext}
+      aria-disabled="true"
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </button>
+  </div>
+  {
+    pagination === 'progress' ? (
+      <div class="carousel-progress" aria-hidden="true">
+        <div class="carousel-progress-fill" />
+      </div>
+    ) : (
+      /* role="group" 而非 nav：这是一组视图切换按钮，不是跳到别的页面 */
+      <div
+        class:list={[
+          'carousel-pagination',
+          pagination === 'segments' && 'carousel-pagination--segments',
+        ]}
+        role="group"
+        aria-label={labelPages}
+      />
+    )
+  }
+  {/* 翻页播报区：常驻初始 HTML，脚本只在页码真的变化时写入 */}
+  <p
+    class="visually-hidden"
+    role="status"
+    aria-live="polite"
+    data-carousel-status
+    data-status-label={labelPages}
+  />
+</div>
+
+<script>
+  (function () {
+    /* 一页可能有多个轮播：逐个初始化，各自持有独立的页码状态 */
+    function init(carousel: Element) {
+      /*
+       * 轨道与两个箭头必定存在（结构写死在模板里），直接按非空类型声明；
+       * 下一行的运行时守卫仍然保留，缺结构时整个轮播不初始化。
+       * 分页与进度条二选一，因此这两个仍按可空处理，各自在用到的地方判空。
+       */
+      const track = carousel.querySelector('.carousel-track') as HTMLElement;
+      const prev = carousel.querySelector('[data-direction="-1"]') as HTMLButtonElement;
+      const next = carousel.querySelector('[data-direction="1"]') as HTMLButtonElement;
+      const pager = carousel.querySelector('.carousel-pagination') as HTMLElement | null;
+      const fill = carousel.querySelector('.carousel-progress-fill') as HTMLElement | null;
+      const status = carousel.querySelector('[data-carousel-status]') as HTMLElement | null;
+      if (!track || !prev || !next || (!pager && !fill)) return;
+
+      carousel.classList.add('is-ready');
+
+      /* 当前页是显式状态：箭头/页码设置它，禁用态与高亮由它派生，
+         不从滚动像素反推——吸附误差和样式注入时序都不会让状态算错。 */
+      var page = 0;
+
+      /*
+       * 页数用上取整：scrollWidth / clientWidth 很少是整数（卡片有间距），
+       * 用 round 会把「3.4 页」算成 3 页，最后一页永远点不到。
+       * 减 1 是为了吸收亚像素误差，避免正好整除时多算一页空白。
+       */
+      function pageCount() {
+        var unit = track.clientWidth;
+        if (!unit) return 1;
+        return Math.max(1, Math.ceil((track.scrollWidth - 1) / unit));
+      }
+
+      /*
+       * 播报门：只在页码真的变化时写一次 status。
+       * 首次同步只记录不播报 —— 初始化、requestAnimationFrame、load 三次 sync 连着跑，
+       * 不设门会连播三遍；而 live region 在加载瞬间写入的内容读屏本来也会忽略。
+       */
+      var announcedPage = -1;
+      function announce(total: number) {
+        if (!status || page === announcedPage) return;
+        var first = announcedPage === -1;
+        announcedPage = page;
+        if (first) return;
+        status.textContent =
+          (status.getAttribute('data-status-label') ?? '') + ' ' + (page + 1) + '/' + total;
+      }
+
+      function sync() {
+        var total = pageCount();
+        if (page > total - 1) page = total - 1;
+        if (page < 0) page = 0;
+
+        /*
+         * 用 aria-disabled 而不是 disabled：disabled 会让按钮不可聚焦，
+         * 焦点停在「下一组」上翻到末页时浏览器会把焦点弹回 body，
+         * 键盘用户直接丢失位置；读屏也取不到「已到末页」。
+         * 越界由上面两行的钳制兜住，键盘 Enter 落到边界页就是空操作。
+         */
+        prev.setAttribute('aria-disabled', String(page <= 0));
+        next.setAttribute('aria-disabled', String(page >= total - 1));
+
+        /* 数字页码形态：数量变化时（断点改变每屏张数）重建，否则只更新高亮 */
+        if (pager) {
+          if (pager.children.length !== total) {
+            /* 重建会清掉焦点，先记下它落在第几个页码上 */
+            const focusedIndex = Array.prototype.indexOf.call(
+              pager.children,
+              document.activeElement
+            );
+
+            pager.innerHTML = '';
+            for (let i = 0; i < total; i++) {
+              var b = document.createElement('button');
+              b.type = 'button';
+              b.textContent = String(i + 1);
+              /* 重建时也要立刻带上当前页语义，否则新按钮要等下一次 sync 才正确 */
+              if (i === page) b.setAttribute('aria-current', 'true');
+              b.addEventListener('click', function () {
+                goTo(i); // let 的逐次绑定：每个页码闭包捕获自己的 i
+              });
+              pager.appendChild(b);
+            }
+
+            /*
+             * 只在原来焦点就在分页里时才还原，避免抢走用户的其他焦点；
+             * preventScroll 防止还原焦点把整页滚回轮播位置。
+             */
+            if (focusedIndex >= 0) {
+              const target = pager.children[Math.min(focusedIndex, total - 1)];
+              if (target instanceof HTMLElement) target.focus({ preventScroll: true });
+            }
+          }
+          for (var i = 0; i < pager.children.length; i++) {
+            var button = pager.children[i];
+            button.className = i === page ? 'is-active' : '';
+            /* is-active 只负责样式，aria-current 负责语义，两者不合并 */
+            if (i === page) button.setAttribute('aria-current', 'true');
+            else button.removeAttribute('aria-current');
+          }
+        }
+
+        /* 进度条形态：填充比例 = 已看完的页 / 总页数 */
+        if (fill) {
+          fill.style.width = ((page + 1) / total) * 100 + '%';
+        }
+
+        announce(total);
+      }
+
+      function goTo(p: number) {
+        page = p;
+        sync();
+        track.scrollTo({ left: page * track.clientWidth, behavior: 'smooth' });
+      }
+
+      prev.addEventListener('click', function () {
+        goTo(page - 1);
+      });
+      next.addEventListener('click', function () {
+        goTo(page + 1);
+      });
+
+      /* 用户手动滑动卡片时，把滚动位置同步回页码状态 */
+      track.addEventListener(
+        'scroll',
+        function () {
+          var synced = Math.round(track.scrollLeft / track.clientWidth);
+          var total = pageCount();
+          if (synced > total - 1) synced = total - 1;
+          if (synced < 0) synced = 0;
+          if (synced !== page) {
+            page = synced;
+            sync();
+          }
+        },
+        { passive: true }
+      );
+
+      sync();
+      requestAnimationFrame(sync);
+      window.addEventListener('load', sync);
+      return sync;
+    }
+
+    /* resize 时要重跑每个轮播的 sync：类型即 init 的返回值 */
+    var applies: (() => void)[] = [];
+    var carousels = document.querySelectorAll('.carousel');
+    for (var i = 0; i < carousels.length; i++) {
+      var sync = init(carousels[i]);
+      if (sync) applies.push(sync);
+    }
+    /* 节流：拖动窗口时 resize 每秒触发几十次，每次都重算所有轮播会掉帧 */
+    var resizeTimer = 0;
+    window.addEventListener(
+      'resize',
+      function () {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(function () {
+          for (var i = 0; i < applies.length; i++) applies[i]();
+        }, 100);
+      },
+      { passive: true }
+    );
+  })();
+</script>
+
+<style>
+  .carousel {
+    position: relative;
+  }
+
+  /* frame 只包住卡片行：箭头相对它垂直居中，不会被分页条的高度带偏 */
+  .carousel-frame {
+    position: relative;
+  }
+
+  .carousel-track {
+    list-style: none;
+    padding: 6px 2px;
+    margin: 0;
+    display: flex;
+    gap: var(--carousel-gap, var(--space-4));
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    /* 滚动条隐藏但滚动能力保留：翻看由箭头、分页与触摸手势承担 */
+    scrollbar-width: none;
+  }
+
+  .carousel-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 页片宽度由 --per-view 决定；slot 内容属于调用方的作用域，需 :global 命中 */
+  .carousel-track > :global(li) {
+    flex: 0 0
+      calc(
+        (100% - (var(--per-view) - 1) * var(--carousel-gap, var(--space-4))) /
+          var(--per-view)
+      );
+    scroll-snap-align: start;
+  }
+
+  /* 箭头：白色圆钮 + 阴影，悬浮在卡片两侧；相对 frame 垂直居中 */
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    /* 渐进增强：脚本就绪后才显示；无 JS 时隐藏，卡片仍可滑动 */
+    display: none;
+    width: 44px;
+    height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-text);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 12%);
+    transition: border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  }
+
+  .carousel.is-ready .carousel-arrow {
+    display: flex;
+  }
+
+  .carousel-arrow:hover:not([aria-disabled='true']) {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .carousel-arrow[aria-disabled='true'] {
+    opacity: 0.25;
+    pointer-events: none;
+    cursor: default;
+    box-shadow: none;
+  }
+
+  /* aria-disabled 的按钮仍可聚焦，焦点轮廓不能跟着 opacity 一起淡掉 */
+  .carousel-arrow:focus-visible {
+    opacity: 1;
+  }
+
+  .carousel-arrow:first-of-type {
+    left: 6px;
+  }
+
+  .carousel-arrow:last-of-type {
+    right: 6px;
+  }
+
+  @media (min-width: 1024px) {
+    .carousel-arrow:first-of-type {
+      left: -22px;
+    }
+
+    .carousel-arrow:last-of-type {
+      right: -22px;
+    }
+  }
+
+  /*
+   * 分页条：页码由脚本填充，就绪前是一个空容器。
+   * 用 visibility 而不是 display:none 隐藏 —— display:none 会让下方 margin-top
+   * 一并消失，就绪时整块下移，产生一次布局跳动。
+   * 隐藏态同时让这个空的 role="group" 不进入无障碍树。
+   */
+  /* 页码过多时（窄屏每屏 1 张 → 页数多）允许换行，否则会撑破容器宽度 */
+  .carousel-pagination {
+    flex-wrap: wrap;
+    display: flex;
+    visibility: hidden;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: var(--space-5);
+  }
+
+  .carousel.is-ready .carousel-pagination {
+    visibility: visible;
+  }
+
+  /* 进度条形态：3px 细条，品牌色填充随翻页增长 */
+  .carousel-progress {
+    height: 3px;
+    margin-top: var(--space-5);
+    background: var(--color-border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .carousel-progress-fill {
+    height: 100%;
+    width: 0;
+    background: var(--color-brand);
+    transition: width 0.3s ease;
+  }
+</style>
+
+<!--
+  页码按钮由脚本在运行时创建，不带 Astro 的 scoped 属性，
+  scoped 样式永远匹配不到它们 —— 因此按钮样式必须是全局的。
+  选择器以 .carousel 开头限定范围，不会泄漏到其它组件。
+-->
+<style is:global>
+  .carousel .carousel-pagination button {
+    min-width: 34px;
+    height: 34px;
+    border: 1px solid var(--color-border);
+    border-radius: 50%;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .carousel .carousel-pagination button:hover {
+    border-color: var(--color-brand);
+    color: var(--color-brand);
+  }
+
+  .carousel .carousel-pagination button.is-active {
+    background: var(--color-brand);
+    border-color: var(--color-brand);
+    color: #fff;
+  }
+
+  /* 分段指示条形态：每页一段短横条，当前段高亮（页码文字隐藏，仅供屏幕阅读器） */
+  .carousel .carousel-pagination--segments {
+    gap: 6px;
+  }
+
+  .carousel .carousel-pagination--segments button {
+    min-width: 0;
+    width: 28px;
+    height: 4px;
+    padding: 0;
+    border: none;
+    border-radius: 2px;
+    background: var(--color-border);
+    font-size: 0;
+    color: transparent;
+  }
+
+  .carousel .carousel-pagination--segments button:hover {
+    background: var(--color-text-muted);
+  }
+
+  .carousel .carousel-pagination--segments button.is-active {
+    background: var(--color-brand);
+  }
+</style>

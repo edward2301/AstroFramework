@@ -1,0 +1,150 @@
+---
+/**
+ * 站点页脚。
+ * 五类入口必须全覆盖：产品、应用、资源、公司、联系。
+ * 页脚是兜底导航，任一栏目缺席都会让部分页面只剩一条到达路径。
+ */
+import { SITE } from '../../data/site';
+import { organizationFor } from '../../data/organization';
+import { t } from '../../i18n/ui';
+import type { Locale } from '../../i18n/routing';
+import type { FooterColumnView } from '../../lib/nav';
+
+interface Props {
+  locale: Locale;
+  /** 页脚分区，已按语言处理并排好序（见 lib/nav.ts） */
+  columns: FooterColumnView[];
+}
+
+const { locale, columns } = Astro.props;
+const dict = t(locale);
+const org = organizationFor(locale);
+
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      {
+        columns.map((col) => (
+          <div class="footer-col">
+            {/* 栏目标题是分组标签，不是文档大纲节点：用 p 避免在无 H2 的页面造成 H1→H3 跳级 */}
+            <p class="footer-col-title">{col.title}</p>
+            <ul class:list={[col.key === 'products' && col.links.length > 4 && 'footer-links--split']}>
+              {col.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+              {col.withContact && (
+                <>
+                  <li>
+                    <a href={`mailto:${org.contactPoint.email}`}>
+                      {org.contactPoint.email}
+                    </a>
+                  </li>
+                  <li>
+                    <a href={`tel:${org.contactPoint.telephone}`}>
+                      {org.contactPoint.telephone}
+                    </a>
+                  </li>
+                  <li>{org.address.street}</li>
+                  <li>
+                    {org.address.city}{locale === 'zh' ? ' ' : ', '}{org.address.region}
+                    {' '}{org.address.postalCode}
+                  </li>
+                </>
+              )}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {year} {org.legalName} {dict.footer.rights}</p>
+      {
+        /* 备案号：在 data/site.ts 填 icp 后自动显示（按主管部门要求展示） */
+        SITE.icp.length > 0 && (
+          <p class="footer-icp">
+            <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+              {SITE.icp}
+            </a>
+          </p>
+        )
+      }
+    </div>
+  </div>
+</footer>
+
+<style>
+  /* 页脚：深海军蓝，与首页 hero 同一色系——是品牌色的延伸，不是一块突兀的黑 */
+  .site-footer {
+    background: var(--color-ink);
+    color: rgb(255 255 255 / 72%);
+    padding: var(--space-7) 0 var(--space-5);
+    margin-top: var(--space-8);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .footer-col .footer-col-title {
+    font-size: var(--fs-sm);
+    font-weight: 700;
+    line-height: var(--lh-tight);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #fff;
+    margin-bottom: var(--space-3);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* 产品列品类多时拆成两列：链接全部直达，列高只按一半速度增长 */
+  .footer-links--split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-5);
+  }
+
+  .footer-col li {
+    margin-bottom: var(--space-2);
+    font-size: var(--fs-sm);
+  }
+
+  .footer-col a {
+    color: rgb(255 255 255 / 72%);
+  }
+
+  .footer-col a:hover {
+    color: #fff;
+  }
+
+  .footer-icp {
+    margin-top: var(--space-2);
+  }
+
+  .footer-icp a {
+    color: rgb(255 255 255 / 50%);
+  }
+
+  .footer-icp a:hover {
+    color: #fff;
+  }
+
+  .footer-bottom {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgb(255 255 255 / 14%);
+    font-size: var(--fs-xs);
+    color: rgb(255 255 255 / 50%);
+  }
+</style>

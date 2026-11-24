@@ -1,0 +1,164 @@
+﻿---
+/**
+ * 品类页型号卡：图 + 编码 + 全部参数 + 详情链接。
+ *
+ * 参数只在卡片里出现一次——这里就是唯一的参数出处，
+ * 所以列全（跟随品类的对比列）。
+ */
+interface Props {
+  href: string;
+  code: string;
+  status: 'active' | 'discontinued';
+  discontinuedLabel: string;
+  params: { label: string; value: string }[];
+  image?: string;
+  linkLabel: string;
+  /** 标签后的冒号：中文用「：」，英文用「: 」 */
+  colon: string;
+}
+
+const { href, code, status, discontinuedLabel, params, image, linkLabel, colon } = Astro.props;
+const discontinued = status === 'discontinued';
+/** 替代文本用已有参数拼出具体规格，避免只留一个型号编码 */
+const imageAlt = params.length > 0 ? `${code} ${params[0].label} ${params[0].value}` : code;
+---
+
+<article class:list={['model-card', discontinued && 'is-discontinued']}>
+  {
+    image && (
+      <img
+        class="model-card-img"
+        src={image}
+        alt={imageAlt}
+        width="800"
+        height="494"
+        loading="lazy"
+        decoding="async"
+      />
+    )
+  }
+  <div class="model-card-body">
+    <div class="model-card-head">
+      <h3>{code}</h3>
+      {discontinued && <span class="badge">{discontinuedLabel}</span>}
+    </div>
+    <dl class="model-card-params">
+      {
+        params.map((p) => (
+          <div>
+            <dt>{p.label}{colon}</dt>
+            <dd>{p.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+    <a class="model-card-link" href={href}>{linkLabel}</a>
+  </div>
+</article>
+
+<style>
+  .model-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  }
+
+  .model-card:hover {
+    border-color: var(--color-brand);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+  }
+
+  .model-card-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.618;
+    object-fit: cover;
+  }
+
+  .is-discontinued .model-card-img {
+    filter: grayscale(0.6);
+    opacity: 0.75;
+  }
+
+  .model-card-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: var(--space-5);
+  }
+
+  .model-card-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  h3 {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--color-ink);
+  }
+
+  .badge {
+    padding: 2px 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    font-size: var(--fs-xs);
+    color: var(--color-text-muted);
+  }
+
+  /* 参数：两列紧凑排布，标签在前、值紧随其后（同一行） */
+  .model-card-params {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2) var(--space-4);
+    margin: 0 0 var(--space-4);
+  }
+
+  .model-card-params div {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  /* 标签：14px 次要灰；值：深海军蓝 + 500，层级差异靠颜色与字重而非大小 */
+  dt {
+    flex-shrink: 0;
+    font-size: var(--fs-sm);
+    color: var(--color-text-muted);
+  }
+
+  dd {
+    margin: 0;
+    font-size: var(--fs-sm);
+    font-weight: 500;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .model-card-link {
+    margin-top: auto;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border-soft);
+    font-size: var(--fs-sm);
+    color: var(--color-brand);
+    transition: color 0.15s ease;
+  }
+
+  .model-card-link:hover {
+    color: var(--color-link-hover);
+  }
+</style>

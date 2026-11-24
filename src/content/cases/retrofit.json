@@ -1,0 +1,44 @@
+{
+  "draft": false,
+  "title": "Line retrofit with drop-in swap",
+  "background": "An older line used discontinued units; the customer needed a replacement that fit the existing bracket and wiring.",
+  "requirements": [
+    "Same mounting thread.",
+    "Same output signal.",
+    "No PLC program change."
+  ],
+  "selection": "The replacement path on each discontinued model page was followed, keeping the original bracket and cable run.",
+  "config": [
+    "c1",
+    "c2"
+  ],
+  "results": [
+    "Changeover within one shift.",
+    "No rewiring.",
+    "Documented path for future units.",
+    "The replacement path was documented and reused on the second line."
+  ],
+  "date": "2026-03-06",
+  "seoTitle": "Line retrofit with drop-in swap — deployment note",
+  "seoDescription": "Line retrofit with drop-in swap: constraints, models chosen and measurable results. A short deployment note for engineers comparing similar setups.",
+  "locales": {
+    "zh": {
+      "title": "产线改造中的原位替换",
+      "background": "旧产线使用已停产型号，客户需要能直接装进原支架与原接线的替代件。",
+      "requirements": [
+        "安装螺纹一致。",
+        "输出信号一致。",
+        "不改 PLC 程序。"
+      ],
+      "selection": "按停产型号页给出的替代路径选型，保留原支架与线缆走向。",
+      "results": [
+        "一个班次内完成换型。",
+        "无需重新接线。",
+        "后续替换有明确路径。",
+        "替代路径形成文件，并复用到第二条产线。"
+      ],
+      "seoTitle": "产线改造原位替换：不改支架与 PLC 的换型现场可用。",
+      "seoDescription": "旧产线原位替换记录：沿用原支架与线缆走向，仅更换表体，一个班次内完成换型且不改 PLC 程序，附停产型号的替代路径与后续替换依据。现场可用。现场可用。"
+    }
+  }
+}
