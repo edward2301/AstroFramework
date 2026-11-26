@@ -48,13 +48,14 @@ const { href, name, intro, linkLabel, image } = Astro.props;
     border-radius: var(--radius);
     color: var(--color-text);
     height: 100%;
-    background: var(--color-bg);
+    background: var(--color-surface);
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: border-color var(--duration-1) var(--ease), box-shadow var(--duration-1) var(--ease),
+      transform var(--duration-1) var(--ease);
   }
 
   .category-card:hover {
-    border-color: var(--color-brand);
+    border-color: var(--color-action);
     box-shadow: var(--shadow-md);
     transform: translateY(-2px);
   }
@@ -66,7 +67,7 @@ const { href, name, intro, linkLabel, image } = Astro.props;
     height: auto;
     aspect-ratio: 1.618;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform var(--duration-3) var(--ease);
   }
 
   /* 悬停微放大：产品卡标配微交互 */
@@ -84,18 +85,18 @@ const { href, name, intro, linkLabel, image } = Astro.props;
 
   h3 {
     margin-bottom: var(--space-3);
-    letter-spacing: -0.01em;
-    transition: color 0.15s ease;
+    letter-spacing: var(--ls-tight);
+    transition: color var(--duration-1) var(--ease);
   }
 
   .category-card:hover h3 {
-    color: var(--color-brand);
+    color: var(--color-action);
   }
 
   p {
     font-size: var(--fs-sm);
-    line-height: 1.65;
-    color: var(--color-text-muted);
+    line-height: var(--lh-body);
+    color: var(--color-muted);
   }
 
   .category-card-link {
@@ -103,8 +104,9 @@ const { href, name, intro, linkLabel, image } = Astro.props;
     margin-top: auto;
     padding-top: var(--space-4);
     font-size: var(--fs-sm);
-    color: var(--color-brand);
-    transition: transform 0.15s ease, color 0.15s ease;
+    font-weight: 600;
+    color: var(--color-link);
+    transition: transform var(--duration-1) var(--ease), color var(--duration-1) var(--ease);
   }
 
   .category-card-link:hover {

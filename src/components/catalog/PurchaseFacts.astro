@@ -1,0 +1,84 @@
+---
+/**
+ * 采购信息块（工业数据目录版）：起订量 / 交货期 / 付款方式 / 认证，4-up 网格。
+ *
+ * 数据全部来自品类条目的 purchaseInfo（经 categoryView 本地化回落），
+ * 这里只负责排版，不造数、不改写文案。
+ */
+interface Props {
+  purchaseInfo: {
+    moq: string;
+    leadTime: string;
+    payment: string;
+    certifications: string[];
+  };
+  labels: {
+    moq: string;
+    leadTime: string;
+    payment: string;
+    certifications: string;
+  };
+}
+
+const { purchaseInfo, labels } = Astro.props;
+
+const cells = [
+  { label: labels.moq, value: purchaseInfo.moq },
+  { label: labels.leadTime, value: purchaseInfo.leadTime },
+  { label: labels.payment, value: purchaseInfo.payment },
+  {
+    label: labels.certifications,
+    value: purchaseInfo.certifications.length > 0 ? purchaseInfo.certifications.join(' / ') : '—',
+  },
+];
+---
+
+<dl class="purchase-facts">
+  {
+    cells.map((c) => (
+      <div class="fact">
+        <dt>{c.label}</dt>
+        <dd>{c.value}</dd>
+      </div>
+    ))
+  }
+</dl>
+
+<style>
+  /* 4-up：桌面一行四个，768 两列，移动一列；铜色顶线标记这是数据区 */
+  .purchase-facts {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-4);
+    margin: var(--space-6) 0 0;
+  }
+
+  .fact {
+    padding: var(--space-4) var(--space-4) var(--space-5);
+    background: var(--color-data-soft);
+    border-radius: var(--radius);
+    border-top: 2px solid var(--color-data);
+  }
+
+  .fact dt {
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wide);
+    color: var(--color-data);
+    font-weight: 600;
+  }
+
+  .fact dd {
+    margin: var(--space-2) 0 0;
+    font-size: var(--fs-data);
+    font-weight: 500;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 1024px) {
+    .purchase-facts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>

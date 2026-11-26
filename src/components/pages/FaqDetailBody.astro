@@ -26,10 +26,10 @@ const { locale, crumbs, question, Content, models, related } = Astro.props;
 const dict = t(locale);
 ---
 
-<section class="section">
-  <div class="container narrow">
-    <PageHeader locale={locale} crumbs={crumbs} title={question} />
+<PageHeader locale={locale} crumbs={crumbs} title={question} width="narrow" />
 
+<section class="section">
+  <div class="container container-narrow">
     <div class="prose">
       <Content />
     </div>

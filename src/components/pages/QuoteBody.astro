@@ -1,10 +1,13 @@
 ﻿---
 /**
- * 询价页主体：左侧询价表单 + 提交前清单，右侧直接联系卡。
+ * 询价页主体（工业数据目录版）：表单前置，联系信息与清单退为侧栏。
  *
  * 表单不依赖后端：校验通过后组装 mailto 并打开邮件客户端，
  * 所有字段都有可见标签与错误提示，未填必填项时不提交。
  * 交互记录不在这里落库：由运维用 Wrangler 写入 Cloudflare D1，见 deploy/cloudflare/README.md。
+ *
+ * 结构：12 栏（桌面 8 栏表单 / 4 栏 sticky 侧栏）→ 表单之后的三步流程。
+ * 不加 CtaBand：本页本身就是转化终点。
  */
 import PageHeader from '../layout/PageHeader.astro';
 import { localizePath, type Locale } from '../../i18n/routing';
@@ -38,11 +41,94 @@ const mailLabels = {
 };
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={dict.quote.h1} lead={dict.quote.lead} />
+
 <section class="section">
   <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={dict.quote.h1} />
-    <p class="lead">{dict.quote.lead}</p>
+    <div class="quote-grid">
+      {/* 表单先出现在 DOM：键盘与读屏首先到达转化目标 */}
+      <form
+        class="quote-form"
+        data-mailto={mailto}
+        data-msg-required={dict.quote.errRequired}
+        data-msg-email={dict.quote.errEmail}
+        data-mail-labels={JSON.stringify(mailLabels)}
+        novalidate
+      >
+        <h2>{dict.quote.formTitle}</h2>
 
+        <div class="field">
+          <label for="q-model">{dict.quote.fModel} *</label>
+          <input id="q-model" name="model" type="text" required autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="q-qty">{dict.quote.fQty} *</label>
+          <input id="q-qty" name="qty" type="text" required inputmode="numeric" />
+        </div>
+        <div class="field field-wide">
+          <label for="q-cond">{dict.quote.fConditions}</label>
+          <input id="q-cond" name="conditions" type="text" />
+        </div>
+        <div class="field field-wide">
+          <label for="q-company">{dict.quote.fCompany}</label>
+          <input id="q-company" name="company" type="text" autocomplete="organization" />
+        </div>
+        <div class="field">
+          <label for="q-name">{dict.quote.fName} *</label>
+          <input id="q-name" name="name" type="text" required autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="q-email">{dict.quote.fEmail} *</label>
+          <input id="q-email" name="email" type="email" required autocomplete="email" />
+        </div>
+        <div class="field field-wide">
+          <label for="q-notes">{dict.quote.fNotes}</label>
+          <textarea id="q-notes" name="notes" rows="3"></textarea>
+        </div>
+
+        <p class="form-hint">{dict.quote.formHint}</p>
+        <p class="form-error" id="quote-error" role="alert" hidden></p>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary">{dict.quote.submit}</button>
+          <a class="link" href={localizePath(locale, ROUTES.products)}>{dict.quote.browseFirst} →</a>
+        </div>
+
+        {/* 兜底：系统没有默认邮件客户端时，让用户仍能拿到可复制的询价内容 */}
+        <div class="mail-fallback" hidden>
+          <p>{dict.quote.fallbackHint}</p>
+          <pre class="mail-fallback-text"></pre>
+        </div>
+      </form>
+
+      <aside class="quote-aside">
+        {/* 提交前清单：跟着表单走，填表时抬头可见 */}
+        <div class="aside-card">
+          <h2>{dict.quote.whatToInclude}</h2>
+          <ul class="checklist">
+            {dict.quote.items.map((item) => <li>{item}</li>)}
+          </ul>
+        </div>
+
+        <div class="aside-card">
+          <h2>{dict.quote.directContact}</h2>
+          <dl>
+            <dt>{dict.quote.emailLabel}</dt>
+            <dd><a href={`mailto:${org.email}`}>{org.email}</a></dd>
+            <dt>{dict.quote.telLabel}</dt>
+            <dd><a href={`tel:${org.telephone}`}>{org.telephone}</a></dd>
+            <dt>{dict.quote.addressLabel}</dt>
+            <dd>
+              {org.address.street}{locale === 'zh' ? ' ' : ', '}{org.address.city}{locale === 'zh' ? ' ' : ', '}{' '}
+              {org.address.region} {org.address.postalCode},{' '}
+              {org.address.country}
+            </dd>
+          </dl>
+        </div>
+      </aside>
+    </div>
+
+    {/* 三步流程：表单之后回收视线，紧凑 3-up */}
     <ol class="steps">
       {
         dict.quote.steps.map((step, i) => (
@@ -53,84 +139,6 @@ const mailLabels = {
         ))
       }
     </ol>
-
-    <div class="quote-grid">
-      <div class="quote-main">
-        <h2>{dict.quote.whatToInclude}</h2>
-        <ul class="checklist">
-          {dict.quote.items.map((item) => <li>{item}</li>)}
-        </ul>
-
-        <h2>{dict.quote.formTitle}</h2>
-        <form
-          class="quote-form"
-          data-mailto={mailto}
-          data-msg-required={dict.quote.errRequired}
-          data-msg-email={dict.quote.errEmail}
-          data-mail-labels={JSON.stringify(mailLabels)}
-          novalidate
-        >
-          <div class="field">
-            <label for="q-model">{dict.quote.fModel} *</label>
-            <input id="q-model" name="model" type="text" required autocomplete="off" />
-          </div>
-          <div class="field">
-            <label for="q-qty">{dict.quote.fQty} *</label>
-            <input id="q-qty" name="qty" type="text" required inputmode="numeric" />
-          </div>
-          <div class="field field-wide">
-            <label for="q-cond">{dict.quote.fConditions}</label>
-            <input id="q-cond" name="conditions" type="text" />
-          </div>
-          <div class="field field-wide">
-            <label for="q-company">{dict.quote.fCompany}</label>
-            <input id="q-company" name="company" type="text" autocomplete="organization" />
-          </div>
-          <div class="field">
-            <label for="q-name">{dict.quote.fName} *</label>
-            <input id="q-name" name="name" type="text" required autocomplete="name" />
-          </div>
-          <div class="field">
-            <label for="q-email">{dict.quote.fEmail} *</label>
-            <input id="q-email" name="email" type="email" required autocomplete="email" />
-          </div>
-          <div class="field field-wide">
-            <label for="q-notes">{dict.quote.fNotes}</label>
-            <textarea id="q-notes" name="notes" rows="3"></textarea>
-          </div>
-
-          <p class="form-hint">{dict.quote.formHint}</p>
-          <p class="form-error" id="quote-error" role="alert" hidden></p>
-
-          <div class="form-actions">
-            <button type="submit" class="btn">{dict.quote.submit}</button>
-            <a class="link" href={localizePath(locale, ROUTES.products)}>{dict.quote.browseFirst} →</a>
-          </div>
-
-          {/* 兜底：系统没有默认邮件客户端时，让用户仍能拿到可复制的询价内容 */}
-          <div class="mail-fallback" hidden>
-            <p>{dict.quote.fallbackHint}</p>
-            <pre class="mail-fallback-text"></pre>
-          </div>
-        </form>
-      </div>
-
-      <aside class="contact-card">
-        <h2>{dict.quote.directContact}</h2>
-        <dl>
-          <dt>{dict.quote.emailLabel}</dt>
-          <dd><a href={`mailto:${org.email}`}>{org.email}</a></dd>
-          <dt>{dict.quote.telLabel}</dt>
-          <dd><a href={`tel:${org.telephone}`}>{org.telephone}</a></dd>
-          <dt>{dict.quote.addressLabel}</dt>
-          <dd>
-            {org.address.street}{locale === 'zh' ? ' ' : ', '}{org.address.city}{locale === 'zh' ? ' ' : ', '}{' '}
-            {org.address.region} {org.address.postalCode},{' '}
-            {org.address.country}
-          </dd>
-        </dl>
-      </aside>
-    </div>
   </div>
 </section>
 
@@ -234,17 +242,173 @@ const mailLabels = {
 </script>
 
 <style>
-  .lead {
-    max-width: 760px;
-    color: var(--color-text-muted);
+  /* 12 栏：桌面 8 栏表单 / 4 栏侧栏；DOM 顺序表单在前 */
+  .quote-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-7);
+    align-items: start;
   }
 
-  /* 三步流程：横排，数字用强调色，形成从提交到确认的视觉动线 */
+  @media (min-width: 1024px) {
+    .quote-grid {
+      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    }
+  }
+
+  /* 表单占满所在列，不再设 760px 上限 */
+  .quote-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+  }
+
+  .quote-form h2 {
+    grid-column: 1 / -1;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0; /* 全局 .field 自带下边距，这里由 grid gap 控制间距 */
+  }
+
+  .field-wide {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    font-size: var(--fs-sm);
+    color: var(--color-muted);
+  }
+
+  /* 输入框基础样式由全局 .field 提供（16px 防 iOS 聚焦缩放），这里只管焦点态 */
+  input:focus,
+  textarea:focus {
+    outline: none;
+    border-color: var(--color-action);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 18%, transparent);
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .form-hint {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-size: var(--fs-xs);
+    color: var(--color-muted);
+  }
+
+  .form-error {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+    color: var(--color-danger);
+    font-size: var(--fs-sm);
+  }
+
+  /* 兜底面板：浅底 + 等宽正文，方便整段选中复制 */
+  .mail-fallback {
+    grid-column: 1 / -1;
+    padding: var(--space-4);
+    background: var(--color-action-soft);
+    border: 1px solid var(--color-border-brand);
+    border-radius: var(--radius);
+  }
+
+  .mail-fallback p {
+    margin: 0 0 var(--space-2);
+    font-size: var(--fs-sm);
+    color: var(--color-muted);
+  }
+
+  .mail-fallback-text {
+    margin: 0;
+    padding: var(--space-3);
+    background: var(--color-surface);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    line-height: 1.6;
+    color: var(--color-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  .link {
+    font-size: var(--fs-sm);
+    color: var(--color-link);
+  }
+
+  /* 侧栏：桌面 sticky 在页头下方 */
+  .quote-aside {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  @media (min-width: 1024px) {
+    .quote-aside {
+      position: sticky;
+      top: calc(var(--header-h) + 16px);
+    }
+  }
+
+  .aside-card {
+    padding: var(--space-5);
+    background: var(--color-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  .aside-card h2 {
+    font-size: var(--fs-h3);
+  }
+
+  .checklist {
+    margin: 0;
+    padding-left: var(--space-5);
+    color: var(--color-muted);
+  }
+
+  .checklist li {
+    margin-bottom: var(--space-2);
+  }
+
+  .aside-card dl {
+    display: grid;
+    gap: var(--space-2);
+    margin: 0;
+  }
+
+  .aside-card dt {
+    font-size: var(--fs-sm);
+    color: var(--color-muted);
+  }
+
+  .aside-card dd {
+    margin: 0 0 var(--space-2);
+  }
+
+  /* 三步流程：表单之后的紧凑 3-up，数字用铜色数据强调 */
   .steps {
     list-style: none;
-    margin: 0 0 var(--space-7);
+    margin: var(--space-8) 0 0;
     padding: var(--space-5) 0 0;
-    border-top: 2px solid var(--color-brand-100);
+    border-top: 1px solid var(--color-border);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-6);
@@ -256,11 +420,11 @@ const mailLabels = {
   }
 
   .step-num {
-    font-size: 28px;
+    font-size: var(--fs-h2);
     font-weight: 700;
     line-height: 1;
-    letter-spacing: -0.02em;
-    color: var(--color-accent);
+    letter-spacing: var(--ls-tight);
+    color: var(--color-data);
     font-variant-numeric: tabular-nums;
   }
 
@@ -270,188 +434,14 @@ const mailLabels = {
     color: var(--color-text);
   }
 
-  .quote-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 320px;
-    gap: var(--space-7);
-    align-items: start;
-  }
-
-  .checklist {
-    margin: 0 0 var(--space-6);
-    padding-left: var(--space-5);
-    color: var(--color-text-muted);
-  }
-
-  .checklist li {
-    margin-bottom: var(--space-2);
-  }
-
-  .quote-form {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
-    max-width: 760px;
-  }
-
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-  }
-
-  .field-wide {
-    grid-column: 1 / -1;
-  }
-
-  label {
-    font-size: var(--fs-sm);
-    color: var(--color-text-muted);
-  }
-
-  input,
-  textarea {
-    width: 100%;
-    padding: 10px 12px;
-    font: inherit;
-    font-size: var(--fs-sm);
-    color: var(--color-text);
-    background: var(--color-bg);
-    border: 1px solid var(--color-border-strong);
-    border-radius: var(--radius);
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  input:focus,
-  textarea:focus {
-    outline: none;
-    border-color: var(--color-brand);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 18%, transparent);
-  }
-
-  textarea {
-    resize: vertical;
-  }
-
-  .form-hint {
-    grid-column: 1 / -1;
-    margin: 0;
-    font-size: var(--fs-xs);
-    color: var(--color-text-muted);
-  }
-
-  .form-error {
-    grid-column: 1 / -1;
-    margin: 0;
-    padding: var(--space-3);
-    border-radius: var(--radius);
-    background: color-mix(in srgb, #d93025 12%, transparent);
-    color: #b3261e;
-    font-size: var(--fs-sm);
-  }
-
-  /* 兜底面板：浅底 + 等宽正文，方便整段选中复制 */
-  .mail-fallback {
-    grid-column: 1 / -1;
-    padding: var(--space-4);
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-100);
-    border-radius: var(--radius);
-  }
-
-  .mail-fallback p {
-    margin: 0 0 var(--space-2);
-    font-size: var(--fs-sm);
-    color: var(--color-text-muted);
-  }
-
-  .mail-fallback-text {
-    margin: 0;
-    padding: var(--space-3);
-    background: var(--color-bg);
-    border-radius: var(--radius);
-    border: 1px solid var(--color-border);
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    line-height: 1.6;
-    color: var(--color-text);
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
-  .btn[disabled] {
-    opacity: 0.6;
-    cursor: default;
-  }
-
-  .form-actions {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
-    flex-wrap: wrap;
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 12px 24px;
-    background: var(--color-brand);
-    color: #fff;
-    border: 0;
-    border-radius: var(--radius);
-    font: inherit;
-    font-size: var(--fs-sm);
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-
-  .btn:hover {
-    background: var(--color-brand-hover);
-  }
-
-  .link {
-    font-size: var(--fs-sm);
-  }
-
-  .contact-card {
-    padding: var(--space-5);
-    background: var(--color-bg-subtle);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-  }
-
-  .contact-card h2 {
-    font-size: var(--fs-h3);
-  }
-
-  .contact-card dl {
-    display: grid;
-    gap: var(--space-2);
-    margin: 0;
-  }
-
-  .contact-card dt {
-    font-size: var(--fs-sm);
-    color: var(--color-text-muted);
-  }
-
-  .contact-card dd {
-    margin: 0 0 var(--space-2);
-  }
-
   @media (max-width: 1024px) {
+    .quote-form {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
     .steps {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-4);
-    }
-
-    .quote-grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-6);
-    }
-
-    .quote-form {
-      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

@@ -1,15 +1,15 @@
 ---
 /**
- * 首页主体。
+ * 首页主体（工业数据目录版）。
  *
  * 只负责渲染，不取数、不拼 SEO —— 数据与元标签由路由层准备后传入。
  * 中英文路由共用本组件，差异只来自 locale 与已本地化的数据。
  *
- * 机型卡轮播用公共组件 Carousel：所有卡片都在服务端 HTML 里，
- * 翻页与箭头只是「切换看哪几张」的视图开关，不决定内容有无，也不产生新 URL。
+ * 结构：石墨 hero（左文案 + 右可核验事实面板）→ 品类网格 → 精选型号网格 → CTA。
+ * 轮播已移除：网格让所有卡片进入服务端 HTML 的同一屏流，不再有半空页。
  */
-import Carousel from '../layout/Carousel.astro';
 import CtaBand from '../layout/CtaBand.astro';
+import SectionTitle from '../layout/SectionTitle.astro';
 import CategoryCard from '../cards/CategoryCard.astro';
 import ModelCard from '../cards/ModelCard.astro';
 import { t } from '../../i18n/ui';
@@ -38,33 +38,40 @@ const dict = t(locale);
 ---
 
 <section class="hero">
-  <div class="container">
-    <h1>{dict.home.h1}</h1>
-    <p class="lead">{dict.home.lead(categories.length, totalModels)}</p>
-    <div class="actions">
-      <a class="btn btn-primary" href={localizePath(locale, ROUTES.products)}>
-        {dict.home.browseProducts}
-      </a>
-      <a class="btn btn-secondary" href={localizePath(locale, ROUTES.quote)}>
-        {dict.home.requestQuote}
-      </a>
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <h1>{dict.home.h1}</h1>
+      <p class="lead">{dict.home.lead(categories.length, totalModels)}</p>
+      <div class="actions">
+        <a class="btn btn--primary btn--lg" href={localizePath(locale, ROUTES.products)}>
+          {dict.home.browseProducts}
+        </a>
+        <a class="btn btn--on-dark btn--lg" href={localizePath(locale, ROUTES.quote)}>
+          {dict.home.requestQuote}
+        </a>
+      </div>
     </div>
+
+    {/* 可核验事实面板：措辞取自 /certifications/，不另造说法 */}
+    <aside class="proof" aria-label={dict.home.trust.link}>
+      <ul>
+        {dict.home.trust.facts.map((fact) => <li>{fact}</li>)}
+      </ul>
+      <a class="proof-link" href={localizePath(locale, ROUTES.certifications)}>
+        {dict.home.trust.link} →
+      </a>
+    </aside>
   </div>
 </section>
 
 <section class="section">
   <div class="container">
-    <h2>
-  <a class="section-title-link" href={localizePath(locale, ROUTES.products)}>
-    {dict.home.categories}
-  </a>
-</h2>
-    <Carousel
-      class="category-carousel"
-      pagination="segments"
-      labelPrev={dict.carousel.prev}
-      labelNext={dict.carousel.next}
-    >
+    <SectionTitle
+      title={dict.home.categories}
+      href={localizePath(locale, ROUTES.products)}
+      linkLabel={dict.home.browseProducts}
+    />
+    <ul class="card-grid">
       {
         categories.map((c) => (
           <li>
@@ -78,21 +85,16 @@ const dict = t(locale);
           </li>
         ))
       }
-    </Carousel>
+    </ul>
   </div>
 </section>
 
 {
   models.length > 0 && (
-    <section class="section section-subtle">
+    <section class="section section-alt">
       <div class="container">
-        <h2>{dict.home.selectedModels}</h2>
-        <Carousel
-          class="model-carousel"
-          labelPrev={dict.carousel.prev}
-          labelNext={dict.carousel.next}
-          labelPages={dict.carousel.pages}
-        >
+        <SectionTitle title={dict.home.selectedModels} />
+        <ul class="card-grid">
           {models.map((m) => (
             <li>
               <ModelCard
@@ -104,53 +106,40 @@ const dict = t(locale);
               />
             </li>
           ))}
-        </Carousel>
+        </ul>
       </div>
     </section>
   )
 }
-
-{/* 信任条：三条可核验事实 + 认证页入口（措辞取自 /certifications/，不另造说法） */}
-<section class="trust-band" aria-label={dict.home.trust.link}>
-  <div class="container trust-band-inner">
-    <ul>
-      {dict.home.trust.facts.map((fact) => <li>{fact}</li>)}
-    </ul>
-    <a class="trust-band-link" href={localizePath(locale, ROUTES.certifications)}>
-      {dict.home.trust.link} →
-    </a>
-  </div>
-</section>
 
 {/* 首页唯一的转化横条：hero 之后直到页脚的询价入口 */}
 <CtaBand locale={locale} />
 
 <style>
   /*
-   * 深色 hero：透明页眉浮在上面（白字），所以这里必须是深色底、白字。
-   * 顶部内边距先补回固定页眉的高度（72px），再留出呼吸空间。
-   */
-  /*
-   * 深色 hero：透明页眉浮在上面（白字），所以这里必须是深色底、白字。
-   * 顶部内边距先补回固定页眉的高度（72px）。两个品牌色光斑做视觉锚点。
+   * 石墨 hero：透明页眉浮在上面（白字），所以这里必须是深色底、白字。
+   * 顶部内边距先补回固定页眉的高度（--header-h），再留出呼吸空间。
    */
   .hero {
-    padding: calc(72px + var(--space-7)) 0 var(--space-7);
-    background:
-      radial-gradient(560px 280px at 85% 15%, rgb(24 99 220 / 28%), transparent 70%),
-      radial-gradient(420px 260px at 8% 95%, rgb(0 150 222 / 14%), transparent 70%),
-      linear-gradient(135deg, var(--color-ink) 0%, var(--color-ink-soft) 55%, #1863dc 145%);
+    padding: calc(var(--header-h) + var(--space-8)) 0 var(--space-8);
+    background: linear-gradient(160deg, var(--color-ink) 0%, var(--color-ink-soft) 100%);
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-7);
   }
 
   .hero h1 {
     max-width: 820px;
-    color: #fff;
+    color: var(--color-on-dark);
   }
 
   .lead {
     max-width: 680px;
     font-size: var(--fs-lead);
-    color: rgb(255 255 255 / 78%);
+    color: var(--color-on-dark-muted);
   }
 
   .actions {
@@ -160,160 +149,96 @@ const dict = t(locale);
     margin-top: var(--space-5);
   }
 
-  .btn {
-    display: inline-block;
-    padding: 12px 26px;
-    border-radius: var(--radius);
-    font-size: var(--fs-sm);
-    font-weight: 500;
-    text-decoration: none;
+  /* 可核验事实面板：深色带上的浅描边面板 */
+  .proof {
+    padding: var(--space-6);
+    border: 1px solid rgb(255 255 255 / 22%);
+    border-radius: var(--radius-lg);
+    background: rgb(255 255 255 / 6%);
   }
 
-  .btn-primary {
-    background: var(--color-brand);
-    color: #fff;
-    box-shadow: 0 4px 14px rgb(0 0 0 / 25%);
-  }
-
-  .btn-primary:hover {
-    background: var(--color-brand-hover);
-    box-shadow: 0 6px 18px rgb(0 0 0 / 35%);
-    text-decoration: none;
-  }
-
-  /* 深色 hero 里的次按钮：白描边幽灵样式（首页只有 hero 用到它） */
-  .hero .btn-secondary {
-    background: transparent;
-    border-color: rgb(255 255 255 / 45%);
-    color: #fff;
-  }
-
-  .hero .btn-secondary:hover {
-    background: rgb(255 255 255 / 12%);
-    border-color: #fff;
-  }
-
-  .btn-secondary {
-    border: 1px solid var(--color-border);
-    color: var(--color-text);
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--color-text-muted);
-    text-decoration: none;
-  }
-
-  .section-subtle {
-    background: var(--color-bg-subtle);
-  }
-
-  /*
-   * 两个轮播的每屏张数（--per-view）：同一组断点内一并声明，避免两套媒体查询平行维护。
-   *   · 品类（大卡，目录层）：1 / 2 / 2 / 3
-   *   · 型号（左文右图，商品层）：1 / 2 / 3 / 4
-   * 改断点只动下面四处；容器 1400px 下宽屏各卡约 335–450px。
-   */
-  :global(.category-carousel) {
-    --per-view: 1;
-  }
-
-  :global(.model-carousel) {
-    --per-view: 1;
-  }
-
-  @media (min-width: 768px) {
-    :global(.category-carousel) {
-      --per-view: 2;
-    }
-
-    :global(.model-carousel) {
-      --per-view: 2;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    :global(.category-carousel) {
-      --per-view: 2;
-    }
-
-    :global(.model-carousel) {
-      --per-view: 3;
-    }
-  }
-
-  /* 宽屏：品类 3 张、型号 4 张——1400 容器里的密度与大屏匹配 */
-  @media (min-width: 1600px) {
-    :global(.category-carousel) {
-      --per-view: 3;
-    }
-
-    :global(.model-carousel) {
-      --per-view: 4;
-    }
-  }
-
-  /* 信任条：与正文同宽的细带，三条事实 + 认证页链接 */
-  .trust-band {
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-    background: var(--color-bg-subtle);
-    padding: var(--space-5) 0;
-  }
-
-  .trust-band-inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--space-3) var(--space-6);
-  }
-
-  .trust-band ul {
+  .proof ul {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3) var(--space-6);
-    flex: 1;
+    display: grid;
+    gap: var(--space-4);
   }
 
-  .trust-band li {
+  .proof li {
     position: relative;
-    padding-left: 14px;
+    padding-left: 20px;
     font-size: var(--fs-sm);
-    color: var(--color-text);
+    line-height: 1.55;
+    color: var(--color-on-dark-muted);
   }
 
-  /* 品牌色小方点：与页眉/h2 的方点语言一致，不用图标 */
-  .trust-band li::before {
+  .proof li::before {
     content: '';
     position: absolute;
     left: 0;
     top: 0.55em;
-    width: 6px;
-    height: 6px;
-    border-radius: 1px;
-    background: var(--color-brand);
+    width: 8px;
+    height: 8px;
+    border-radius: var(--radius-xs);
+    background: rgb(255 255 255 / 45%);
   }
 
-  .trust-band-link {
-    flex-shrink: 0;
+  .proof-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid rgb(255 255 255 / 14%);
     font-size: var(--fs-sm);
-    color: var(--color-brand);
+    font-weight: 600;
+    color: var(--color-on-dark-active);
   }
 
-  .trust-band-link:hover {
-    color: var(--color-link-hover);
-  }
-  /* 板块标题里的链接：外观与标题一致，悬停才染品牌色 */
-  .section-title-link {
-    color: inherit;
-    text-decoration: none;
-    transition: color 0.15s ease;
+  .proof-link:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
   }
 
-  .section-title-link:hover {
-    color: var(--color-brand);
-    text-decoration: none;
+  /* 宽屏两栏：左文案、右事实面板；面板比文案列窄，视线先落在 h1 上 */
+  @media (min-width: 1024px) {
+    .hero-inner {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: center;
+    }
+  }
+
+  .section-alt {
+    background: var(--color-subtle);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  /* 卡片网格：1 / 2 / 3 栏；li 用 flex 让卡片等高 */
+  .card-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .card-grid > li {
+    display: flex;
+  }
+
+  @media (min-width: 768px) {
+    .card-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .card-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 </style>

@@ -37,10 +37,10 @@ const related = [
 ];
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={heading} lead={body.intro} />
+
 <section class="section">
   <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={heading} lead={body.intro} />
-
     {metrics.length > 0 && <MetricStrip items={metrics} />}
 
     {/* 栏目说明：有列表时同样要出现，否则页面只剩标题与卡片，正文全丢 */}
@@ -99,7 +99,7 @@ const related = [
   .section-current {
     max-width: 760px;
     margin: 0 0 var(--space-6);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .section-layout {
@@ -117,10 +117,10 @@ const related = [
     width: 34px;
     height: 34px;
     margin-bottom: var(--space-2);
-    border-radius: 8px;
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-100);
-    color: var(--color-brand);
+    border-radius: var(--radius-sm);
+    background: var(--color-action-soft);
+    border: 1px solid var(--color-border-brand);
+    color: var(--color-action);
     font-size: var(--fs-sm);
     font-weight: 700;
     text-transform: uppercase;
@@ -153,13 +153,14 @@ const related = [
     padding: var(--space-5);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    background: var(--color-bg);
+    background: var(--color-surface);
     text-decoration: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: border-color var(--duration-1) var(--ease), box-shadow var(--duration-1) var(--ease),
+      transform var(--duration-1) var(--ease);
   }
 
   .items a:hover {
-    border-color: var(--color-brand);
+    border-color: var(--color-action);
     box-shadow: var(--shadow-md);
     transform: translateY(-3px);
     text-decoration: none;
@@ -173,7 +174,7 @@ const related = [
 
   .items .meta {
     font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -183,16 +184,12 @@ const related = [
   .items .badge {
     margin-top: auto;
     align-self: flex-start;
-    padding: 2px 8px;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    font-size: var(--fs-xs);
-    color: var(--color-brand);
+    color: var(--color-action);
   }
 
   .related-card {
     padding: var(--space-5);
-    background: var(--color-bg-subtle);
+    background: var(--color-subtle);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
   }
@@ -211,7 +208,7 @@ const related = [
 
   .links a {
     font-size: var(--fs-sm);
-    color: var(--color-brand);
+    color: var(--color-link);
   }
 
   .links a:hover {

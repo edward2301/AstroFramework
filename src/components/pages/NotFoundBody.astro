@@ -26,10 +26,10 @@ const dict = t(locale);
     <h1>{dict.notFound.h1}</h1>
     <p class="lead">{dict.notFound.lead}</p>
     <p class="actions">
-      <a class="btn" href={localizePath(locale, ROUTES.products)}>
+      <a class="btn btn--primary" href={localizePath(locale, ROUTES.products)}>
         {dict.notFound.browseProducts}
       </a>
-      <a class="btn btn-secondary" href={localizePath(locale, ROUTES.quote)}>
+      <a class="btn btn--secondary" href={localizePath(locale, ROUTES.quote)}>
         {dict.notFound.requestQuote}
       </a>
     </p>
@@ -41,12 +41,12 @@ const dict = t(locale);
     margin: 0 0 var(--space-2);
     font-size: var(--fs-sm);
     letter-spacing: 0.12em;
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .lead {
     max-width: 640px;
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .actions {
@@ -54,30 +54,5 @@ const dict = t(locale);
     gap: var(--space-3);
     flex-wrap: wrap;
     margin-top: var(--space-5);
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background: var(--color-brand);
-    color: #fff;
-    border-radius: var(--radius);
-    font-size: var(--fs-sm);
-    text-decoration: none;
-  }
-
-  .btn:hover {
-    background: var(--color-brand-hover);
-    text-decoration: none;
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--color-text-muted);
   }
 </style>

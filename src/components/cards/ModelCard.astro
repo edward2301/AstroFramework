@@ -45,15 +45,16 @@ const { href, code, firstParamLabel, firstParam, image } = Astro.props;
   .model-card {
     display: flex;
     align-items: center;
-    background: var(--color-bg);
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: border-color var(--duration-1) var(--ease), box-shadow var(--duration-1) var(--ease),
+      transform var(--duration-1) var(--ease);
   }
 
   .model-card:hover {
-    border-color: var(--color-brand);
+    border-color: var(--color-action);
     box-shadow: var(--shadow-md);
     transform: translateY(-3px);
   }
@@ -78,13 +79,13 @@ const { href, code, firstParamLabel, firstParam, image } = Astro.props;
   }
 
   .model-card-code:hover strong {
-    color: var(--color-brand);
+    color: var(--color-action);
   }
 
   strong {
     font-size: var(--fs-h3);
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--ls-tight);
   }
 
   .model-card-code strong::after {
@@ -92,8 +93,8 @@ const { href, code, firstParamLabel, firstParam, image } = Astro.props;
     display: block;
     width: 28px;
     height: 3px;
-    border-radius: 2px;
-    background: var(--color-brand);
+    border-radius: var(--radius-xs);
+    background: var(--color-action);
     margin-top: 10px;
   }
 
@@ -101,7 +102,7 @@ const { href, code, firstParamLabel, firstParam, image } = Astro.props;
   em {
     font-style: normal;
     font-size: var(--fs-xs);
-    color: var(--color-text);
+    color: var(--color-muted);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -120,7 +121,7 @@ const { href, code, firstParamLabel, firstParam, image } = Astro.props;
     aspect-ratio: 1.618;
     align-self: center;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform var(--duration-3) var(--ease);
   }
 
   /* 悬停微放大：产品卡标配微交互 */

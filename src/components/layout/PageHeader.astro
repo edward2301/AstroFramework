@@ -1,9 +1,9 @@
 ---
 /**
- * 内页页头横幅：面包屑 + 页面标题，浅灰底。
+ * 内页页头：full-bleed 浅色带，面包屑 + h1 + lead + meta + actions。
  *
- * 全站内页的页头区在这里统一，
- * 参考同类 B2B 站「每个内页一条浅色 banner」的做法。
+ * 必须放在 `.section` 之外（紧贴页头下方），内部自带 container；
+ * 放进 `.section > .container` 会出现双重内缩。
  */
 import Breadcrumb from '../seo/Breadcrumb.astro';
 import { t } from '../../i18n/ui';
@@ -14,56 +14,48 @@ interface Props {
   locale: Locale;
   crumbs: Crumb[];
   title: string;
-  /** 可选右侧配图（public/ 路径）：标题与图同行，避免横幅右侧留空 */
-  image?: string;
-  /** 配图 alt；图仅作识别时传空字符串 */
-  imageAlt?: string;
-  /** 标题下的一行概述（型号数、对比项等），灰字 */
+  /** 标题下的一行概述 */
   lead?: string;
+  /** 一行数据摘要（型号数、参数数、停产数），tabular 数字 */
+  meta?: string;
+  /** 横幅内宽度：wide 1280 / narrow 880 */
+  width?: 'wide' | 'narrow';
 }
 
-const { locale, crumbs, title, image, imageAlt = '', lead } = Astro.props;
+const { locale, crumbs, title, lead, meta, width = 'wide' } = Astro.props;
 const dict = t(locale);
 ---
 
 <div class="page-header">
-  <div class="container page-header-inner">
+  <div class:list={['container', 'page-header-inner', width === 'narrow' && 'page-header-inner--narrow']}>
     <div class="page-header-text">
       <Breadcrumb items={crumbs} label={dict.breadcrumb.aria} />
       <h1>{title}</h1>
       {lead && <p class="page-header-lead">{lead}</p>}
+      {meta && <p class="page-header-meta">{meta}</p>}
     </div>
-    {
-      image && (
-        <img
-          class="page-header-img"
-          src={image}
-          alt={imageAlt}
-          width="1200"
-          height="742"
-          loading="lazy"
-          decoding="async"
-        />
-      )
-    }
+    <div class="page-header-actions">
+      <slot name="actions" />
+    </div>
   </div>
 </div>
 
 <style>
-  /* 浅底偏品牌蓝：比纯灰更有温度，仍足够安静不抢内容 */
   .page-header {
-    /* 横幅与下方内容统一留白：所有内页共用，避免各页各加一次 */
-    margin-bottom: var(--space-6);
-    background: color-mix(in srgb, var(--color-brand-soft) 45%, var(--color-bg-subtle));
-    border-bottom: 1px solid var(--color-border-brand);
-    padding: var(--space-5) 0;
+    background: var(--color-subtle);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-6) 0;
   }
 
   .page-header-inner {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: var(--space-6);
+    gap: var(--space-5);
+  }
+
+  .page-header-inner--narrow {
+    max-width: var(--container-narrow);
   }
 
   .page-header-text {
@@ -71,32 +63,37 @@ const dict = t(locale);
   }
 
   .page-header h1 {
-    margin: 0;
+    margin: var(--space-2) 0 0;
     font-size: var(--fs-h1);
     color: var(--color-ink);
   }
 
   .page-header-lead {
+    margin: var(--space-3) 0 0;
+    max-width: var(--measure-lead);
+    font-size: var(--fs-lead);
+    line-height: var(--lh-body);
+    color: var(--color-muted);
+  }
+
+  .page-header-meta {
     margin: var(--space-2) 0 0;
-    max-width: 760px;
     font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
   }
 
-  /* 横幅配图：固定小尺寸，只做品类标记，不与标题争视线 */
-  .page-header-img {
+  .page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
     flex-shrink: 0;
-    width: 200px;
-    height: auto;
-    aspect-ratio: 1.618;
-    object-fit: cover;
-    border-radius: var(--radius);
-    border: 1px solid var(--color-border-brand);
   }
 
-  @media (max-width: 767px) {
-    .page-header-img {
-      display: none;
+  @media (max-width: 768px) {
+    .page-header-inner {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>

@@ -3,24 +3,42 @@
  * 站点页脚。
  * 五类入口必须全覆盖：产品、应用、资源、公司、联系。
  * 页脚是兜底导航，任一栏目缺席都会让部分页面只剩一条到达路径。
+ * 另提供全站语言切换（页眉语言钮在窄屏隐藏后的替代入口）。
  */
 import { SITE } from '../../data/site';
 import { organizationFor } from '../../data/organization';
 import { t } from '../../i18n/ui';
-import type { Locale } from '../../i18n/routing';
+import {
+  LOCALES,
+  LOCALE_LABELS,
+  LOCALE_META,
+  localizePath,
+  type Locale,
+} from '../../i18n/routing';
 import type { FooterColumnView } from '../../lib/nav';
 
 interface Props {
   locale: Locale;
   /** 页脚分区，已按语言处理并排好序（见 lib/nav.ts） */
   columns: FooterColumnView[];
+  /** 语言无关路径，用于生成各语言页脚链接 */
+  path: string;
 }
 
-const { locale, columns } = Astro.props;
+const { locale, columns, path } = Astro.props;
 const dict = t(locale);
 const org = organizationFor(locale);
 
 const year = new Date().getFullYear();
+
+/** 语言切换：列出全部语言，当前语言标记 aria-current */
+const localeLinks = LOCALES.map((item) => ({
+  locale: item,
+  label: LOCALE_LABELS[item],
+  href: localizePath(item, path),
+  current: item === locale,
+  htmlLang: LOCALE_META[item].htmlLang,
+}));
 ---
 <footer class="site-footer">
   <div class="container">
@@ -61,6 +79,21 @@ const year = new Date().getFullYear();
       }
     </div>
 
+    <nav class="footer-lang" aria-label={dict.header.switchAria(LOCALE_LABELS[locale])}>
+      {
+        localeLinks.map((item) => (
+          <a
+            href={item.href}
+            hreflang={item.htmlLang}
+            lang={item.htmlLang}
+            aria-current={item.current ? 'page' : undefined}
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
     <div class="footer-bottom">
       <p>&copy; {year} {org.legalName} {dict.footer.rights}</p>
       {
@@ -78,17 +111,17 @@ const year = new Date().getFullYear();
 </footer>
 
 <style>
-  /* 页脚：深海军蓝，与首页 hero 同一色系——是品牌色的延伸，不是一块突兀的黑 */
+  /* 页脚：深石墨，与首页 hero 同一色系——是品牌色的延伸，不是一块突兀的黑 */
   .site-footer {
     background: var(--color-ink);
     color: rgb(255 255 255 / 72%);
     padding: var(--space-7) 0 var(--space-5);
-    margin-top: var(--space-8);
+    margin-top: var(--space-section);
   }
 
   .footer-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    grid-template-columns: 1fr;
     gap: var(--space-6);
   }
 
@@ -120,12 +153,50 @@ const year = new Date().getFullYear();
     font-size: var(--fs-sm);
   }
 
+  .footer-col li a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+  }
+
   .footer-col a {
     color: rgb(255 255 255 / 72%);
   }
 
   .footer-col a:hover {
     color: #fff;
+  }
+
+  /* 语言切换：页眉语言钮在窄屏隐藏后的替代入口 */
+  .footer-lang {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgb(255 255 255 / 14%);
+  }
+
+  .footer-lang a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    border: 1px solid rgb(255 255 255 / 25%);
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-sm);
+    color: rgb(255 255 255 / 72%);
+    text-decoration: none;
+  }
+
+  .footer-lang a:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .footer-lang a[aria-current='page'] {
+    color: #fff;
+    border-color: rgb(255 255 255 / 55%);
   }
 
   .footer-icp {
@@ -141,10 +212,22 @@ const year = new Date().getFullYear();
   }
 
   .footer-bottom {
-    margin-top: var(--space-6);
+    margin-top: var(--space-5);
     padding-top: var(--space-4);
     border-top: 1px solid rgb(255 255 255 / 14%);
     font-size: var(--fs-xs);
     color: rgb(255 255 255 / 50%);
+  }
+
+  @media (min-width: 768px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 2fr repeat(4, minmax(0, 1fr));
+    }
   }
 </style>

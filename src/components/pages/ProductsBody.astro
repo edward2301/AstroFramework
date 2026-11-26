@@ -1,6 +1,8 @@
 ---
 /**
- * 产品总览主体。只负责渲染，数据由路由层准备。
+ * 产品总览主体（工业数据目录版）。只负责渲染，数据由路由层准备。
+ *
+ * 结构：品类索引表（可扫读的目录入口）→ 品类目录行（280px 图 + 文案）→ CTA。
  */
 import PageHeader from '../layout/PageHeader.astro';
 import CtaBand from '../layout/CtaBand.astro';
@@ -28,21 +30,53 @@ const { locale, crumbs, categories, totalModels } = Astro.props;
 const dict = t(locale);
 ---
 
+<PageHeader
+  locale={locale}
+  crumbs={crumbs}
+  title={dict.products.h1}
+  lead={dict.products.lead(categories.length, totalModels)}
+/>
+
 <section class="section">
   <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={dict.products.h1} />
-    <p class="lead">{dict.products.lead(categories.length, totalModels)}</p>
+    {/* 品类索引表：先给一张可扫读的目录，再进入逐个介绍 */}
+    <table class="data-table index-table">
+      <caption>{dict.products.h1}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{dict.footer.columns.products}</th>
+          <th scope="col">{dict.category.modelsTitle}</th>
+          <th scope="col">{dict.category.detailLink}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          categories.map((c) => (
+            <tr>
+              <th scope="row">
+                <a href={localizePath(locale, detailPath.category(c.id))}>{c.name}</a>
+              </th>
+              <td>{c.modelCount}</td>
+              <td>
+                <a href={localizePath(locale, detailPath.category(c.id))}>
+                  {dict.products.browseModels(c.modelCount)}
+                </a>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
 
     <div class="category-rows">
       {
-        categories.map((c, i) => (
+        categories.map((c) => (
           <CategoryRow
             href={localizePath(locale, detailPath.category(c.id))}
             name={c.name}
             intro={`${c.intro.slice(0, 150)}…`}
             linkLabel={dict.products.browseModels(c.modelCount)}
             image={c.image}
-            flip={i % 2 === 1}
           />
         ))
       }
@@ -53,16 +87,24 @@ const dict = t(locale);
 <CtaBand locale={locale} />
 
 <style>
-  .lead {
-    max-width: 700px;
-    color: var(--color-text-muted);
+  .index-table {
+    margin-bottom: var(--space-8);
+  }
+
+  .index-table th[scope='row'] {
+    width: auto;
+    font-weight: 500;
+  }
+
+  .index-table td {
+    width: 1%;
+    white-space: nowrap;
   }
 
   /* 品类行之间用细线分隔：比纯留白更有目录节奏，也便于滚动时定位 */
   .category-rows {
     display: grid;
     gap: var(--space-7);
-    margin-top: var(--space-6);
   }
 
   .category-rows > * + * {

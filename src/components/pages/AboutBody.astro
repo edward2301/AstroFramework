@@ -31,10 +31,10 @@ const images = [
 ];
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={heading} lead={org.description} />
+
 <section class="section">
   <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={heading} lead={org.description} />
-
     <MetricStrip items={metrics} />
 
     <div class="about-rows">
@@ -55,7 +55,7 @@ const images = [
       <div class="about-contact-text">
         <h2>{dict.aboutPage.contactTitle}</h2>
         <p>{dict.quote.lead}</p>
-        <a class="btn" href={localizePath(locale, '/contact/quote/')}>{dict.home.requestQuote} →</a>
+        <a class="btn btn--primary" href={localizePath(locale, '/contact/quote/')}>{dict.home.requestQuote} →</a>
       </div>
 
       <dl class="about-contact-card">
@@ -94,31 +94,14 @@ const images = [
   }
 
   .about-contact-text p {
-    color: var(--color-text-muted);
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 12px 24px;
-    border-radius: 999px;
-    background: var(--color-brand);
-    color: #fff;
-    font-size: var(--fs-sm);
-    text-decoration: none;
-    transition: background 0.15s ease;
-  }
-
-  .btn:hover {
-    background: var(--color-brand-hover);
-    color: #fff;
-    text-decoration: none;
+    color: var(--color-muted);
   }
 
   .about-contact-card {
     margin: 0;
     padding: var(--space-5);
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-100);
+    background: var(--color-action-soft);
+    border: 1px solid var(--color-border-brand);
     border-radius: var(--radius);
     display: grid;
     gap: var(--space-4);
@@ -128,7 +111,7 @@ const images = [
     font-size: var(--fs-xs);
     text-transform: uppercase;
     letter-spacing: var(--ls-wide);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .about-contact-card dd {

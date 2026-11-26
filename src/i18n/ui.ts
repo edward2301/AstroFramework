@@ -34,12 +34,6 @@ export interface Dict {
   cta: {
     title: string;
   };
-  /** 轮播组件（components/layout/Carousel.astro）的无障碍标签 */
-  carousel: {
-    prev: string;
-    next: string;
-    pages: string;
-  };
   home: {
     h1: string;
     lead: (categories: number, models: number) => string;
@@ -73,6 +67,10 @@ export interface Dict {
     paramsUnit: (count: number) => string;
     /** 型号卡上的详情链接文案 */
     detailLink: string;
+    /** 采购信息标签（PurchaseFacts）：起订量 / 交货期 / 付款方式 */
+    moq: string;
+    leadTime: string;
+    payment: string;
   };
   model: {
     discontinuedTitle: string;
@@ -222,11 +220,6 @@ const en: Dict = {
       link: 'Quality and certifications',
     },
   },
-  carousel: {
-    prev: 'Previous',
-    next: 'Next',
-    pages: 'Pagination',
-  },
   products: {
     h1: 'Product catalog',
     lead: (categories, models) =>
@@ -243,6 +236,9 @@ const en: Dict = {
     about: 'About this category',
     paramsUnit: (count) => `${count} parameters`,
     detailLink: 'View details →',
+    moq: 'MOQ',
+    leadTime: 'Lead time',
+    payment: 'Payment',
   },
   model: {
     discontinuedTitle: 'This model has been discontinued.',
@@ -404,11 +400,6 @@ const zh: Dict = {
       link: '查看认证与质量',
     },
   },
-  carousel: {
-    prev: '上一组',
-    next: '下一组',
-    pages: '分页',
-  },
   products: {
     h1: '产品目录',
     lead: (categories, models) =>
@@ -425,6 +416,9 @@ const zh: Dict = {
     about: '品类说明',
     paramsUnit: (count) => `${count} 项参数`,
     detailLink: '查看详情 →',
+    moq: '起订量',
+    leadTime: '交货期',
+    payment: '付款方式',
   },
   model: {
     discontinuedTitle: '该型号已停产。',

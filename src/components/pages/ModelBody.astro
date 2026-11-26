@@ -1,14 +1,17 @@
 ﻿---
 /**
- * 型号页主体。
+ * 型号页主体（工业数据目录版）。
  *
- * 布局：左图（黄金比）+ 右信息（关键参数两列 + 行动按钮）两栏
- * → 技术规格（规格组两列并排）→ 尺寸与合规 → 替代型号 / 同品类其他型号 → 页尾 CTA。
+ * 布局：PageHeader（询价 + 资料按钮）→ 7/5 栏 hero（左图 / 右关键参数 + 认证 chip）
+ * → 技术规格（两栏 .spec-table）→ 尺寸与接口（definition grid）→ 相关（分组 h3）
+ * → 页尾 CTA；≤1024 另有固定底部询价条。
  *
- * 取舍：图片与关键参数进首屏，规格表退到第二层；询价横条只在页尾出现一次，
- * 不插在参数与规格之间打断阅读。
+ * 取舍：图片与关键参数进首屏，规格表退到第二层；询价入口在页头与底部条出现，
+ * 不插在参数与规格之间打断阅读。SEO/JSON-LD 与 quote URL 不变。
  */
 import PageHeader from '../layout/PageHeader.astro';
+import SectionTitle from '../layout/SectionTitle.astro';
+import CtaBand from '../layout/CtaBand.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
 import { detailPath, ROUTES } from '../../data/routes';
@@ -41,12 +44,24 @@ interface Props {
 const { locale, crumbs, model, image, datasheet, replacements, applications, cases, siblings } =
   Astro.props;
 const dict = t(locale);
+
+/** hero 与底部询价条共用的询价地址：保持现有 URL，不带 query */
+const quoteHref = localizePath(locale, ROUTES.quote);
 ---
+
+<PageHeader locale={locale} crumbs={crumbs} title={`${model.code} ${model.name}`}>
+  <a class="btn btn--primary" slot="actions" href={quoteHref}>{dict.home.requestQuote}</a>
+  {
+    datasheet?.available && (
+      <a class="btn btn--secondary" slot="actions" href={datasheet.path}>
+        {dict.model.datasheet}
+      </a>
+    )
+  }
+</PageHeader>
 
 <section class="section">
   <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={`${model.code} ${model.name}`} />
-
     {
       model.status === 'discontinued' && (
         <div class="notice">
@@ -85,26 +100,25 @@ const dict = t(locale);
           }
         </dl>
 
-        <div class="product-actions">
-          <a class="btn" href={localizePath(locale, ROUTES.quote)}>{dict.home.requestQuote}</a>
-          {
-            datasheet?.available && (
-              <a class="btn btn-secondary" href={datasheet.path}>
-                {dict.model.datasheet}
-              </a>
-            )
-          }
-        </div>
+        {
+          model.certifications.length > 0 && (
+            <ul class="cert-chips" aria-label={dict.model.certifications}>
+              {model.certifications.map((c) => (
+                <li class="chip">{c}</li>
+              ))}
+            </ul>
+          )
+        }
       </div>
     </div>
 
-    <h2>{dict.model.specs}</h2>
+    <SectionTitle title={dict.model.specs} />
     <div class="spec-grid">
       {
         model.specGroups.map((group) => (
           <div class="spec-group">
             <h3>{group.title}</h3>
-            <table class="spec">
+            <table class="spec-table">
               <tbody>
                 {group.rows.map((row) => (
                   <tr>
@@ -119,87 +133,104 @@ const dict = t(locale);
       }
     </div>
 
-    <h2>{dict.model.dimensionsAndCompliance}</h2>
+    <SectionTitle title={dict.model.dimensionsAndCompliance} />
     <dl class="facts">
       {model.dimensions && (<><dt>{dict.model.dimensions}</dt><dd>{model.dimensions}</dd></>)}
       {model.interface && (<><dt>{dict.model.interface}</dt><dd>{model.interface}</dd></>)}
-      <dt>{dict.model.certifications}</dt>
-      <dd>{model.certifications.join(', ') || '—'}</dd>
     </dl>
 
     {
-      replacements.length > 0 && (
-        <>
-          <h2>{dict.model.replacement}</h2>
-          <ul class="related">
-            {replacements.map((r) => (
-              <li>
-                <a href={localizePath(locale, detailPath.model(r.categoryId, r.id))}>
-                  {r.code} {r.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </>
+      (replacements.length > 0 ||
+        applications.length > 0 ||
+        cases.length > 0 ||
+        siblings.length > 0) && (
+        <SectionTitle title={dict.section.related} />
       )
     }
 
-    {
-      applications.length > 0 && (
-        <>
-          <h2>{dict.model.applications}</h2>
-          <ul class="related">
-            {applications.map((a) => (
-              <li>
-                <a href={localizePath(locale, detailPath.application(a.id))}>{a.name}</a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    }
+    <div class="related-groups">
+      {
+        replacements.length > 0 && (
+          <section class="related-group">
+            <h3>{dict.model.replacement}</h3>
+            <ul class="related">
+              {replacements.map((r) => (
+                <li>
+                  <a href={localizePath(locale, detailPath.model(r.categoryId, r.id))}>
+                    {r.code} {r.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
 
-    {
-      cases.length > 0 && (
-        <>
-          <h2>{dict.model.relatedCases}</h2>
-          <ul class="related">
-            {cases.map((c) => (
-              <li>
-                <a href={localizePath(locale, detailPath.caseStudy(c.id))}>{c.title}</a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    }
+      {
+        applications.length > 0 && (
+          <section class="related-group">
+            <h3>{dict.model.applications}</h3>
+            <ul class="related">
+              {applications.map((a) => (
+                <li>
+                  <a href={localizePath(locale, detailPath.application(a.id))}>{a.name}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
 
-    {
-      siblings.length > 0 && (
-        <>
-          <h2>{dict.model.otherModels}</h2>
-          <ul class="related related--inline">
-            {siblings.map((m) => (
-              <li>
-                <a href={localizePath(locale, detailPath.model(m.categoryId, m.id))}>{m.code}</a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    }
+      {
+        cases.length > 0 && (
+          <section class="related-group">
+            <h3>{dict.model.relatedCases}</h3>
+            <ul class="related">
+              {cases.map((c) => (
+                <li>
+                  <a href={localizePath(locale, detailPath.caseStudy(c.id))}>{c.title}</a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        siblings.length > 0 && (
+          <section class="related-group">
+            <h3>{dict.model.otherModels}</h3>
+            <ul class="sibling-chips">
+              {siblings.map((m) => (
+                <li>
+                  <a class="chip" href={localizePath(locale, detailPath.model(m.categoryId, m.id))}>
+                    {m.code}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+    </div>
   </div>
 </section>
 
+<CtaBand locale={locale} />
+
+{/* ≤1024 固定底部询价条：型号编码 + 询价按钮；桌面隐藏 */}
+<div class="quote-bar">
+  <span class="quote-bar-code">{model.code}</span>
+  <a class="btn btn--primary btn--sm" href={quoteHref}>{dict.home.requestQuote}</a>
+</div>
 
 <style>
-  /* 首屏两栏：左图（黄金比）+ 右信息（参数与行动） */
+  /* 首屏 7/5 栏：左图（黄金比）+ 右信息（参数与认证 chip） */
   .product-hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: var(--space-7);
     align-items: start;
-    /* 上边距由 PageHeader 统一提供，这里只管与下方规格区的距离 */
     margin-bottom: var(--space-8);
   }
 
@@ -215,7 +246,7 @@ const dict = t(locale);
     object-fit: cover;
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
-    background: var(--color-bg-subtle);
+    background: var(--color-subtle);
   }
 
   .product-side {
@@ -241,57 +272,27 @@ const dict = t(locale);
     font-size: var(--fs-xs);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .key-params dd {
     margin: 2px 0 0;
-    font-size: var(--fs-body);
+    font-size: var(--fs-data);
     font-weight: 600;
     color: var(--color-ink);
     font-variant-numeric: tabular-nums;
   }
 
-  .product-actions {
+  .cert-chips {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
-  .notice {
-    padding: var(--space-4);
-    background: var(--color-bg-subtle);
-    border-left: 3px solid var(--color-brand);
-    margin-bottom: var(--space-5);
-    font-size: var(--fs-sm);
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 12px 24px;
-    background: var(--color-brand);
-    color: #fff;
-    border-radius: var(--radius);
-    font-size: var(--fs-sm);
-  }
-
-  .btn:hover {
-    background: var(--color-brand-hover);
-    text-decoration: none;
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-  }
-
-  .btn-secondary:hover {
-    background: transparent;
-    border-color: var(--color-text-muted);
-  }
-
-  /* 规格：两组并排，铺满内容宽度（之前单列 720 右侧全空） */
+  /* 规格：两组并排，铺满内容宽度 */
   .spec-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -303,72 +304,69 @@ const dict = t(locale);
     font-size: var(--fs-sm);
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--color-text-muted);
+    color: var(--color-muted);
     margin-bottom: var(--space-2);
   }
 
-  .spec {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .spec th,
-  .spec td {
-    border-bottom: 1px solid color-mix(in srgb, var(--color-border) 65%, transparent);
-    padding: var(--space-3) var(--space-3);
-    text-align: left;
-    font-size: var(--fs-sm);
-    vertical-align: top;
-  }
-
-  .spec th {
-    font-weight: 400;
-    color: var(--color-text-muted);
-    width: 42%;
-  }
-
-  .spec td {
-    color: var(--color-text);
-    font-variant-numeric: tabular-nums;
-  }
-
+  /* 尺寸与接口：definition grid，认证已上移为 hero 的 chip */
   .facts {
     display: grid;
     grid-template-columns: max-content 1fr;
     gap: var(--space-2) var(--space-5);
-    margin: 0 0 var(--space-6);
+    margin: 0;
     font-size: var(--fs-sm);
-    max-width: 720px;
   }
 
   .facts dt {
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .facts dd {
     margin: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* 相关：分组 h3 + 列表；两栏铺开避免窄长 */
+  .related-groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5) var(--space-7);
+  }
+
+  .related-group h3 {
+    font-size: var(--fs-h4);
+    margin-bottom: var(--space-2);
   }
 
   .related {
-    max-width: 720px;
-    margin: 0 0 var(--space-5);
+    max-width: none;
+    margin: 0;
     padding-left: 18px;
   }
 
-  /* 同品类其他型号：横排一行，便于逐个对比 */
-  .related--inline {
+  /* 同品类其他型号：chip 横排一行，便于逐个对比 */
+  .sibling-chips {
     list-style: none;
+    margin: 0;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    gap: var(--space-2);
   }
 
-  .related--inline li {
-    padding: 6px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    font-size: var(--fs-sm);
+  .sibling-chips .chip {
+    text-decoration: none;
+    color: var(--color-link);
+  }
+
+  .sibling-chips .chip:hover {
+    border-color: var(--color-link);
+    color: var(--color-link-hover);
+  }
+
+  /* 固定底部询价条：仅 ≤1024 出现；高度 56px + 底部安全区 */
+  .quote-bar {
+    display: none;
   }
 
   @media (max-width: 1024px) {
@@ -377,8 +375,31 @@ const dict = t(locale);
       gap: var(--space-5);
     }
 
-    .spec-grid {
+    .spec-grid,
+    .related-groups {
       grid-template-columns: minmax(0, 1fr);
+    }
+
+    .quote-bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: var(--z-sticky);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      height: calc(56px + env(safe-area-inset-bottom));
+      padding: 0 var(--gutter) env(safe-area-inset-bottom);
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* 页脚最后几行不被固定条遮住 */
+    :global(body:has(.quote-bar)) {
+      padding-bottom: calc(56px + env(safe-area-inset-bottom));
     }
   }
 </style>

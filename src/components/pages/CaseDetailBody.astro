@@ -29,9 +29,10 @@ const { locale, crumbs, caseStudy, models } = Astro.props;
 const dict = t(locale);
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={caseStudy.title} width="narrow" />
+
 <section class="section">
-  <div class="container narrow">
-    <PageHeader locale={locale} crumbs={crumbs} title={caseStudy.title} />
+  <div class="container container-narrow">
     <p class="meta">{dict.detail.date(caseStudy.date)}</p>
     <p class="intro">{caseStudy.background}</p>
 
@@ -75,7 +76,7 @@ const dict = t(locale);
 <style>
   .meta {
     font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .intro {

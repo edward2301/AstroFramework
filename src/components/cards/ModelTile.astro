@@ -15,9 +15,12 @@ interface Props {
   linkLabel: string;
   /** 标签后的冒号：中文用「：」，英文用「: 」 */
   colon: string;
+  /** 次级形态：只出图 + 编码 + 状态 + 详情链接，不重复参数（参数出处是对比表） */
+  compact?: boolean;
 }
 
-const { href, code, status, discontinuedLabel, params, image, linkLabel, colon } = Astro.props;
+const { href, code, status, discontinuedLabel, params, image, linkLabel, colon, compact = false } =
+  Astro.props;
 const discontinued = status === 'discontinued';
 /** 替代文本用已有参数拼出具体规格，避免只留一个型号编码 */
 const imageAlt = params.length > 0 ? `${code} ${params[0].label} ${params[0].value}` : code;
@@ -44,12 +47,13 @@ const imageAlt = params.length > 0 ? `${code} ${params[0].label} ${params[0].val
     </div>
     <dl class="model-card-params">
       {
-        params.map((p) => (
-          <div>
-            <dt>{p.label}{colon}</dt>
-            <dd>{p.value}</dd>
-          </div>
-        ))
+        !compact &&
+          params.map((p) => (
+            <div>
+              <dt>{p.label}{colon}</dt>
+              <dd>{p.value}</dd>
+            </div>
+          ))
       }
     </dl>
     <a class="model-card-link" href={href}>{linkLabel}</a>
@@ -61,15 +65,16 @@ const imageAlt = params.length > 0 ? `${code} ${params[0].label} ${params[0].val
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--color-bg);
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: border-color var(--duration-1) var(--ease), box-shadow var(--duration-1) var(--ease),
+      transform var(--duration-1) var(--ease);
   }
 
   .model-card:hover {
-    border-color: var(--color-brand);
+    border-color: var(--color-action);
     box-shadow: var(--shadow-md);
     transform: translateY(-3px);
   }
@@ -104,16 +109,8 @@ const imageAlt = params.length > 0 ? `${code} ${params[0].label} ${params[0].val
   h3 {
     font-size: var(--fs-h3);
     font-weight: 700;
-    letter-spacing: 0.02em;
+    letter-spacing: var(--ls-tight);
     color: var(--color-ink);
-  }
-
-  .badge {
-    padding: 2px 8px;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    font-size: var(--fs-xs);
-    color: var(--color-text-muted);
   }
 
   /* 参数：两列紧凑排布，标签在前、值紧随其后（同一行） */
@@ -131,11 +128,11 @@ const imageAlt = params.length > 0 ? `${code} ${params[0].label} ${params[0].val
     min-width: 0;
   }
 
-  /* 标签：14px 次要灰；值：深海军蓝 + 500，层级差异靠颜色与字重而非大小 */
+  /* 标签：次要灰；值：墨色 + 500，层级差异靠颜色与字重而非大小 */
   dt {
     flex-shrink: 0;
     font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   dd {
@@ -154,8 +151,9 @@ const imageAlt = params.length > 0 ? `${code} ${params[0].label} ${params[0].val
     padding-top: var(--space-3);
     border-top: 1px solid var(--color-border-soft);
     font-size: var(--fs-sm);
-    color: var(--color-brand);
-    transition: color 0.15s ease;
+    font-weight: 600;
+    color: var(--color-link);
+    transition: color var(--duration-1) var(--ease);
   }
 
   .model-card-link:hover {

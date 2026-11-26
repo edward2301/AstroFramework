@@ -25,9 +25,10 @@ const { locale, crumbs, guide, Content, models } = Astro.props;
 const dict = t(locale);
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={guide.title} width="narrow" />
+
 <section class="section">
-  <div class="container narrow">
-    <PageHeader locale={locale} crumbs={crumbs} title={guide.title} />
+  <div class="container container-narrow">
     <p class="meta">{dict.detail.updated(guide.updated)}</p>
     <p class="intro">{guide.tldr}</p>
 
@@ -58,7 +59,7 @@ const dict = t(locale);
 <style>
   .meta {
     font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
   .intro {

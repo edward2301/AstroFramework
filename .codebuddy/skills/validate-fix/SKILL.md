@@ -8,7 +8,7 @@ description: "解读并修复 npm run validate、build、check-links 的失败�
 > 2. 先复现，再只读第一条错误；不要一次改全部。
 > 3. 只做最小修复，不顺手重构；不编辑 `dist/`。
 > 4. 每次修复后重跑同一命令，并回读被改文件。
-> 5. 报告必须含命令、错误、修复文件、复验结果。
+> 5. 报告必须含命令、错误、修复文件、复验结果与 `Docs:` 行。
 
 # 校验与构建失败诊断
 
@@ -37,6 +37,7 @@ description: "解读并修复 npm run validate、build、check-links 的失败�
 | 错误 / 现象 | 去这里 |
 |---|---|
 | `Node.js vX is not supported by Astro` | `nvm use`（版本见 `.nvmrc`），不是代码问题 |
+| 构建收尾打印 `Assertion failed: ... src\win\async.c` 且退出码 0 | 非代码问题：Node 24 Windows libuv 退出噪音，判定与处置见指南 §10；退出码非 0 或守卫日志缺失才按对应条目排查 |
 | `标题宽度 ... 应在 <SEO_LIMITS 区间>` / `标题与 ... 重复` / 填充桩 | `seo-copy` |
 | `对比表列 ... 在 keyParams 中缺少同名键` | `content-category` + `content-model` |
 | `缺少中文译文` / `译文缺少字段` | 对应 `content-*`；新语言用 `add-locale` |
@@ -73,6 +74,7 @@ description: "解读并修复 npm run validate、build、check-links 的失败�
 责任技能：<skill>
 修复文件：<path>
 复验：npm run validate（通过）/ npm run check && npm run test（通过）
+Docs: updated/no change — <文件/章节 或 理由>
 ```
 
 ## 验证

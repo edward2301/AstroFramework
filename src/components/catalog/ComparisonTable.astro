@@ -1,0 +1,153 @@
+---
+/**
+ * 品类对比表（工业数据目录版）。
+ *
+ * 行 = 型号，列 = 品类的对比参数；参数只在表格出现一次（对比表就是唯一出处）。
+ * 首列（型号）在表格内部横向滚动时保持可见；外层 .table-scroll 保证
+ * <768 时只在表内横滚，页面本身不溢出。
+ */
+import { t } from '../../i18n/ui';
+import { localizePath, type Locale } from '../../i18n/routing';
+import { detailPath } from '../../data/routes';
+
+interface Props {
+  locale: Locale;
+  categoryId: string;
+  /** 品类名（caption 与缩略图 alt 用） */
+  categoryName: string;
+  /** 品类对比列名，与每个型号的 cells 一一对应 */
+  comparisonParams: string[];
+  models: {
+    id: string;
+    code: string;
+    status: 'active' | 'discontinued';
+    image?: string;
+    /** 与 comparisonParams 顺序一致的单元格值；缺失时渲染 — */
+    cells: string[];
+  }[];
+  /** 滚动区域的可达名（如「A 系列 — 型号一览」） */
+  scrollLabel: string;
+}
+
+const { locale, categoryId, categoryName, comparisonParams, models, scrollLabel } = Astro.props;
+const dict = t(locale);
+---
+
+<div class="table-scroll compare-scroll" role="region" aria-label={scrollLabel} tabindex="0">
+  <table class="compare">
+    <caption>{categoryName} — {dict.category.modelsTitle}</caption>
+    <thead>
+      <tr>
+        <th scope="col">{dict.category.modelsTitle}</th>
+        {comparisonParams.map((p) => <th scope="col">{p}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        models.map((m) => (
+          <tr class:list={[m.status === 'discontinued' && 'is-discontinued']}>
+            <th scope="row">
+              {m.image && (
+                <img
+                  class="compare-thumb"
+                  src={m.image}
+                  alt={`${m.code} ${categoryName}`}
+                  width="96"
+                  height="60"
+                  loading="lazy"
+                  decoding="async"
+                />
+              )}
+              <span class="compare-code">
+                <a href={localizePath(locale, detailPath.model(categoryId, m.id))}>{m.code}</a>
+                {m.status === 'discontinued' && <span class="badge">{dict.category.discontinued}</span>}
+              </span>
+            </th>
+            {m.cells.map((v) => <td>{v || '—'}</td>)}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .compare-scroll {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+
+  /* 表格最小宽度触发表内横滚；页面容器不随之溢出 */
+  .compare {
+    min-width: 720px;
+  }
+
+  .compare th,
+  .compare td {
+    padding: var(--space-3) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--fs-data);
+  }
+
+  .compare thead th {
+    background: var(--color-subtle);
+    font-size: var(--fs-sm);
+    font-weight: 600;
+    color: var(--color-ink);
+    white-space: nowrap;
+  }
+
+  .compare tbody tr:last-child th,
+  .compare tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  /* 首列：滚动时钉住，型号编码始终可见 */
+  .compare th[scope='row'] {
+    position: sticky;
+    left: 0;
+    width: 180px;
+    min-width: 180px;
+    background: var(--color-surface);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .compare thead th:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+  }
+
+  /* 单元格数值：tabular 对齐；缺失值渲染为 — */
+  .compare td {
+    color: var(--color-text);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .is-discontinued td {
+    color: var(--color-muted);
+  }
+
+  .compare-thumb {
+    display: block;
+    width: 48px;
+    height: auto;
+    aspect-ratio: 1.618;
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xs);
+  }
+
+  .compare-code {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .compare-code a {
+    font-weight: 600;
+  }
+</style>

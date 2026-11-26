@@ -1,13 +1,19 @@
 ﻿---
 /**
- * 品类页主体：紧凑横幅 → 型号卡网格（图 + 全参数 + 详情）→ 品类说明。
+ * 品类页主体（工业数据目录版）。
  *
- * 参数只在型号卡里出现一次，卡片就是这个品类的参数出处。
- * 三列网格、卡片信息完整，客户在一屏半内能看完 7 个型号的所有关键参数。
+ * 结构：PageHeader（meta 数据行 + 询价按钮）→ 对比表（参数唯一出处）
+ * → 采购信息 4-up → 型号速览（次级紧凑卡）→ 品类说明 → CTA。
+ *
+ * 参数只在对比表出现一次，卡片退为「图 + 编码 + 状态」的次级入口；
+ * purchaseInfo 来自品类条目（经 categoryView 本地化），这里只排版。
  */
-import Breadcrumb from '../seo/Breadcrumb.astro';
-import ModelTile from '../cards/ModelTile.astro';
+import PageHeader from '../layout/PageHeader.astro';
+import SectionTitle from '../layout/SectionTitle.astro';
 import CtaBand from '../layout/CtaBand.astro';
+import ComparisonTable from '../catalog/ComparisonTable.astro';
+import PurchaseFacts from '../catalog/PurchaseFacts.astro';
+import ModelTile from '../cards/ModelTile.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
 import { detailPath, ROUTES } from '../../data/routes';
@@ -23,6 +29,12 @@ interface Props {
     image?: string;
     comparisonParams: string[];
     selectionPoints: string[];
+    purchaseInfo: {
+      moq: string;
+      leadTime: string;
+      payment: string;
+      certifications: string[];
+    };
   };
   models: {
     id: string;
@@ -37,69 +49,84 @@ interface Props {
 const { locale, crumbs, categoryId, category, models, discontinuedCount } = Astro.props;
 const dict = t(locale);
 
-/** 卡片参数 = 该品类的全部对比列（卡片是唯一出处） */
-const tiles = models.map((m) => ({
-  ...m,
-  params: category.comparisonParams.map((label, i) => ({
-    label,
-    value: m.cells[i] ?? '—',
-  })),
-}));
+/** 页头数据行：型号数 · 参数数（· 停产提示），tabular 数字 */
+const metaLine = [
+  dict.products.modelsUnit(models.length),
+  dict.category.paramsUnit(category.comparisonParams.length),
+  discontinuedCount > 0 ? dict.category.discontinuedNote(discontinuedCount) : '',
+]
+  .filter(Boolean)
+  .join(' · ');
 ---
 
-<section class="cat-hero">
-  <div class="container">
-    <Breadcrumb items={crumbs} label={dict.breadcrumb.aria} />
-    <div class="cat-hero-row">
-      <h1>{category.name}</h1>
-      <a class="cat-cta" href={localizePath(locale, ROUTES.quote)}>{dict.home.requestQuote}</a>
-    </div>
-    <p class="cat-facts">
-      {dict.products.modelsUnit(models.length)} · {dict.category.paramsUnit(
-        category.comparisonParams.length
-      )}
-      {discontinuedCount > 0 && ` · ${dict.category.discontinuedNote(discontinuedCount)}`}
-    </p>
-  </div>
-</section>
+<PageHeader locale={locale} crumbs={crumbs} title={category.name} meta={metaLine}>
+  <a class="btn btn--primary" slot="actions" href={localizePath(locale, ROUTES.quote)}>
+    {dict.home.requestQuote}
+  </a>
+</PageHeader>
 
 <section class="section">
   <div class="container">
-    <h2>{dict.category.modelsTitle}</h2>
+    <SectionTitle title={dict.category.modelsTitle} />
 
-    <ul class="model-grid">
+    <ComparisonTable
+      locale={locale}
+      categoryId={categoryId}
+      categoryName={category.name}
+      comparisonParams={category.comparisonParams}
+      models={models}
+      scrollLabel={`${category.name} — ${dict.category.modelsTitle}`}
+    />
+
+    <PurchaseFacts
+      purchaseInfo={category.purchaseInfo}
+      labels={{
+        moq: dict.category.moq,
+        leadTime: dict.category.leadTime,
+        payment: dict.category.payment,
+        certifications: dict.model.certifications,
+      }}
+    />
+
+    {/* 型号速览：次级入口，参数以对比表为准，不再重复 */}
+    <ul class="tile-grid">
       {
-        tiles.map((m) => (
+        models.map((m) => (
           <li>
             <ModelTile
               href={localizePath(locale, detailPath.model(categoryId, m.id))}
               code={m.code}
               status={m.status}
               discontinuedLabel={dict.category.discontinued}
-              params={m.params}
+              params={[]}
               image={m.image}
               linkLabel={dict.category.detailLink}
               colon={locale === 'zh' ? '：' : ': '}
+              compact
             />
           </li>
         ))
       }
     </ul>
+  </div>
+</section>
 
-    <div class="cat-about">
-      <h2>{dict.category.about}</h2>
-      <div class="cat-about-body">
-        <p>{category.intro}</p>
-        {
-          category.selectionPoints.length > 0 && (
-            <ul class="cat-points">
-              {category.selectionPoints.map((p) => (
-                <li>{p}</li>
-              ))}
-            </ul>
-          )
-        }
-      </div>
+<section class="section about-section">
+  <div class="container">
+    <SectionTitle title={dict.category.about} />
+
+    <div class="grid-12 about-grid">
+      <p class="span-8">{category.intro}</p>
+
+      {
+        category.selectionPoints.length > 0 && (
+          <ul class="span-4 about-points">
+            {category.selectionPoints.map((p) => (
+              <li>{p}</li>
+            ))}
+          </ul>
+        )
+      }
     </div>
   </div>
 </section>
@@ -107,132 +134,81 @@ const tiles = models.map((m) => ({
 <CtaBand locale={locale} />
 
 <style>
-  /* 紧凑横幅：标题与询价同一行，规模信息一行 */
-  .cat-hero {
-    background: color-mix(in srgb, var(--color-brand-soft) 55%, var(--color-bg));
-    border-bottom: 1px solid var(--color-border-brand);
-    padding: var(--space-6) 0 var(--space-5);
-  }
-
-  .cat-hero-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-5);
-    margin: var(--space-2) 0 var(--space-2);
-  }
-
-  .cat-hero-row h1 {
-    margin: 0;
-    color: var(--color-ink);
-  }
-
-  .cat-facts {
-    margin: 0;
-    font-size: var(--fs-sm);
-    color: var(--color-text-muted);
-  }
-
-  .cat-cta {
-    flex-shrink: 0;
-    padding: 12px 24px;
-    border-radius: 999px;
-    background: var(--color-brand);
-    color: #fff;
-    font-size: var(--fs-sm);
-    text-decoration: none;
-    transition: background 0.15s ease;
-  }
-
-  .cat-cta:hover {
-    background: var(--color-brand-hover);
-    color: #fff;
-    text-decoration: none;
-  }
-
-  /* 型号网格：三列，卡片信息完整 */
-  .model-grid {
+  .tile-grid {
     list-style: none;
-    margin: var(--space-4) 0 0;
+    margin: var(--space-6) 0 0;
     padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-4);
   }
 
-  .model-grid > li {
-    flex: 0 0 calc((100% - 2 * var(--space-4)) / 3);
-    max-width: calc((100% - 2 * var(--space-4)) / 3);
+  .tile-grid > li {
+    display: flex;
   }
 
-  /* 说明：左右两栏，左标题右正文 */
-  .cat-about {
-    display: grid;
-    grid-template-columns: 280px minmax(0, 1fr);
-    gap: var(--space-7);
-    margin-top: var(--space-8);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--color-border-soft);
+  @media (min-width: 768px) {
+    .tile-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
-  .cat-about h2 {
-    margin-bottom: 0;
+  @media (min-width: 1024px) {
+    .tile-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
   }
 
-  .cat-about-body p {
-    margin: 0 0 var(--space-4);
-    color: var(--color-text-muted);
+  .about-section {
+    border-top: 1px solid var(--color-border);
   }
 
-  .cat-points {
+  .about-grid {
+    margin-top: 0;
+  }
+
+  .about-grid > p {
+    margin: 0;
+    color: var(--color-muted);
+    grid-column: span 8 / span 8;
+  }
+
+  .about-points {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
     gap: var(--space-2);
+    grid-column: span 4 / span 4;
+    align-content: start;
   }
 
-  .cat-points li {
+  .about-points li {
     position: relative;
     padding-left: 14px;
     font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
-  .cat-points li::before {
+  /* 铜色小方点：选型要点是数据类内容，用 data 色标记 */
+  .about-points li::before {
     content: '';
     position: absolute;
     left: 0;
     top: 0.55em;
     width: 6px;
     height: 6px;
-    border-radius: 1px;
-    background: var(--color-brand);
+    border-radius: var(--radius-xs);
+    background: var(--color-data);
   }
 
   @media (max-width: 1024px) {
-    .model-grid > li {
-      flex: 0 0 calc((100% - var(--space-4)) / 2);
-      max-width: calc((100% - var(--space-4)) / 2);
+    .about-grid > p {
+      grid-column: span 12 / span 12;
     }
 
-    .cat-about {
-      grid-template-columns: 1fr;
-      gap: var(--space-4);
-    }
-  }
-
-  @media (max-width: 767px) {
-    .model-grid > li {
-      flex: 1 1 100%;
-      max-width: 100%;
-    }
-
-    .cat-hero-row {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: var(--space-3);
+    .about-points {
+      grid-column: span 12 / span 12;
     }
   }
 </style>

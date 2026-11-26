@@ -1,0 +1,63 @@
+---
+/**
+ * 板块标题：细线 + h2 + 可选右侧链接。
+ *
+ * 替代旧的全局 h2 竖条：竖条只留给这里，避免页面里每个 h2 都带装饰。
+ * 使用方：首页/品类页等内容区的板块标题。
+ */
+interface Props {
+  title: string;
+  /** 右侧链接目标；与 linkLabel 成对出现 */
+  href?: string;
+  linkLabel?: string;
+  /** 标题下的一行说明（数量、来源等） */
+  meta?: string;
+}
+
+const { title, href, linkLabel, meta } = Astro.props;
+---
+
+<div class="section-title">
+  <div class="section-title-text">
+    <h2>{title}</h2>
+    {meta && <p class="section-title-meta">{meta}</p>}
+  </div>
+  {href && linkLabel && <a class="section-title-link" href={href}>{linkLabel}</a>}
+</div>
+
+<style>
+  .section-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .section-title-text {
+    min-width: 0;
+  }
+
+  .section-title h2 {
+    margin: 0;
+    font-size: var(--fs-h2);
+  }
+
+  .section-title-meta {
+    margin: var(--space-1) 0 0;
+    font-size: var(--fs-sm);
+    color: var(--color-muted);
+  }
+
+  .section-title-link {
+    flex-shrink: 0;
+    font-size: var(--fs-sm);
+    color: var(--color-link);
+  }
+
+  .section-title-link:hover {
+    color: var(--color-link-hover);
+  }
+</style>
