@@ -75,6 +75,15 @@ footer: {
 ```
 模板只展示结构；`order` 必须与现有条目避让，`label` 必须两种语言都写。
 
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
+
 ## 验证
 - `npm run validate`：主导航/页脚 order 无重复。
 - `npm run test`：`tests/nav.test.ts` 通过；调整顺序后同步预期数组。

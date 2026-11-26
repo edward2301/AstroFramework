@@ -26,6 +26,13 @@ description: "新增、修改或删除指南、FAQ、下载资料及中英文件
 
 ## 步骤
 
+**动手前一次性确认：**
+1) 本次是 guides、faqs 还是 downloads？
+2) slug / 关联型号 / 目标语言？
+3) 是否中英配对（或新语言目录）？
+4) 下载资料文件是否已在 `public/downloads/`？
+用户答齐再写；缺项不猜。
+
 ### 指南与 FAQ
 1. 定 slug；默认语言建 `src/content/guides/<slug>.md` 或 `src/content/faqs/<slug>.md`，其他语言建 `zh/<slug>.md`（新增语言后为 `<lang>/<slug>.md`）。同一 slug 每种语言只能有一个文件。
 2. 指南 frontmatter 写 `title`、`tldr`、`updated`、`relatedModels`、`relatedApplications`、`seoTitle`、`seoDescription`。
@@ -98,6 +105,15 @@ seoDescription: "<按 seo-copy 规则撰写>"
 }
 ```
 模板只展示结构；SEO 占位文本必须按 `seo-copy` 重写，`relatedModels` 等引用必须换成真实已发布 id。
+
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
 
 ## 验证
 - `npm run validate`：配对、空正文、引用、译文无错误。

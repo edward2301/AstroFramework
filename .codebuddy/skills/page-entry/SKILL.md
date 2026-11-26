@@ -73,6 +73,15 @@ export default definePage({
 ```
 模板只展示结构；SEO 占位文本必须按 `seo-copy` 重写，`order` 必须与现有导航避让。
 
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
+
 ## 验证
 - `npm run validate`：路径、SEO、导航 order 无错误。
 - `npm run check`：`PageDef` 联合与 props 类型通过。

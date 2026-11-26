@@ -103,6 +103,15 @@ description: "新增、修改或删除应用方向与客户案例（condition、
 ```
 模板只展示结构；不得照抄 SEO 占位文本，也不得把 `a1` 当真实引用（换成当前仓库存在的型号 id）。
 
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
+
 ## 验证
 - `npm run validate`：引用与译文无错误。
 - `npm run test`：`tests/content.test.ts` 的 recommended/config 引用检查通过。

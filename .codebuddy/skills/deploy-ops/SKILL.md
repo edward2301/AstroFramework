@@ -66,6 +66,19 @@ description: "发布 Cloudflare Pages、配置域名/CI、D1 运维与上线检�
 - [ ] D1 远程写入先 `d1 export`；命令见 §4
 - [ ] 烟测 curl 清单见 §5
 
+**反例**：只跑 `npm run build`（不含 Vitest）就发布 → 质量门缺口；必须补 `npm run test`。
+
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
+
+**收尾**：报告后只给一个具体下一步（验证/提交/继续下一项），不泛泛问。
+
 ## 验证
 - 构建成功，`dist/` 含分语言 404、sitemap-index、robots。
 - 预览 URL 正常；生产 curl 清单全部符合预期。

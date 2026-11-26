@@ -99,6 +99,19 @@ description: "新增、修改或删除工业品型号 JSON（code、keyParams、
 ```
 示例只展示结构；`seoTitle`/`seoDescription` 和中文键必须按实际品类与文案重写，不能照抄。
 
+**反例**：品类列是 `IP Rating`，型号 `keyParams` 写 `Protection` → 对比表对应单元格渲染 `—`，构建不报错；必须逐语言对齐 `k`。
+
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
+
+**收尾**：报告后只给一个具体下一步（验证/提交/继续下一项），不泛泛问。
+
 ## 验证
 - `npm run validate`：无错误；警告逐条判断。
 - `npm run test`：`tests/content.test.ts` 通过。

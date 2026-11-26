@@ -28,6 +28,14 @@ description: "新增语言（第三种及以后）并完成全站接入：routin
 - 页脚格式：`src/components/layout/Footer.astro` 的 `locale === 'zh'` 分支。
 
 ## 步骤
+
+**动手前一次性确认：**
+1) 目标语言、前缀、显示名与 htmlLang？
+2) 翻译全部已发布内容，还是先上线部分页面？
+3) 是否包含 guides/faqs 的 `<lang>/` 文件？
+4) 是否同步测试、Footer 与 `_headers`/`_redirects`？
+用户答齐再写；缺项不猜。
+
 1. `src/i18n/routing.ts`：`LOCALES` 加语言；补 `LOCALE_PREFIX`、`LOCALE_LABELS`、`LOCALE_META`（都是 `Record<Locale,…>`，漏加编译失败）。
 2. `src/i18n/ui.ts`：补整份 `Dict` 翻译；键集合与数组长度必须与 en/zh 一致。
 3. 内容译文：
@@ -94,6 +102,15 @@ export const LOCALE_META: Record<Locale, { htmlLang: string; ogLocale: string }>
 /ja/404/index.html  /ja/  301
 ```
 模板只展示 ja 的写法；实际前缀、显示名与 htmlLang 按新语言替换。
+
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
 
 ## 验证
 - `npm run validate`：译文完整度、SEO、Markdown 配对无错误。

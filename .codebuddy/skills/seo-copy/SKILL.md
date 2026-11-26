@@ -66,6 +66,19 @@ description: "撰写或返修 seoTitle、seoDescription 与页面级 meta 文案
 ```
 没有本地测量工具时，直接跑 `npm run validate`，按报错里的宽度调整；不要凭感觉估。
 
+**反例**：标题补后缀后超出 `SEO_LIMITS` 上限 → 不要加虚词凑字数；应补真实参数或删一项。描述复制另一条 → 不报错但失去差异点。
+
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
+
+**收尾**：报告后只给一个具体下一步（验证/提交/继续下一项），不泛泛问。
+
 ## 验证
 - `npm run validate`：SEO 相关错误清零。
 - `npm run check`：改到页面条目/组件时运行。

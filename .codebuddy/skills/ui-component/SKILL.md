@@ -74,6 +74,15 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 [ ] 是否引入新的全站 CSS 体积
 ```
 
+**完成后报告：**
+```text
+改动：<文件/字段>
+检查：<owner/镜像/§ 引用>
+验证：<命令与结果>
+遗留：<none 或下一步>
+Docs: updated/no change — <文件/章节 或 理由>
+```
+
 ## 验证
 - `npm run check`：Astro/TS 通过。
 - `npm run build`：内容体检、链接检查通过。
