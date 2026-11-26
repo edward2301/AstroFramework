@@ -36,8 +36,8 @@ description: "解读并修复 npm run validate、build、check-links 的失败�
 
 | 错误 / 现象 | 去这里 |
 |---|---|
-| `Node.js vX is not supported by Astro` | `nvm use`（Node 24.14.1），不是代码问题 |
-| `标题宽度 ... 应在 50–60` / `标题与 ... 重复` / 填充桩 | `seo-copy` |
+| `Node.js vX is not supported by Astro` | `nvm use`（版本见 `.nvmrc`），不是代码问题 |
+| `标题宽度 ... 应在 <SEO_LIMITS 区间>` / `标题与 ... 重复` / 填充桩 | `seo-copy` |
 | `对比表列 ... 在 keyParams 中缺少同名键` | `content-category` + `content-model` |
 | `缺少中文译文` / `译文缺少字段` | 对应 `content-*`；新语言用 `add-locale` |
 | `缺少中文版本，应新建 .../zh/xxx.md` / 正文为空 | `content-resources` |
@@ -64,14 +64,8 @@ description: "解读并修复 npm run validate、build、check-links 的失败�
   - 为消 `image` 警告删掉图片字段：页面少图，问题没解决。
 
 ## 模板
-复现与复验：
-```sh
-npm run validate
-npm run check
-npm run test
-npm run build
-npm run check-links
-```
+复验命令见指南 §2.2；涉及产物链接时加 `npm run build` / `npm run check-links`。
+
 报告格式：
 ```text
 命令：npm run validate
@@ -83,7 +77,7 @@ npm run check-links
 
 ## 验证
 - 原失败命令通过。
-- 全量质量门 `npm run validate && npm run check && npm run test` 通过。
+- 全量质量门（见指南 §2.2）通过。
 - 涉及产物链接时，`npm run build` 与 `npm run check-links` 通过。
 - `git diff --stat` 只包含预期文件；没有 `dist/` 改动。
 - 写后回读被改文件，确认没有引入重复键、缺语言或断链。

@@ -43,7 +43,7 @@ description: "调整主导航、页脚栏目、面包屑与 order。当用户说
 - `nav.label` 是 `Record<Locale,string>`，所有语言必填。
 - 动态列由内容填充，不手写品类/应用链接；品类兜底只用于 products 列。
 - 站内 URL 取自条目 `path` 或 `src/data/routes.ts`，不硬编码。
-- 页脚分区固定五类：products、applications、resources、company、contact；空列不渲染。
+- 页脚分区以 `FooterColumnKey` 为准；空列不渲染。
 - Header 的询价 CTA 文案在 `src/i18n/ui.ts`，不在 `nav`；语言切换由 `routing.ts` 的路径函数处理。
 - 常见失败：
   - `主导航 order 20 与 ... 重复，顺序将取决于声明顺序`

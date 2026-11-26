@@ -441,10 +441,10 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
   <p>所有 URL 末尾带斜杠（<code>trailingSlash: 'always'</code>），产物是目录式 <code>/path/index.html</code>。Pages 默认的 <code>auto-trailing-slash</code> 会自动补齐缺斜杠的请求，不产生重复 URL。旧链接 301 在 <code>_redirects</code> 里用精确路径逐条登记，<strong>不要用正则或通配，避免误伤正常页面</strong>。</p>
 
   <h3>5.2 内容模型：用 schema 卡住字段</h3>
-  <p>7 个内容集合的 schema 集中在 <code>src/content.config.ts</code>：型号必须有 5 项关键参数、品类 <code>intro</code> 不少于 300 字、译文 <code>intro</code> 不少于 150 字。<code>draft: true</code> 的条目不生成路由、不进列表；已发布条目引用草稿会在体检阶段报错。</p>
+  <p>内容集合的 schema 集中在 <code>src/content.config.ts</code>：型号必须有 5 项关键参数、品类 <code>intro</code> 不少于 300 字、译文 <code>intro</code> 不少于 150 字。<code>draft: true</code> 的条目不生成路由、不进列表；已发布条目引用草稿会在体检阶段报错。</p>
 
   <h3>5.3 元标签：三段式模板 + 构建期体检</h3>
-  <p>标题（含品牌后缀后）50–60、描述 140–158，按显示宽度计（全角计 2）。标题全站唯一，内容里的 <code>seoTitle</code> 只写标题本体，后缀由 <code>lib/seo/branding.ts</code> 单点拼接。<strong>区间下限不是排版偏好，而是信息完整度的代理指标</strong>——低于 50 字符通常意味着少了量程、精度或认证中的一项。</p>
+  <p>标题与描述阈值读 <code>src/data/site.ts</code> 的 <code>SEO_LIMITS</code>，按显示宽度计（全角计 2）。标题全站唯一，内容里的 <code>seoTitle</code> 只写标题本体，后缀由 <code>lib/seo/branding.ts</code> 单点拼接。<strong>区间下限不是排版偏好，而是信息完整度的代理指标</strong>——低于下限通常意味着少了量程、精度或认证中的一项。</p>
 
   <h3>5.4 Schema：按页面价值分级</h3>
   <p>品类页、型号页、FAQ 页、案例页各有自己的结构化数据，不做「一刀切套同一个类型」。每页唯一 <code>&lt;h1&gt;</code>，每个内容页有可见面包屑，且面包屑组件与 <code>breadcrumbSchema</code> 共用同一个 <code>crumbs</code> 数组。</p>
@@ -495,7 +495,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
         <tr><td>标题长度与唯一性、对比表键名、缺译、图片属性</td><td>构建期脚本（每次部署自动跑）</td><td>每次部署</td></tr>
         <tr><td>站内断链与语言版本配对</td><td><code>scripts/check-links.mjs</code>（构建守卫）</td><td>每次部署</td></tr>
         <tr><td>抓取趋势、访问量、边缘命中率</td><td>Cloudflare Web Analytics</td><td>每周</td></tr>
-        <tr><td>404 / 301 规则是否仍生效</td><td><code>deploy/cloudflare/README.md</code> 的 5 条 <code>curl</code> 实测</td><td>每次改配置后</td></tr>
+        <tr><td>404 / 301 规则是否仍生效</td><td><code>deploy/cloudflare/README.md</code> 的 <code>curl</code> 清单实测</td><td>每次改配置后</td></tr>
         <tr><td>D1 数据增长与备份</td><td><code>SELECT count(*)</code> + <code>d1 export</code></td><td>按固定周期</td></tr>
       </tbody>
     </table>

@@ -20,7 +20,7 @@ description: "新增、修改或删除工业品型号 JSON（code、keyParams、
 ## 事实源
 - Schema：`src/content.config.ts` 的 `models`。
 - 文件名规则：`src/lib/utils/text.ts` 的 `toSlug()`。
-- 校验：`scripts/validate-content.mjs` 第 2 节（文件名/引用）与第 4 节（对比表列）。
+- 校验：`scripts/validate-content.mjs` §2（文件名）、§3（引用）与 §4（对比表列）。
 - 参照样本：`src/content/models/a1.json`。
 - 品类列：`src/content/categories/<category-id>.json` 的 `comparisonParams`。
 - 渲染消费：`src/components/pages/ModelBody.astro`。
@@ -34,7 +34,7 @@ description: "新增、修改或删除工业品型号 JSON（code、keyParams、
 6. 可选字段按需：`dimensions`、`interface`、`certifications`、`datasheet`、`image`。写图片前先列出路径并确认；路径形如 `/images/models/<slug>.png`，文件必须真实存在于 `public/`。
 7. 补 `locales.zh` 必填：`name`、`keyParams`、`specGroups`、`seoTitle`、`seoDescription`。
 8. 引用只写已发布条目 id，不写型号 code：`category`、`replacement`、`applications`、`relatedCases`。
-9. 写 `seoTitle` / `seoDescription` 时按 `seo-copy` 的检查表自检：标题只写本体、补后缀后宽度 50–60、描述 140–158、全站标题不重复。
+9. 写 `seoTitle` / `seoDescription` 时按 `seo-copy` 的检查表自检：标题只写本体、宽度读 `SEO_LIMITS`、全站标题不重复。
 10. 跑 `npm run validate`；再跑 `npm run test`。开发态查看 `/products/<category>/<slug>/` 与 `/zh/products/<category>/<slug>/`。
 
 ## 不变量

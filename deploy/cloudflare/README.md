@@ -22,7 +22,7 @@
 
 ### 1.1 本地
 
-- Node **24.14.1**：先 `nvm use`（或 fnm / volta），低于 Astro 7 的下限 22.23.4 会直接拒绝构建。
+- Node 版本以 `.nvmrc` 为准：先 `nvm use`（或 fnm / volta）；低于 Astro 7 的 `engines` 下限会直接拒绝构建。
 - `npm ci` 安装依赖，`wrangler` 已在 `devDependencies`，无需全局安装。
 - 登录 Cloudflare：
 
@@ -60,7 +60,7 @@ CI 环境改用环境变量，不要写进仓库（`.env` 已在 `.gitignore` �
 |---|---|
 | Build command | `npm run build` |
 | Build output directory | `dist` |
-| Node version | `24.14.1`（或设置环境变量 `NODE_VERSION=24.14.1`） |
+| Node version | 与 `.nvmrc` 一致（或设置 `NODE_VERSION` 为同一版本） |
 | Root directory | `/` |
 
 直传与 Git 集成跑的是同一个 `npm run build`，因此内容体检、链接检查与分语言 404 产物
@@ -112,7 +112,7 @@ npx wrangler d1 execute astro-framework-interactions --local --command "SELECT n
 ```sh
 nvm use
 npm ci
-npm run test        # 单测；check / validate / 链接检查已随 npm run build 执行
+npm run test        # 单测（固定 vmForks，见 vitest.config.ts）；check / validate / 链接检查已随 npm run build 执行
 npm run deploy      # 构建 → wrangler pages deploy
 ```
 
@@ -123,8 +123,7 @@ npm run build
 wrangler pages deploy
 ```
 
-质量门 = `npm run validate && npm run check && npm run test`（提交前自查）；
-发布时不必重复跑：`npm run build` 内的构建守卫已执行内容体检与链接检查。
+质量门与执行时机见 `docs/上手指南.md` §2.2；发布时不必重复跑：`npm run build` 内的构建守卫已执行内容体检与链接检查。
 
 `npm run build` 本身已包含**分语言 404 产物的复制**：构建守卫
 （`scripts/build-guard.mjs` 的 `astro:build:done`）按 `LOCALES` 把
@@ -276,7 +275,7 @@ curl -s https://你的域名/zh/this-does-not-exist/ | grep -o '<html lang="[^"]
 | 站名与标题后缀 | `src/data/site.ts` | 占位品牌名 |
 | 凭证 | 环境变量 `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` | 仅 Wrangler 直传需要，不进仓库 |
 
-替换后按第 5 节的 5 条 `curl` 逐条实测。`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时，
+替换后按第 5 节的 `curl` 清单逐条实测。`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时，
 `site` 仍是 `example.com` 会直接构建失败——这是故意的域名守卫。
 
 ---

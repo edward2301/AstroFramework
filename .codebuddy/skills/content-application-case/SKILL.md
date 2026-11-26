@@ -32,7 +32,7 @@ description: "新增、修改或删除应用方向与客户案例（condition、
    - 应用：`name`、`condition`、`criteria`、`seoTitle`、`seoDescription`。
    - 案例：`title`、`background`、`requirements`、`selection`、`seoTitle`、`seoDescription`。
    - `cautions`、`results` 可选；可选字段缺失时回落源语言。
-5. SEO 字段按 `seo-copy` 的检查表自检：标题只写本体、补后缀后 50–60、描述 140–158、全站标题不重复。
+5. SEO 字段按 `seo-copy` 的检查表自检：标题只写本体、宽度读 `SEO_LIMITS`、全站标题不重复。
 6. 跑 `npm run validate`；开发态查看两个语言的详情页与列表卡片，确认型号链接可点。
 
 ## 不变量

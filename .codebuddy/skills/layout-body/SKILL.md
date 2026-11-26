@@ -26,7 +26,7 @@ description: "新增页面版式、Body 组件或调整页面结构。当用户�
 - 样式：`src/styles/tokens.css`、`global.css`；共享组件在 `src/components/{layout,cards,pages}/`。
 
 ## 步骤
-1. 先证明现有 6 种版式无法复用；列出复用方案与新版的差异，给 2–3 个选项等确认。
+1. 先证明现有版式（`PageDef`）无法复用；列出复用方案与新版的差异，给 2–3 个选项等确认。
 2. 判断属于哪条路径：
    - **静态版式**：数据来自页面条目，`PageInput` 仍是 `{ kind: 'static' }`。
    - **内容详情版式**：数据来自集合，需要新的 `PageInput` kind 与路由枚举。

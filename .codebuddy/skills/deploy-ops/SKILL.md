@@ -26,13 +26,13 @@ description: "发布 Cloudflare Pages、配置域名/CI、D1 运维与上线检�
 - 组织与占位：`src/data/organization.ts`、`src/data/site.ts`、`public/logo.png`、`public/og-default.png`。
 
 ## 步骤
-1. 预检：Node 24.14.1（`nvm use`）、完整 git 历史（sitemap `lastmod` 依赖）、`site` 不是 `example.com`（`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时会直接失败）。
-2. 质量门：`npm run validate && npm run check && npm run test`。`npm run build` 只含 check + 构建守卫，不含 Vitest，别把 test 省掉。
+1. 预检：Node 版本见 `.nvmrc`（`nvm use`）、完整 git 历史（sitemap `lastmod` 依赖）、`site` 不是 `example.com`（`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时会直接失败）。
+2. 质量门：按指南 §2.2 执行。`npm run build` 只含 check + 构建守卫，不含 Vitest，别把 test 省掉。
 3. 构建：`npm run build`；确认 `dist/` 有分语言 404、`sitemap-index.xml`、`robots.txt`。
 4. 预览：`npx wrangler pages deploy --branch preview`，拿到独立预览 URL，不影响生产。
 5. 生产：`npm run deploy`（= `npm run build && wrangler pages deploy`）。部署前确认当前分支与产物。
 6. D1：先 `--local` 演练；远程写入前 `d1 export` 备份；再 `--remote` 执行。`<DB>` 为 `astro-framework-interactions`。
-7. 烟测：按下方 5 条 curl 检查 404、301、尾斜杠、正常页与中文 404。
+7. 烟测：按 `deploy/cloudflare/README.md` §5 的 curl 清单检查 404、301、尾斜杠、正常页与中文 404。
 8. 回滚：Pages 在控制台/`wrangler pages deployment list` 回滚；D1 不会随 Pages 回滚，数据要单独恢复。
 
 ## 不变量
@@ -50,38 +50,25 @@ description: "发布 Cloudflare Pages、配置域名/CI、D1 运维与上线检�
   - 不存在的路径返回 200：检查 `_redirects` 是否误加通配。
   - `/404.html` 返回 200：检查 `_redirects` 的直访 301 是否还在。
   - 中文 404 仍是英文：检查 `<prefix>/404.html` 是否被 build-guard 复制。
+  - `wrangler.toml` 的 `database_id` 仍是全零：远程 D1 命令会失败；先 `d1 create` 回填。
+  - 部署前未确认当前分支/产物：可能把未合并代码推上线。
+  - token 出现在命令历史或日志：用 CI secret，不写进命令行。
+  - 预览域名混入 canonical 或 sitemap：预览只用于验收，不写进内容。
+  - `_headers` / `_redirects` 不在 `dist/`：先检查构建产物再上传。
 
 ## 模板
-发布命令：
-```sh
-nvm use
-npm run validate && npm run check && npm run test
-npm run build
-npx wrangler pages deploy --branch preview
-npm run deploy
-npx wrangler pages deployment list
-```
+发布前检查清单：
 
-D1 命令：
-```sh
-npx wrangler d1 create astro-framework-interactions
-npx wrangler d1 execute astro-framework-interactions --local --command "SELECT name FROM sqlite_master WHERE type='table';"
-npx wrangler d1 export astro-framework-interactions --remote --output=./backup-inquiries.sql
-npx wrangler d1 execute astro-framework-interactions --remote --file=./backup-inquiries.sql
-```
-
-烟测：
-```sh
-curl -sI https://你的域名/this-does-not-exist/ | head -1          # 404
-curl -sI https://你的域名/404.html | head -1                      # 301
-curl -sI https://你的域名/products/category-a | head -3           # 3xx 补尾斜杠
-curl -sI https://你的域名/products/category-a/ | head -1          # 200
-curl -s https://你的域名/zh/this-does-not-exist/ | grep -o '<html lang="[^"]*"'  # zh-CN
-```
+- [ ] 预检：Node 见 `.nvmrc`、完整 git 历史、`site` 非 `example.com`
+- [ ] 质量门按指南 §2.2
+- [ ] `npm run build` 产物含分语言 404、sitemap、robots
+- [ ] 预览/生产命令见 `deploy/cloudflare/README.md` §3
+- [ ] D1 远程写入先 `d1 export`；命令见 §4
+- [ ] 烟测 curl 清单见 §5
 
 ## 验证
 - 构建成功，`dist/` 含分语言 404、sitemap-index、robots。
-- 预览 URL 正常；生产 5 条 curl 全部符合预期。
+- 预览 URL 正常；生产 curl 清单全部符合预期。
 - D1 查询返回预期；备份文件存在且未提交。
 - 回滚路径已记录（Pages 部署列表 + D1 备份文件）。
 - 写后回读 `wrangler.toml`、`_headers`、`_redirects`，确认没有被误改。

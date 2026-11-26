@@ -34,7 +34,7 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 6. 界面文案进 `src/i18n/ui.ts`，不写死在组件里；内容文案来自内容集合。
 7. 所有 `<img>` 必须有 `width`、`height`、`alt`、`loading`；主图按现有约定用 eager/lazy。
 8. 检查可访问性：一个 `<h1>`、标题层级不跳级、`focus-visible`、`aria-current`、表单 label、页脚栏标题用 `<p>` 避免标题跳级。
-9. 断点沿用现有 480 / 768 / 900 / 1024 / 1150 / 1600，不新增；移动端优先检查 767/768。
+9. 断点沿用现有 CSS（`global.css` 与组件），不新增；移动端优先检查现有移动断点。
 10. 跑 `npm run check` 与 `npm run build`；对比构建前后 CSS 体积。
 
 ## 不变量

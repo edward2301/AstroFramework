@@ -1,6 +1,6 @@
 ---
 name: content-category
-description: "新增、修改或删除品类与品类对比表（comparisonParams、intro、selectionPoints、purchaseInfo）。当用户说「加品类 / 改对比列 / 对比表整列空白 / category intro」时使用；只改单个型号参数用 content-model，读校验报错用 validate-fix，独立 SEO 文案用 seo-copy。"
+description: "新增、修改或删除品类与品类对比表（comparisonParams、intro、selectionPoints、purchaseInfo）。当用户说「加品类 / 改对比列 / 对比表空列 / 渲染 — / category intro」时使用；只改单个型号参数用 content-model，读校验报错用 validate-fix，独立 SEO 文案用 seo-copy。"
 ---
 
 > 工作协议：
@@ -44,7 +44,7 @@ description: "新增、修改或删除品类与品类对比表（comparisonParam
 - 删除品类前，先迁移或删除其全部型号，否则型号的 `category` 引用会报错。
 - 常见失败：
   - `对比表列 IP Rating 在 keyParams 中缺少同名键（品类：category-a）`
-  - `品类 category-a 已提供中文对比列，但该型号没有中文 keyParams；对比表会整列空白`
+  - `品类 category-a 已提供中文对比列，但该型号没有中文 keyParams；对比表会整列空白`（实际对应单元格渲染 `—`）
   - `该型号已提供中文 keyParams，但品类 category-a 没有中文 comparisonParams`
 
 ## 模板
