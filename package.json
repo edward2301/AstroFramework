@@ -11,6 +11,7 @@
     "validate": "node scripts/validate-content.mjs",
     "check": "astro check",
     "check-links": "node scripts/check-links.mjs",
+    "check:layout": "node scripts/check-layout.mjs",
     "test": "vitest run",
     "build": "npm run check && astro build",
     "preview": "astro preview",

@@ -8,7 +8,8 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 > 2. 这是结构性改版：先确认用户已选定方向（全宽 / 扁平型号 / 德系极简 / 首轮四页），不再逐页重问。
 > 3. 并行时严格按 lane 文件所有权施工；共享文件只在 Wave 0 由主代理写。
 > 4. 每次写入后立即回读，确认 `<style>` 块数量、联合类型与路由分支完整。
-> 5. 完成后只报改动、验证结果与 `Docs:` 行。
+> 5. 版式/CSS 修复走「修复协议」（见下）：修模式不修实例，全站扫双端双语言。
+> 6. 完成后只报改动、验证结果与 `Docs:` 行。
 
 # 工业站视觉与版式契约
 
@@ -72,8 +73,28 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 **任何 lane 都不得改**：`src/styles/*`、`src/i18n/ui.ts`、`components/layout/*`、`components/seo/Breadcrumb.astro`、`data/routes.ts`、`lib/pages/{render,static}.ts`、`pages/[...slug].astro`、`lib/seo/{breadcrumb,lastmod}.ts`、`scripts/*`、`tests/*`、`public/`、其他 lane 的文件。
 缺文案/全局工具时上报主代理，由主代理在 Wave 0 文件中补。
 
+## 修复协议（查 bug / 改 bug 必读）
+
+反复返工的教训都来自「只修被标记的那一处」。任何版式 / CSS 修复按此执行：
+
+1. **先定性**：空带 = 多层边距叠加；双细线 = 页头下边线 + 首块自带分隔线；错位 = order/列宽；文案语言 = locale 链路。
+2. **修模式，不修实例**：同类模式全站扫——`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`（124 页，含 /404/ 与 /zh/404/，绝不排除任何页面类）。
+3. **双语言 + 双端**：zh/en × 桌面 1600 + 移动 390，四个组合都要过。
+4. **改完必须视觉抽查**：对被修页面截图确认，不能只凭构建绿灯宣布完成。
+5. **知识回写**：新坑追加进下方踩坑清单与 ui-component 的「常见失败」。
+
+### 踩坑清单（每条都真实复发过）
+
+- **空带 = 多层边距叠加**：页头 32px 下内边距 + `.section` 56–112px 上边距 + 首块自带 padding/分隔线，可叠到 80–130px。系统解法：`.page-header + .section`（space-5）+ 首个 `.section-title` / `.notice` 去顶线；**无页头页面（404）不在覆盖内必须单独收紧**（NotFoundBody 已覆写 `.section`）。
+- **双细线夹空白像渲染残留**：相邻两条 1px 线之间只要有空白就会被当成 bug——首块不再画分隔线，页头下边线即分隔。
+- **`order` 在不对称 grid 列下错位**：reverse 布局用显式 `grid-column` + 列宽互换（FeatureRow 模式），不用 order。
+- **astro dev（7.4.13）无尾斜杠拦截在中间件与自定义 404 之前**：合法页 404、未知页弹品牌提示页，middleware/connect 都拦不到——由 astro.config 的 `devTrailingSlash` 集成（connect 栈 unshift）+ `trailingSlash: 'ignore'` 处理；**不要再往 middleware.ts 塞这类逻辑**。
+- **astro dev 错误路由匹配不到带前缀 404**：未知 /zh/ 路径回落英文 404——根 404.astro 按路径前缀动态推断语言已缓解。
+- **体检脚本两类误报口径**：桌面按设计隐藏的元素（型号页询价条）offsetParent 为 null，不计异常；滚动条 15px 假溢出必须用 `clientWidth` 口径比较；首页 hero 大顶距与透明页眉描边主按钮是设计使然，已豁免。
+
 ## 验证
 
+- **布局体检硬门（版式/CSS 改动必跑）**：`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`——对 dist 全部 124 页（含 /404/ 与 /zh/404/）自动测空带（页头→首块内容 >72px）、横向溢出（clientWidth 口径）与全部 .btn（高度/主按钮配色/空文案）。退出码非 0 先修再交。
 - `npm run test`、`npm run validate`、`npm run check`、`npm run build`。
 - 开发态看 1920 / 1440 / 1024 / 768 / 390，en + zh 四页；`scrollWidth === clientWidth`。
 - 产物：旧型号 URL 不在 HTML；sitemap 只有扁平型号 URL；canonical / og:url / Product JSON-LD / BreadcrumbList 末项为扁平路径；三条 hreflang 仍在。
