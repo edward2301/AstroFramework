@@ -442,13 +442,6 @@ function isActive(href: string): boolean {
     display: none;
   }
 
-  /* 极窄屏：页眉语言钮让位给主 CTA；语言入口仍在移动菜单 */
-  @media (max-width: 480px) {
-    .lang-switch-group {
-      display: none;
-    }
-  }
-
   @media (max-width: 1024px) {
     .main-nav {
       display: none;
@@ -550,11 +543,15 @@ function isActive(href: string): boolean {
   }
 
   /*
-   * 330px 极窄屏：品牌 + Menu + CTA 的最小内容宽度约 306px，
-   * 24px  gutter 下会顶到右边缘。压缩字号、间距与按钮内边距，
-   * 保留两侧 24px 对齐；360px 以上视觉不变。
+   * ≤480px 极窄屏：语言钮让位给主 CTA（语言入口仍在移动菜单）；
+   * 330px 下品牌 + Menu + CTA 的最小内容宽度约 306px，24px gutter 下会顶到
+   * 右边缘——压缩字号、间距与按钮内边距，保留两侧 24px 对齐；360px 以上视觉不变。
    */
   @media (max-width: 480px) {
+    .lang-switch-group {
+      display: none;
+    }
+
     .site-header .header-inner {
       gap: var(--space-2);
     }

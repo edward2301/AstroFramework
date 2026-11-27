@@ -146,20 +146,6 @@ const year = new Date().getFullYear();
     color: #fff;
   }
 
-  /* 移动端：页脚栏目链接与备案链接补到 44px 触控高度 */
-  @media (max-width: 768px) {
-    .footer-col li a {
-      min-width: 44px;
-      min-height: 44px;
-    }
-
-    .footer-icp a {
-      display: inline-flex;
-      align-items: center;
-      min-height: 44px;
-    }
-  }
-
   .footer-bottom {
     margin-top: var(--space-5);
     padding-top: var(--space-4);
@@ -180,7 +166,10 @@ const year = new Date().getFullYear();
     }
   }
 
-  /* 移动端收紧：两列栅格 + 去行距，链接仍保持 44px 触控高度 */
+  /*
+   * 移动端（≤768）：两列栅格 + 去行距收紧页脚；栏目链接与备案链接
+   * 补到 44px 触控高度。置于 min-width 块之后，768px 整点仍是两列。
+   */
   @media (max-width: 768px) {
     .footer-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -189,6 +178,17 @@ const year = new Date().getFullYear();
 
     .footer-col li {
       margin-bottom: 0;
+    }
+
+    .footer-col li a {
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .footer-icp a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
     }
   }
 </style>
