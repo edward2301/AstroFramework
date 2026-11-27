@@ -152,6 +152,11 @@ const categories = defineCollection({
      * 图片由运营人工维护（构建不处理），与型号 `image` 同一套约定，见 §7.5。
      */
     image: z.string().optional(),
+    /**
+     * 品类色：该品类页与所属型号页 PageHeader 的底色（深色调 hex，
+     * 保证 `--color-on-dark*` 浅色文字的对比度）。
+     */
+    color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
     /** 对比表横向维度，5–7 项 */
     comparisonParams: z.array(z.string()).min(5).max(7),
     selectionPoints: z.array(z.string()).default([]),

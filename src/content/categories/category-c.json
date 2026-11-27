@@ -3,6 +3,7 @@
   "name": "Category C",
   "intro": "Category C is a placeholder group that focuses on documentation. Its items carry the same fields the real range will use for datasheets, drawings and declarations, so the download area, the document list on each model page and the print layout can all be reviewed early in the build. Fields, links and structured data are generated from the entry, so no template change is needed when the real catalog arrives.",
   "image": "/images/categories/category-c.png",
+  "color": "#6b3a2e",
   "comparisonParams": [
     "Range",
     "Accuracy",

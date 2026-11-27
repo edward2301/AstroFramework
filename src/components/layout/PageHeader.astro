@@ -22,13 +22,15 @@ interface Props {
   meta?: string;
   /** 横幅内宽度：wide 1920 / narrow 1280 */
   width?: 'wide' | 'narrow';
+  /** 品类色 hex：传入后替代默认石墨色作为页头底色（品类页/型号页） */
+  tone?: string;
 }
 
-const { locale, crumbs, title, lead, meta, width = 'wide' } = Astro.props;
+const { locale, crumbs, title, lead, meta, width = 'wide', tone } = Astro.props;
 const dict = t(locale);
 ---
 
-<div class="page-header">
+<div class="page-header" style={tone ? `background-color: ${tone};` : undefined}>
   <div class:list={['container', 'page-header-inner', width === 'narrow' && 'page-header-inner--narrow']}>
     <div class="page-header-text">
       <Breadcrumb items={crumbs} label={dict.breadcrumb.aria} />

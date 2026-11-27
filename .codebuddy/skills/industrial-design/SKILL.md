@@ -23,7 +23,7 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 - **全宽流式**：`--container: 1920px`；`--container-narrow: 1280px`（详情页）；`--gutter: clamp(24px, 2.5vw, 40px)`；背景色带挂在 `<section>` 上，内容用 `.container`。
 - **直角**：`--radius-*` 全部 `0`；不再新增圆角组件。
 - **无阴影**：`--shadow-*` 为 `none`；层级靠 1px 细线与底色差。
-- **底色节奏**：内页用「石墨深色 PageHeader → 白正文 → 浅灰通栏色带（全局 `.band`，标出品类说明/相关型号等次要内容）→ 石墨 `CtaBand`」四层；侧栏/次要面板用全局 `.aside-panel`（`--color-subtle` 底 + 1px 细线）。底色差与细线并重，别只靠细线。
+- **底色节奏**：内页用「PageHeader（品类页/型号页用**品类色** `color` 字段，其余页用石墨 `--color-ink`）→ 白正文 → 浅灰通栏色带（全局 `.band`，标出品类说明/相关型号等次要内容）→ 石墨 `CtaBand`」四层；侧栏/次要面板用全局 `.aside-panel`（`--color-subtle` 底 + 1px 细线）。底色差与细线并重，别只靠细线。
 - **颜色**：白 + 冷石墨（`--graphite-900 #0d1117` … `--graphite-600 #3a424b`）；蓝色只用于主按钮、链接、焦点；不再用铜色装饰。
 - **字体**：大标题 `--fs-h1` 上限 4.5rem、`--lh-tight 1.05`、`--ls-tight -0.02em`；小标签 `--fs-xs` + `--ls-wide 0.1em` + 大写；型号编码一律 `.mono`。
 - **网格**：不新增断点；卡片/规格网格用 `repeat(auto-fit|auto-fill, minmax(min(100%, Npx), 1fr))`；同一断点在组件内只开一个 `@media` 块，新规则并入既有块（置于 base 规则之后）。

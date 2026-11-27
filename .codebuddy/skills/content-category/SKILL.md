@@ -27,8 +27,8 @@ description: "新增、修改或删除品类与品类对比表（comparisonParam
 
 ## 步骤
 1. 定小写 id 与文件 `src/content/categories/<id>.json`；引用方使用这个 id。
-2. 写必填字段：`name`、`intro`、`comparisonParams`、`purchaseInfo`、`seoTitle`、`seoDescription`。
-3. `intro` 至少 300 字；`comparisonParams` 5–7 项；`purchaseInfo` 写 `moq`、`leadTime`、`payment`，`certifications` 可选。
+2. 写必填字段：`name`、`intro`、`comparisonParams`、`purchaseInfo`、`color`、`seoTitle`、`seoDescription`。
+3. `intro` 至少 300 字；`comparisonParams` 5–7 项；`purchaseInfo` 写 `moq`、`leadTime`、`payment`，`certifications` 可选；`color` 为深色调 hex（`#rrggbb`，如 `#1f3a5f`），用于品类页与所属型号页的 PageHeader 底色——必须够深以保证 `--color-on-dark*` 浅字对比度，不要用亮色。
 4. `order` 建议显式写且不重复（默认 100，只影响品类排序）。
 5. 枚举该品类下**全部已发布型号**，逐列核对每个型号的 `keyParams.k`；新增品类时至少确认没有遗留型号。
 6. 要改列名或删列时，先列出所有受影响型号，给出"改列还是改型号键"的方案并等确认；不得静默删列。

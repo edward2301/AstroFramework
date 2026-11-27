@@ -49,6 +49,8 @@ export function categoryView(entry: CollectionEntry<'categories'>, locale: Local
     intro: tr?.intro ?? d.intro,
     /** 封面路径与语言无关，直接透传 */
     image: d.image,
+    /** 品类色：页头底色（深色调，语言无关） */
+    color: d.color,
     comparisonParams: tr?.comparisonParams ?? d.comparisonParams,
     selectionPoints: tr?.selectionPoints ?? d.selectionPoints,
     purchaseInfo: {

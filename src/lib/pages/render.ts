@@ -214,6 +214,8 @@ export type RenderedPage = PageCommon &
           locale: Locale;
           crumbs: Crumb[];
           model: ModelView;
+          /** 所属品类的品类色：型号页 PageHeader 底色，与品类页一致 */
+          categoryColor: string;
           /** 主图公开路径（public/ 下），缺图时 undefined */
           image?: string;
           datasheet?: { path: string; available: boolean };
@@ -460,6 +462,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
           locale,
           crumbs,
           model: view,
+          categoryColor: category.color,
           image: view.image,
           datasheet: detail.data.datasheet
             ? { path: detail.data.datasheet, available: hasDatasheet }

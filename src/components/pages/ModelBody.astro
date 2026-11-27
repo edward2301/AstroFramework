@@ -40,9 +40,11 @@ interface Props {
   cases: { id: string; title: string }[];
   /** 同品类其他型号（横向内链，用于型号间对比与抓取） */
   siblings: { id: string; categoryId: string; code: string }[];
+  /** 所属品类的品类色：页头底色，与品类页一致 */
+  categoryColor: string;
 }
 
-const { locale, crumbs, model, image, datasheet, replacements, applications, cases, siblings } =
+const { locale, crumbs, model, image, datasheet, replacements, applications, cases, siblings, categoryColor } =
   Astro.props;
 const dict = t(locale);
 
@@ -50,7 +52,7 @@ const dict = t(locale);
 const quoteHref = localizePath(locale, ROUTES.quote);
 ---
 
-<PageHeader locale={locale} crumbs={crumbs} title={`${model.code} ${model.name}`}>
+<PageHeader locale={locale} crumbs={crumbs} title={`${model.code} ${model.name}`} tone={categoryColor}>
   <a class="btn btn--primary" slot="actions" href={quoteHref}>{dict.home.requestQuote}</a>
   {
     datasheet?.available && (

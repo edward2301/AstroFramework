@@ -27,6 +27,8 @@ interface Props {
     name: string;
     intro: string;
     image?: string;
+    /** 品类色：PageHeader 底色 */
+    color: string;
     comparisonParams: string[];
     selectionPoints: string[];
     purchaseInfo: {
@@ -60,7 +62,7 @@ const metaLine = [
   .join(' · ');
 ---
 
-<PageHeader locale={locale} crumbs={crumbs} title={category.name} meta={metaLine}>
+<PageHeader locale={locale} crumbs={crumbs} title={category.name} meta={metaLine} tone={category.color}>
   <a class="btn btn--primary" slot="actions" href={localizePath(locale, ROUTES.quote)}>
     {dict.home.requestQuote}
   </a>
