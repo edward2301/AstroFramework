@@ -37,7 +37,7 @@ const { locale, categories, models, totalModels } = Astro.props;
 const dict = t(locale);
 ---
 
-<section class="hero">
+<section class:list={['hero', locale === 'en' && 'hero--en']}>
   <div class="container hero-inner">
     <div class="hero-copy">
       <h1>{dict.home.h1}</h1>
@@ -216,6 +216,20 @@ const dict = t(locale);
 
     .proof {
       grid-column: span 4;
+    }
+  }
+
+  /*
+   * 英文标题更长：320–360px 下标题 32–36px、顶部留白 112px，
+   * 到 480px 平滑回到 36px / 124px；中文 hero 不受影响。
+   */
+  @media (max-width: 480px) {
+    .hero--en {
+      padding-top: calc(var(--header-h) + clamp(52px, 14.44vw, var(--space-8)));
+    }
+
+    .hero--en h1 {
+      font-size: clamp(2rem, 10vw, 2.25rem);
     }
   }
 
