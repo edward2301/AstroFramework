@@ -8,7 +8,7 @@
  *
  * 所有行都进首屏 HTML：产品总览页的筛选与搜索只切 `hidden`，不重新渲染。
  * 行上带 data-category / data-search，供页面内联脚本过滤；无 JS 时全行可见。
- * 外层 .table-scroll 保证窄屏只在表内横滚，页面本身不溢出。
+ * 外层 .table-scroll 保证窄屏只在表内横滚，页面本身不溢出；≤768 行转为卡片，无横滚。
  */
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
@@ -93,12 +93,12 @@ const searchIndex = (m: ModelRow) =>
                   </a>
                 </div>
               </th>
-              <td class="cell-category">
+              <td class="cell-category" data-label={dict.products.categoryColumn}>
                 <a class="category-link" href={localizePath(locale, detailPath.category(m.categoryId))}>
                   {m.categoryName}
                 </a>
               </td>
-              <td class="cell-params">
+              <td class="cell-params" data-label={dict.products.keyParamsColumn}>
                 <dl class="param-list">
                   {m.keyParams.slice(0, 5).map((p) => (
                     <div class="param">
@@ -108,7 +108,7 @@ const searchIndex = (m: ModelRow) =>
                   ))}
                 </dl>
               </td>
-              <td class="cell-status">
+              <td class="cell-status" data-label={dict.products.statusColumn}>
                 <span
                   class:list={['status-badge', discontinued && 'status-badge--discontinued']}
                 >
@@ -330,5 +330,77 @@ const searchIndex = (m: ModelRow) =>
   .is-discontinued .model-name,
   .is-discontinued .param dd {
     color: var(--color-muted);
+  }
+
+  /*
+   * 移动端卡片化：≤768 行转为卡片，去掉表内横滚。
+   * 列名由 td[data-label] 生成；表头隐藏，行内 hidden 过滤态必须显式恢复 display:none。
+   */
+  @media (max-width: 768px) {
+    .catalog-scroll {
+      border: 0;
+      background: transparent;
+    }
+
+    .catalog {
+      min-width: 0;
+    }
+
+    .catalog thead {
+      display: none;
+    }
+
+    .catalog tbody tr {
+      display: block;
+      margin-bottom: var(--space-4);
+      padding: var(--space-4);
+      border: 1px solid var(--color-border);
+      background: var(--color-surface);
+    }
+
+    .catalog tbody tr:last-child {
+      margin-bottom: 0;
+    }
+
+    .catalog tbody tr[hidden] {
+      display: none;
+    }
+
+    .catalog tbody th,
+    .catalog tbody td {
+      display: block;
+      width: auto;
+      min-width: 0;
+      padding: 0;
+      border-bottom: 0;
+    }
+
+    .catalog tbody td[data-label]::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 2px;
+      font-size: var(--fs-xs);
+      letter-spacing: var(--ls-wide);
+      text-transform: uppercase;
+      color: var(--color-muted);
+    }
+
+    .cell-model {
+      margin-bottom: var(--space-3);
+    }
+
+    .cell-params .param-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cell-status {
+      margin-top: var(--space-3);
+    }
+
+    .cell-details {
+      margin-top: var(--space-3);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--color-border);
+    }
   }
 </style>

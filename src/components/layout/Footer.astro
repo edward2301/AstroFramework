@@ -244,4 +244,16 @@ const localeLinks = LOCALES.map((item) => ({
       grid-template-columns: 2fr repeat(4, minmax(0, 1fr));
     }
   }
+
+  /* 移动端收紧：两列栅格 + 去行距，链接仍保持 44px 触控高度 */
+  @media (max-width: 768px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+
+    .footer-col li {
+      margin-bottom: 0;
+    }
+  }
 </style>

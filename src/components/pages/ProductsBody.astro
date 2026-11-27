@@ -335,12 +335,12 @@ const dict = t(locale);
     display: none;
   }
 
-  /* 表内横滚提示：只在会溢出的宽度出现 */
+  /* 表内横滚提示：仅 769–1024 的表格滚动形态出现；≤768 已卡片化 */
   .table-hint {
     display: none;
   }
 
-  @media (max-width: 1024px) {
+  @media (min-width: 769px) and (max-width: 1024px) {
     .table-hint {
       display: block;
       margin: 0 0 var(--space-2);
