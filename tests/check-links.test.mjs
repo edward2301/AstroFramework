@@ -76,6 +76,17 @@ describe('checkLinks', () => {
     expect(checkLinks(dist).errors).toEqual([]);
   });
 
+  it('404 页页脚语言切换的自链 /404/ 不算断链（根级 404.html 特例）', () => {
+    const dist = path.join(tmpRoot, 'notfound-selflink');
+    writeFile(dist, 'index.html', '');
+    writeFile(dist, 'zh/index.html', '');
+    // 404 页页脚渲染当前页两种语言的地址：/404/ 与 /zh/404/
+    writeFile(dist, '404.html', '<a href="/404/"><a href="/zh/404/">');
+    writeFile(dist, 'zh/404/index.html', '');
+
+    expect(checkLinks(dist).errors).toEqual([]);
+  });
+
   it('PENDING_ROUTES 登记的待建页面降级为警告', async () => {
     const dist = path.join(tmpRoot, 'pending');
     writeFile(dist, 'index.html', '<a href="/applications/new-entry/">');

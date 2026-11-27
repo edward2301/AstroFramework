@@ -1,0 +1,66 @@
+---
+/**
+ * 详情页双栏：左侧正文（760px 阅读宽度）+ 右侧 sticky 相关栏。
+ *
+ * 用于应用方向 / 案例 / 指南 / 问答详情。页面外壳仍是
+ * `.container.container-narrow`（1280px），本组件只负责栏内分配；
+ * ≤1024 自动堆叠，侧栏取消 sticky。
+ */
+interface Props {
+  /** 右侧栏是否渲染；无相关内容时传 false，正文会占满整行 */
+  aside?: boolean;
+}
+
+const { aside = true } = Astro.props;
+---
+
+<div class:list={['detail-layout', !aside && 'detail-layout--single']}>
+  <div class="detail-main">
+    <slot />
+  </div>
+  {
+    aside && (
+      <aside class="detail-aside">
+        <slot name="aside" />
+      </aside>
+    )
+  }
+</div>
+
+<style>
+  .detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 760px) 320px;
+    justify-content: space-between;
+    gap: var(--space-7);
+    align-items: start;
+  }
+
+  .detail-layout--single {
+    grid-template-columns: minmax(0, 760px);
+    justify-content: start;
+  }
+
+  .detail-main {
+    min-width: 0;
+  }
+
+  .detail-aside {
+    display: grid;
+    gap: var(--space-6);
+    position: sticky;
+    top: calc(var(--header-h) + var(--space-5));
+  }
+
+  @media (max-width: 1024px) {
+    .detail-layout,
+    .detail-layout--single {
+      grid-template-columns: minmax(0, 1fr);
+      gap: var(--space-6);
+    }
+
+    .detail-aside {
+      position: static;
+    }
+  }
+</style>

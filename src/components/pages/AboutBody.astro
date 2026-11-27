@@ -31,10 +31,10 @@ const images = [
 ];
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={heading} lead={org.description} />
+
 <section class="section">
   <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={heading} lead={org.description} />
-
     <MetricStrip items={metrics} />
 
     <div class="about-rows">
@@ -55,10 +55,10 @@ const images = [
       <div class="about-contact-text">
         <h2>{dict.aboutPage.contactTitle}</h2>
         <p>{dict.quote.lead}</p>
-        <a class="btn" href={localizePath(locale, '/contact/quote/')}>{dict.home.requestQuote} →</a>
+        <a class="btn btn--primary" href={localizePath(locale, '/contact/quote/')}>{dict.home.requestQuote} →</a>
       </div>
 
-      <dl class="about-contact-card">
+      <dl class="about-contact-facts">
         <div>
           <dt>{dict.quote.emailLabel}</dt>
           <dd><a href={`mailto:${org.contactPoint.email}`}>{org.contactPoint.email}</a></dd>
@@ -83,64 +83,67 @@ const images = [
     margin-top: var(--space-8);
   }
 
+  /* 联系区：正文在左、事实网格在右，顶部一条细线分带 */
   .about-contact {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-columns: minmax(0, 1fr) 360px;
     gap: var(--space-7);
-    align-items: center;
+    align-items: start;
     margin-top: var(--space-8);
     padding-top: var(--space-6);
-    border-top: 1px solid var(--color-border-soft);
+    border-top: 1px solid var(--color-border);
   }
 
   .about-contact-text p {
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
-  .btn {
-    display: inline-block;
-    padding: 12px 24px;
-    border-radius: 999px;
-    background: var(--color-brand);
-    color: #fff;
-    font-size: var(--fs-sm);
-    text-decoration: none;
-    transition: background 0.15s ease;
-  }
-
-  .btn:hover {
-    background: var(--color-brand-hover);
-    color: #fff;
-    text-decoration: none;
-  }
-
-  .about-contact-card {
+  /* 事实网格：行间细线，无底色、无圆角 */
+  .about-contact-facts {
     margin: 0;
-    padding: var(--space-5);
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-100);
-    border-radius: var(--radius);
-    display: grid;
-    gap: var(--space-4);
+    border-top: 1px solid var(--color-border);
   }
 
-  .about-contact-card dt {
+  .about-contact-facts > div {
+    display: grid;
+    gap: 2px;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .about-contact-facts dt {
     font-size: var(--fs-xs);
     text-transform: uppercase;
     letter-spacing: var(--ls-wide);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
-  .about-contact-card dd {
-    margin: 2px 0 0;
+  .about-contact-facts dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     font-size: var(--fs-sm);
+    line-height: var(--lh-data);
     color: var(--color-ink);
+  }
+
+  .about-contact-facts dd a {
+    color: var(--color-link);
   }
 
   @media (max-width: 1024px) {
     .about-contact {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-5);
+    }
+  }
+
+  /* 联系方式是可点击的整行入口，移动端补到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .about-contact-facts dd a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
     }
   }
 </style>

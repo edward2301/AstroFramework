@@ -34,12 +34,6 @@ export interface Dict {
   cta: {
     title: string;
   };
-  /** 轮播组件（components/layout/Carousel.astro）的无障碍标签 */
-  carousel: {
-    prev: string;
-    next: string;
-    pages: string;
-  };
   home: {
     h1: string;
     lead: (categories: number, models: number) => string;
@@ -60,6 +54,23 @@ export interface Dict {
     /** 品类行按钮：动作 + 型号数 */
     browseModels: (count: number) => string;
     modelsUnit: (count: number) => string;
+    /** 全型号目录：筛选、搜索、表头与空态 */
+    filterAll: string;
+    filterLabel: string;
+    searchLabel: string;
+    searchPlaceholder: string;
+    resultCount: (count: number) => string;
+    /** 目录计数用单数与复数单位（JS 过滤后重算文案） */
+    modelUnit: string;
+    modelUnitPlural: string;
+    empty: string;
+    tableHint: string;
+    modelColumn: string;
+    categoryColumn: string;
+    keyParamsColumn: string;
+    statusColumn: string;
+    detailsColumn: string;
+    active: string;
   };
   category: {
     discontinued: string;
@@ -73,6 +84,10 @@ export interface Dict {
     paramsUnit: (count: number) => string;
     /** 型号卡上的详情链接文案 */
     detailLink: string;
+    /** 采购信息标签（PurchaseFacts）：起订量 / 交货期 / 付款方式 */
+    moq: string;
+    leadTime: string;
+    payment: string;
   };
   model: {
     discontinuedTitle: string;
@@ -222,17 +237,27 @@ const en: Dict = {
       link: 'Quality and certifications',
     },
   },
-  carousel: {
-    prev: 'Previous',
-    next: 'Next',
-    pages: 'Pagination',
-  },
   products: {
     h1: 'Product catalog',
     lead: (categories, models) =>
-      `${categories} categories and ${models} models, each with full specifications, mounting dimensions and datasheet links. Compare parameters across a category, then open any model for the complete picture.`,
+      `${categories} categories and ${models} models, each with full specifications, mounting dimensions and datasheet links. Filter by category or search the full catalog, then open any model for the complete picture.`,
     browseModels: (count) => `Browse ${count} models →`,
     modelsUnit: (count) => `${count} models`,
+    filterAll: 'All models',
+    filterLabel: 'Filter by category',
+    searchLabel: 'Search models',
+    searchPlaceholder: 'Model code, name or parameter',
+    resultCount: (count) => `${count} ${count === 1 ? 'model' : 'models'}`,
+    modelUnit: 'model',
+    modelUnitPlural: 'models',
+    empty: 'No models match this filter.',
+    tableHint: 'Swipe horizontally to see all columns.',
+    modelColumn: 'Model',
+    categoryColumn: 'Category',
+    keyParamsColumn: 'Key parameters',
+    statusColumn: 'Status',
+    detailsColumn: 'Details',
+    active: 'Active',
   },
   category: {
     discontinued: 'Discontinued',
@@ -243,6 +268,9 @@ const en: Dict = {
     about: 'About this category',
     paramsUnit: (count) => `${count} parameters`,
     detailLink: 'View details →',
+    moq: 'MOQ',
+    leadTime: 'Lead time',
+    payment: 'Payment',
   },
   model: {
     discontinuedTitle: 'This model has been discontinued.',
@@ -404,17 +432,27 @@ const zh: Dict = {
       link: '查看认证与质量',
     },
   },
-  carousel: {
-    prev: '上一组',
-    next: '下一组',
-    pages: '分页',
-  },
   products: {
     h1: '产品目录',
     lead: (categories, models) =>
-      `共 ${categories} 个品类、${models} 个型号，每个型号页都提供完整规格、安装尺寸与资料下载。先在品类页横向对比参数，再进入型号页查看全部细节。`,
+      `共 ${categories} 个品类、${models} 个型号，每个型号页都提供完整规格、安装尺寸与资料下载。可按品类筛选或搜索全部型号，再进入型号页查看全部细节。`,
     browseModels: (count) => `浏览 ${count} 个型号 →`,
     modelsUnit: (count) => `${count} 个型号`,
+    filterAll: '全部型号',
+    filterLabel: '按品类筛选',
+    searchLabel: '搜索型号',
+    searchPlaceholder: '型号编码、名称或参数',
+    resultCount: (count) => `${count} 个型号`,
+    modelUnit: '个型号',
+    modelUnitPlural: '个型号',
+    empty: '没有符合条件的型号。',
+    tableHint: '左右滑动查看完整参数。',
+    modelColumn: '型号',
+    categoryColumn: '品类',
+    keyParamsColumn: '关键参数',
+    statusColumn: '状态',
+    detailsColumn: '详情',
+    active: '在售',
   },
   category: {
     discontinued: '已停产',
@@ -425,6 +463,9 @@ const zh: Dict = {
     about: '品类说明',
     paramsUnit: (count) => `${count} 项参数`,
     detailLink: '查看详情 →',
+    moq: '起订量',
+    leadTime: '交货期',
+    payment: '付款方式',
   },
   model: {
     discontinuedTitle: '该型号已停产。',

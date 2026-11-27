@@ -23,7 +23,7 @@ description: "新增页面版式、Body 组件或调整页面结构。当用户�
 - 详情装配：`src/lib/pages/render.ts` 的 `PageInput`、`BodyKey`、`RenderedPage`、`loadPage`。
 - 路由：`src/pages/[...slug].astro` 的 `getStaticPaths` 与条件渲染。
 - 路径：`src/data/routes.ts` 的 `detailPath`。
-- 样式：`src/styles/tokens.css`、`global.css`；共享组件在 `src/components/{layout,cards,pages}/`。
+- 样式：`src/styles/tokens.css`、`global.css`；共享组件在 `src/components/{layout,cards,catalog,pages}/`。
 
 ## 步骤
 1. 先证明现有版式（`PageDef`）无法复用；列出复用方案与新版的差异，给 2–3 个选项等确认。
@@ -31,7 +31,7 @@ description: "新增页面版式、Body 组件或调整页面结构。当用户�
    - **静态版式**：数据来自页面条目，`PageInput` 仍是 `{ kind: 'static' }`。
    - **内容详情版式**：数据来自集合，需要新的 `PageInput` kind 与路由枚举。
 3. 新建 `XBody.astro`：props 从 `RenderedPage` 的对应变体派生；组件只渲染，不 `getCollection`，不写 SEO。
-4. 复用 `PageHeader`、`CtaBand`、`MetricStrip`、`FeatureRow`；不要复制第四套 hero 或按钮。
+4. 复用 `PageHeader`（放 `.section` 之外，全站唯一 h1）、`SectionTitle`、`CtaBand`、`MetricStrip`、`FeatureRow` 与 `components/catalog/` 的数据表；不要另造新套 hero 或按钮。
 5. 静态版式接线：
    - `contract.ts` 加 interface 并加入 `PageDef` 联合；
    - `static.ts` 的 `switch (def.layout)` 加 `case`，返回 `body: '<key>'` 与 `bodyProps`；
@@ -46,7 +46,9 @@ description: "新增页面版式、Body 组件或调整页面结构。当用户�
    - `loadPage` 加取数、面包屑、schema、`bodyProps` 分支；
    - 再加 `BodyKey`/`RenderedPage` 变体与分发器分支。详情版式不需要 entry；若要栏目入口页，另按 `page-entry` 建。
 7. 所有 `<img>` 补 `width`、`height`、`alt`、`loading`；主图按现有约定决定 eager/lazy。
-8. 跑 `npm run check` 与 `npm run build`；对比构建前后 CSS 体积。
+8. 全宽契约：内容用 `.container`（1920px 上限），详情页用 `.container-narrow`（1280px）+ `DetailLayout`；不要新增 1920/1280 之外的宽度变体。
+9. 产品目录类页面用 `catalog/CatalogTable.astro` 的密集表；筛选脚本必须 `<script is:inline>`，只在本页生效。
+10. 跑 `npm run check` 与 `npm run build`；对比构建前后 CSS 体积。
 
 ## 不变量
 - 两条路径的触点缺一不可：漏一个通常表现为页面不渲染、类型报错或路由 404。
@@ -54,6 +56,7 @@ description: "新增页面版式、Body 组件或调整页面结构。当用户�
 - Body 不直接取数；所有数据由 `static.ts` / `render.ts` 装配。
 - `[...slug].astro` import 的每个 Body 都会进入全站公共 CSS；低频版式先评估体积，404 继续保持独立路由。
 - 新详情路由必须在 `LOCALES` 的每种语言下都产出，否则 `check-links` 的语言配对会失败。
+- 型号页 URL 已是 `/products/<modelId>/`；品类页 `/products/<categoryId>/` 与之同层，model id 不得等于 category id。
 - 不新增依赖；图片继续走 `public/` 原样复制，不做构建期图片处理。
 - 常见失败：
   - 新增了 `PageDef` 但没加 `static.ts` 的 `case`：页面生成但 body 为空/类型不匹配。
@@ -79,6 +82,8 @@ const { locale, crumbs, heading } = Astro.props as Page['bodyProps'];
   </div>
 </section>
 ```
+Body 骨架不变量：PageHeader 在 `.section` 外（内部自带 container）；按钮只用全局 `.btn` 变体；
+表格套 `.table-scroll`；页尾按需接 `CtaBand`（Quote 页不加）。
 接线清单（逐条打勾）：
 ```text
 [ ] contract.ts：interface + PageDef 联合

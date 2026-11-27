@@ -18,36 +18,43 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 - 不负责版式/路由结构（去 `layout-body`），不负责内容数据（去 `content-*`），不写 SEO 文案。
 
 ## 事实源
-- 令牌：`src/styles/tokens.css`（颜色、字号、间距、容器、圆角、阴影）。
-- 全局：`src/styles/global.css`（reset、排版、容器、`.section`、链接、focus-visible）。
-- 共享组件：`src/components/layout/`（PageHeader、CtaBand、MetricStrip、FeatureRow、Carousel、Header、Footer）。
-- 卡片：`src/components/cards/`（CategoryCard、CategoryRow、ModelCard、ModelTile）。
+- 令牌：`src/styles/tokens.css`（L0 primitives → L1 面/文字/边 → L2 动作/数据 → L3 排版 → L4 布局 → L5 形状/动效/z）。
+- 全局：`src/styles/global.css`（reset、排版、容器与 12 栏、`.section`、链接、`.btn` 变体、`.card/.badge/.chip`、`.data-table/.spec-table/.table-scroll`、`.field`、focus-visible、reduced-motion）。
+- 共享组件：`src/components/layout/`（PageHeader、SectionTitle、CtaBand、MetricStrip、FeatureRow、Header、Footer）。
+- 目录组件：`src/components/catalog/`（ComparisonTable、PurchaseFacts）。
+- 卡片：`src/components/cards/`（CategoryCard、ModelCard、ModelTile）。
 - 页面 Body：`src/components/pages/*Body.astro`。
 - 样式作用域警告：`src/pages/[...slug].astro` 顶部注释（所有 Body 共享一份 CSS）。
 
 ## 步骤
 1. 判定改动层级：token → 共享组件 → 页面局部。优先改 token；只有确实没有对应 token 时才写局部值。
-2. 先搜现有组件与类：四套 hero（Home / PageHeader / Category / Model）和按钮类已经重复，能扩展就不新造第五套/第六套。
+2. 先搜现有组件与类：按钮只有全局 `.btn` 一套（变体 `--primary/--secondary/--ghost/--on-dark`），表格用 `.data-table/.spec-table` + `.table-scroll`，能扩展就不新造。
 3. 要合并重复按钮、相关链接块或卡片时，先列出所有调用点与差异，给方案等确认。
 4. 一次只改一个值（颜色、间距、字号、断点分开改），让用户看效果后再继续。
 5. 保持 props 向后兼容；新增可选 prop 优先，不重命名现有 prop。
 6. 界面文案进 `src/i18n/ui.ts`，不写死在组件里；内容文案来自内容集合。
 7. 所有 `<img>` 必须有 `width`、`height`、`alt`、`loading`；主图按现有约定用 eager/lazy。
-8. 检查可访问性：一个 `<h1>`、标题层级不跳级、`focus-visible`、`aria-current`、表单 label、页脚栏标题用 `<p>` 避免标题跳级。
-9. 断点沿用现有 CSS（`global.css` 与组件），不新增；移动端优先检查现有移动断点。
+8. 检查可访问性：PageHeader 是全站唯一 `<h1>`、标题层级不跳级、`focus-visible`、`aria-current`、表单 label、页脚栏标题用 `<p>` 避免标题跳级。
+9. 断点只用 480 / 768 / 1024 / 1280 / 1440；不新增断点；卡片/规格网格优先用 `repeat(auto-fit|auto-fill, minmax(min(100%, Npx), 1fr))`。
 10. 跑 `npm run check` 与 `npm run build`；对比构建前后 CSS 体积。
 
 ## 不变量
-- 颜色、间距、字号优先用 token；现有代码存在 `#fff`、72px header、760px prose、320/380px aside、13px breadcrumb 等局部值，确无对应 token 时可保留并说明，不新增同义 token。
-- `CategoryCard` 与 `CategoryRow`、`ModelCard` 与 `ModelTile` 是刻意拆分（首页轮播 vs 目录页），不盲目合并。
-- 现有按钮类 `.btn`、`.btn-secondary`、`.cta-btn`、`.cat-cta`、`.header-cta` 已重复；新增按钮前先复用或提出统一方案。
-- `Carousel` 没有默认 `--per-view`，由调用方在响应式规则里设置；`perView` 是固定值。
+- 颜色、间距、字号一律用 token；组件不写死色值（深色带上的 `#fff` 例外）。信号蓝（`--color-action/link/focus`）只用于主按钮填充、链接、焦点；`--color-data` 已改为石墨，不再用铜色装饰。
+- 全宽契约：`--container` 1920px、`--container-narrow` 1280px、`--gutter` 24–40px；背景色带挂 `<section>`，不挂 `.container`。
+- 形状契约：`--radius-*` 全为 0，`--shadow-*` 为 none；不要再新写圆角、阴影或 hover 抬升。
+- 移动端可点击目标（按钮 / 筛选 pill / 输入框 / 卡片入口链接 / 表格内链接）≥44px；会横滚的表格在 ≤1024 显示一行「左右滑动」提示。
+- 型号编码用全局 `.mono`；表格表头小号大写 + `--ls-wide`。
+- 按钮全站唯一：任何局部 `.btn-*`/`.cta-*`/`.header-cta`/`.cat-cta` 都是违规，一律迁到全局变体；每个视口区域只一个填充主按钮。
+- PageHeader 是 full-bleed 带、放 `.section` 之外（内部自带 container），全站唯一 h1；SectionTitle 管 h2；related 分组用 h3。
+- 表格必须套 `.table-scroll`（`tabindex="0"` + `role="region"` + `aria-label`），只在表内横滚。
+- `CategoryCard` 与 `ModelCard` / `ModelTile`（含 `compact`）是刻意拆分（网格卡 vs 次级磁贴），不盲目合并。
 - 组件不取数、不调用 `getCollection`、不写内容文案。
 - 所有 Body 经 `[...slug].astro` 共享一份 CSS；低频样式先评估体积，404 继续独立路由。
 - 一次只改一个变量；禁止把尺寸、断点、布局方案捆在一次改动里。
 - 常见失败：
-  - 直接写 `#0b5fff` 或 `padding: 37px`：应先用 `--color-brand` / `--space-*`。
-  - 再写一套 `.btn-quote`：页面出现第六种按钮。
+  - 直接写 `#0b5fff` 或 `padding: 37px`：应先用 `--color-action` / `--space-*`。
+  - 再写一套 `.btn-quote`：页面出现第二套按钮。
+  - PageHeader 塞进 `.section > .container`：双重内缩 + 双 h1 结构。
   - 页脚栏标题用 `<h3>`：标题层级从 h1 跳到 h3。
   - `<img>` 缺 `width/height`：构建期校验直接失败。
 

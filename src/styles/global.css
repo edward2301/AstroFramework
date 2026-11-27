@@ -1,5 +1,7 @@
 @import './tokens.css';
 
+/* ---------- reset / base ---------- */
+
 *,
 *::before,
 *::after {
@@ -22,63 +24,98 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+summary {
+  cursor: pointer;
+}
+
+img,
+picture,
+svg {
+  max-width: 100%;
+  display: block;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--color-border);
+  margin: var(--space-6) 0;
+}
+
+/* ---------- type ---------- */
+
 h1,
 h2,
 h3,
 h4 {
-  line-height: var(--lh-tight);
   margin: 0 0 var(--space-4);
-  font-weight: 700;
-  color: var(--color-text);
-  letter-spacing: var(--ls-tight);
+  color: var(--color-ink);
   text-wrap: balance;
 }
 
 h1 {
   font-size: var(--fs-h1);
+  line-height: var(--lh-tight);
+  font-weight: 700;
+  letter-spacing: var(--ls-tight);
 }
 
-/* 板块标题统一带 4px 品牌色竖条（文章正文里的 h2 同样式，全站一致） */
 h2 {
   font-size: var(--fs-h2);
-  position: relative;
-  padding-left: 14px;
-}
-
-h2::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.14em;
-  width: 4px;
-  height: 1.1em;
-  border-radius: 2px;
-  background: var(--color-brand);
+  line-height: var(--lh-heading);
+  font-weight: 700;
+  letter-spacing: var(--ls-tight);
 }
 
 h3 {
   font-size: var(--fs-h3);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  letter-spacing: var(--ls-h3);
+}
+
+h4 {
+  font-size: var(--fs-h4);
+  line-height: var(--lh-heading);
+  font-weight: 600;
 }
 
 p {
   margin: 0 0 var(--space-4);
+  text-wrap: pretty;
 }
+
+ul,
+ol {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+}
+
+/* ---------- links ---------- */
 
 a {
   color: var(--color-link);
   text-decoration: none;
-  transition: color 0.15s ease;
+  transition: color var(--duration-1) var(--ease);
 }
+
 a:hover {
   color: var(--color-link-hover);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /*
  * 正文里的行内链接不能只靠颜色区分（WCAG 1.4.1）。
  * 作用域严格限定在 Markdown 正文与内页正文的文本流元素下、且无 class 的链接：
  * 主导航、面包屑、卡片、按钮、页脚、分页控件都不在命中范围内。
- * .prose 分支允许 li（Markdown 列表），内页分支不含 li 以避开面包屑与链接列表。
  */
 :is(
   .prose :where(p, li, dd, blockquote, figcaption, td),
@@ -89,50 +126,277 @@ a:hover {
 }
 
 ::selection {
-  background: var(--color-brand-soft);
+  background: var(--color-action-soft);
 }
 
 /* 键盘焦点：Tab 到链接/按钮/箭头/页码时的可见描边（鼠标点击不显示） */
 :focus-visible {
-  outline: 2px solid var(--color-brand);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
 }
 
-img,
-picture,
-svg {
-  max-width: 100%;
-  display: block;
-}
-
-ul,
-ol {
-  margin: 0 0 var(--space-4);
-  padding-left: var(--space-5);
-}
+/* ---------- tables ---------- */
 
 table {
   border-collapse: collapse;
   width: 100%;
 }
 
-/* 布局工具 */
+caption {
+  text-align: left;
+  font-size: var(--fs-sm);
+  color: var(--color-muted);
+  padding: 0 0 var(--space-3);
+}
+
+/* ---------- layout ---------- */
+
+/*
+ * 全宽流式：容器上限 1920px，边距由 --gutter 控制。
+ * 背景色带必须挂在 <section> 上，不能挂进 .container，否则会被 1920 截断。
+ */
 .container {
   width: 100%;
   max-width: var(--container);
   margin: 0 auto;
-  padding: 0 var(--space-4);
+  padding: 0 var(--gutter);
 }
 
 .container-narrow {
   max-width: var(--container-narrow);
 }
 
-/* 板块节奏：桌面 64px，移动端由空间令牌自动降到 44px */
+/* 板块节奏：桌面 80px 上限，移动端由 token 自动降到 48px */
 .section {
-  padding: var(--space-8) 0;
+  padding: var(--space-section) 0;
 }
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.span-1 { grid-column: span 1 / span 1; }
+.span-2 { grid-column: span 2 / span 2; }
+.span-3 { grid-column: span 3 / span 3; }
+.span-4 { grid-column: span 4 / span 4; }
+.span-5 { grid-column: span 5 / span 5; }
+.span-6 { grid-column: span 6 / span 6; }
+.span-7 { grid-column: span 7 / span 7; }
+.span-8 { grid-column: span 8 / span 8; }
+.span-9 { grid-column: span 9 / span 9; }
+.span-10 { grid-column: span 10 / span 10; }
+.span-11 { grid-column: span 11 / span 11; }
+.span-12 { grid-column: span 12 / span 12; }
+
+.prose {
+  max-width: var(--measure);
+}
+
+/* 型号编码 / 数据编号：全站唯一等宽工具 */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+/* ---------- components ---------- */
+
+/* 按钮：全站唯一一套；局部样式一律删除 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background var(--duration-1) var(--ease),
+    border-color var(--duration-1) var(--ease),
+    color var(--duration-1) var(--ease);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn--primary {
+  background: var(--color-action);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--color-action-hover);
+  color: #fff;
+}
+
+.btn--secondary {
+  background: var(--color-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.btn--secondary:hover {
+  background: var(--color-subtle);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-link);
+}
+
+.btn--ghost:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
+}
+
+.btn--on-dark {
+  background: transparent;
+  border-color: var(--color-on-dark-muted);
+  color: var(--color-on-dark);
+}
+
+.btn--on-dark:hover {
+  background: rgb(255 255 255 / 12%);
+}
+
+.btn--sm {
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+.btn--lg {
+  min-height: 48px;
+  padding: 0 24px;
+}
+
+/* 卡片：统一容器，hover 行为由调用方决定 */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: var(--card-padding, var(--space-5));
+}
+
+/* 徽标 / 标签 */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  font-size: var(--fs-xs);
+  color: var(--color-muted);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-sm);
+  color: var(--color-text);
+}
+
+/* 数据表：表头小号大写、行分隔、数字对齐 */
+.data-table th,
+.data-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table thead th {
+  background: var(--color-subtle);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.data-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 规格表：行内键值对；标签列固定更窄，数据更密 */
+.spec-table th,
+.spec-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  font-variant-numeric: tabular-nums;
+}
+
+.spec-table th[scope='row'] {
+  width: 34%;
+  color: var(--color-muted);
+  font-weight: 500;
+  font-size: var(--fs-sm);
+}
+
+/* 横向滚动容器：表格只在内部滚，页面不溢出 */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+/* 提示块：石墨细线，不再用铜色 */
+.notice {
+  padding: var(--space-4);
+  border-left: 2px solid var(--color-ink);
+  background: var(--color-subtle);
+}
+
+/* 表单字段 */
+.field {
+  margin-bottom: var(--space-4);
+}
+
+.field label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  font-size: 16px; /* 防 iOS 聚焦缩放 */
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.field input[aria-invalid='true'],
+.field select[aria-invalid='true'],
+.field textarea[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.field-error {
+  margin-top: var(--space-1);
+  font-size: var(--fs-xs);
+  color: var(--color-danger);
+}
+
+/* ---------- a11y / motion ---------- */
 
 .visually-hidden {
   position: absolute;
@@ -150,11 +414,23 @@ table {
   position: absolute;
   left: -9999px;
 }
+
 .skip-link:focus {
   left: var(--space-4);
   top: var(--space-4);
   background: var(--color-bg);
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-border);
-  z-index: 100;
+  z-index: var(--z-skip);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

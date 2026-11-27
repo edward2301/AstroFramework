@@ -1,16 +1,17 @@
 ﻿---
 /**
- * 品类卡：封面图（黄金比通栏）+ 品类名 + 简介 + 显式链接。
+ * 品类卡：封面图（通栏）+ 品类名 + 简介 + 显式链接。
  *
- * 点击行为收窄在链接上（图与卡体不跳转），悬停高亮保留在整卡。
- * 使用方：首页品类轮播、产品总览列表。
+ * 图上文下、直角、1px 细线；悬停只换边框色（不位移、不投影、不放大）。
+ * 点击行为收窄在链接上（图与卡体不跳转）。
+ * 使用方：首页品类网格。
  */
 interface Props {
   href: string;
   name: string;
   /** 简介文本；截断与省略号由调用方决定 */
   intro: string;
-  /** 链接文案，由调用方按语境传（如「查看型号 →」「6 个型号 · 查看系列 →」） */
+  /** 链接文案，由调用方按语境传（如「查看型号 →」） */
   linkLabel: string;
   /** 品类封面图（public/ 下，黄金比 1.618），缺省时不输出图片 */
   image?: string;
@@ -45,18 +46,16 @@ const { href, name, intro, linkLabel, image } = Astro.props;
     display: flex;
     flex-direction: column;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
     color: var(--color-text);
     height: 100%;
-    background: var(--color-bg);
+    background: var(--color-surface);
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: border-color var(--duration-1) var(--ease);
   }
 
+  /* 唯一的悬停反馈：细线加深 */
   .category-card:hover {
-    border-color: var(--color-brand);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    border-color: var(--color-border-strong);
   }
 
   /* 封面：通栏黄金比。height:auto 必须显式声明，否则 height="742" 属性会盖掉比例 */
@@ -66,36 +65,23 @@ const { href, name, intro, linkLabel, image } = Astro.props;
     height: auto;
     aspect-ratio: 1.618;
     object-fit: cover;
-    transition: transform 0.3s ease;
   }
 
-  /* 悬停微放大：产品卡标配微交互 */
-  .category-card:hover .category-card-img {
-    transform: scale(1.04);
-  }
-
-  /* 文字区：32px 四周留白，与图片、边框都有呼吸距离 */
   .category-card-body {
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: var(--space-6);
+    padding: var(--space-5);
   }
 
   h3 {
     margin-bottom: var(--space-3);
-    letter-spacing: -0.01em;
-    transition: color 0.15s ease;
-  }
-
-  .category-card:hover h3 {
-    color: var(--color-brand);
   }
 
   p {
     font-size: var(--fs-sm);
-    line-height: 1.65;
-    color: var(--color-text-muted);
+    line-height: var(--lh-body);
+    color: var(--color-muted);
   }
 
   .category-card-link {
@@ -103,22 +89,20 @@ const { href, name, intro, linkLabel, image } = Astro.props;
     margin-top: auto;
     padding-top: var(--space-4);
     font-size: var(--fs-sm);
-    color: var(--color-brand);
-    transition: transform 0.15s ease, color 0.15s ease;
+    font-weight: 500;
+    color: var(--color-link);
   }
 
   .category-card-link:hover {
     color: var(--color-link-hover);
   }
 
-  .category-card:hover .category-card-link {
-    transform: translateX(3px);
-  }
-
-  /* 手机：卡片窄，文字区内边距收一档 */
-  @media (max-width: 767px) {
-    .category-card-body {
-      padding: var(--space-5);
+  /* 卡片入口链接：移动端补到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .category-card-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
     }
   }
 </style>

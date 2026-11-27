@@ -34,9 +34,8 @@ export const ROUTES = {
 export const detailPath = {
   /** 品类页：/products/<品类>/ */
   category: (categoryId: string) => `${ROUTES.products}${categoryId}/`,
-  /** 型号页：/products/<品类>/<型号>/ */
-  model: (categoryId: string, modelId: string) =>
-    `${ROUTES.products}${categoryId}/${modelId}/`,
+  /** 型号页：/products/<型号>/（品类不再进 URL） */
+  model: (modelId: string) => `${ROUTES.products}${modelId}/`,
   /** 应用方向：/applications/<id>/ */
   application: (id: string) => `${ROUTES.applications}${id}/`,
   /** 案例：/case-studies/<id>/ */

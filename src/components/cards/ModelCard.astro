@@ -1,14 +1,16 @@
 ﻿---
 /**
- * 机型卡：左文（编码 + 首参数，归拢居中）+ 右图。
+ * 机型卡：通栏主图 + 等宽编码 + 型号名 + 首参数。
  *
- * 图片文件本身是黄金比（800x494），卡片高度自然由图片撑出——
- * 不设 min-height、不设卡片比例、不做拉伸：比例永远等于源图，零裁切零白缝。
- * 唯一可点目标是型号名链接；图片与参数不参与点击。使用方：首页「常用型号」轮播。
+ * 图上文下、直角、1px 细线；悬停只换边框色（不位移、不投影、不放大）。
+ * 唯一可点目标是型号名链接；图片与参数不参与点击。使用方：首页「常用型号」。
  */
 interface Props {
   href: string;
+  /** 型号编码（等宽显示） */
   code: string;
+  /** 型号名；作为卡片 h3 与链接文案 */
+  name: string;
   /** 首参数的键名（如「量程 / Range」），与参数值成对展示 */
   firstParamLabel: string;
   firstParam: string;
@@ -16,22 +18,16 @@ interface Props {
   image?: string;
 }
 
-const { href, code, firstParamLabel, firstParam, image } = Astro.props;
+const { href, code, name, firstParamLabel, firstParam, image } = Astro.props;
 ---
 
 <div class="model-card">
-  <div class="model-card-body">
-    <a class="model-card-code" href={href}>
-      <strong>{code}</strong>
-    </a>
-    <em>{firstParamLabel} · {firstParam}</em>
-  </div>
   {
     image && (
       <img
         class="model-card-img"
         src={image}
-        alt={`${code} ${firstParamLabel} ${firstParam}`}
+        alt={`${code} ${name}`}
         width="800"
         height="494"
         loading="lazy"
@@ -39,92 +35,100 @@ const { href, code, firstParamLabel, firstParam, image } = Astro.props;
       />
     )
   }
+  <div class="model-card-body">
+    <p class="model-card-code mono">{code}</p>
+    <h3 class="model-card-name"><a href={href}>{name}</a></h3>
+    <dl class="model-card-param">
+      <dt>{firstParamLabel}</dt>
+      <dd class="mono">{firstParam}</dd>
+    </dl>
+  </div>
 </div>
 
 <style>
   .model-card {
     display: flex;
-    align-items: center;
-    background: var(--color-bg);
+    flex-direction: column;
+    height: 100%;
+    background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: border-color var(--duration-1) var(--ease);
   }
 
+  /* 唯一的悬停反馈：细线加深 */
   .model-card:hover {
-    border-color: var(--color-brand);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
+    border-color: var(--color-border-strong);
   }
 
-  /* 左文：编码与参数归拢为一组、整组垂直居中（卡片高度=图片高度） */
+  /* 通栏主图：height:auto 必须显式声明，否则 height="494" 属性会盖掉比例 */
+  .model-card-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.618;
+    object-fit: cover;
+  }
+
   .model-card-body {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 8px;
     flex: 1;
-    min-width: 0;
-    padding: var(--space-4) var(--space-5);
-    color: inherit;
+    padding: var(--space-5);
   }
 
-  /* 唯一可点目标：型号名链接；参数与图片不跳转 */
   .model-card-code {
-    align-self: flex-start;
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .model-card-code:hover strong {
-    color: var(--color-brand);
-  }
-
-  strong {
-    font-size: var(--fs-h3);
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-
-  .model-card-code strong::after {
-    content: '';
-    display: block;
-    width: 28px;
-    height: 3px;
-    border-radius: 2px;
-    background: var(--color-brand);
-    margin-top: 10px;
-  }
-
-  /* 参数行单行不折：折行会把卡片撑高、把右侧图片拉成方形 */
-  em {
-    font-style: normal;
+    margin: 0 0 var(--space-2);
     font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: var(--fs-h3);
+    letter-spacing: var(--ls-tight);
+  }
+
+  .model-card-name a:hover {
+    color: var(--color-link-hover);
+  }
+
+  /* 型号名是卡片唯一入口：移动端补到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .model-card-name a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
+  /* 一个参数：细线上方一行 k/v */
+  .model-card-param {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin: var(--space-4) 0 0;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .model-card-param dt {
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .model-card-param dd {
+    margin: 0;
+    min-width: 0;
+    font-size: var(--fs-data);
+    line-height: var(--lh-data);
     color: var(--color-text);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /*
-   * 右图：宽 55%，高度 = 宽 ÷ 1.618（黄金比）。
-   * align-self: center 是必须的——卡片的 align-items 会把图拉伸到卡片高度，
-   * 一旦文字行变高或同行卡片被拉齐，比例就会被破坏（之前就是这样变成方形的）。
-   */
-  .model-card-img {
-    display: block;
-    flex: 0 0 55%;
-    width: 55%;
-    height: auto;
-    aspect-ratio: 1.618;
-    align-self: center;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-
-  /* 悬停微放大：产品卡标配微交互 */
-  .model-card:hover .model-card-img {
-    transform: scale(1.04);
+    text-align: right;
+    overflow-wrap: anywhere;
   }
 </style>

@@ -96,7 +96,7 @@ export async function loadStaticPage(
             path,
             items: modelCards.map((m) => ({
               name: m.code,
-              path: detailPath.model(m.categoryId, m.id),
+              path: detailPath.model(m.id),
             })),
           }),
         ],
@@ -114,7 +114,8 @@ export async function loadStaticPage(
 
     case 'products': {
       const categories = await getAllCategories();
-      const models = await getAllModels();
+      // 含停产型号：目录页要保留入口，停产状态在表格里标注
+      const models = await getAllModels(true);
 
       const countByCategory = new Map<string, number>();
       for (const m of models) {
@@ -124,15 +125,30 @@ export async function loadStaticPage(
 
       const crumbs = productsCrumbs(locale);
 
-      const cards = categories.map((c) => {
+      const categoryCards = categories.map((c) => {
         const v = categoryView(c, locale);
         return {
           id: c.id,
           name: v.name,
           intro: v.intro,
           modelCount: countByCategory.get(c.id) ?? 0,
-          /** 品类封面：品类条目自己的 image 字段（运营维护，构建不处理） */
           image: c.data.image,
+        };
+      });
+
+      // 全型号目录：参数键在不同品类间不一致，表格用统一的 keyParams 单元格
+      const categoryNames = new Map(categories.map((c) => [c.id, categoryView(c, locale).name]));
+      const modelRows = models.map((m) => {
+        const v = modelView(m, locale);
+        return {
+          id: m.id,
+          categoryId: m.data.category.id,
+          categoryName: categoryNames.get(m.data.category.id) ?? m.data.category.id,
+          code: v.code,
+          name: v.name,
+          status: v.status,
+          keyParams: v.keyParams,
+          image: v.image,
         };
       });
 
@@ -142,7 +158,10 @@ export async function loadStaticPage(
           name: meta.title,
           description: meta.description,
           path,
-          items: cards.map((c) => ({ name: c.name, path: detailPath.category(c.id) })),
+          items: modelRows.map((m) => ({
+            name: `${m.code} ${m.name}`,
+            path: detailPath.model(m.id),
+          })),
         }),
         breadcrumbSchema(crumbs),
       ];
@@ -153,7 +172,7 @@ export async function loadStaticPage(
         ...meta,
         schemas,
         body: 'products',
-        bodyProps: { locale, crumbs, categories: cards, totalModels: models.length },
+        bodyProps: { locale, crumbs, categories: categoryCards, models: modelRows, totalModels: modelRows.length },
       };
     }
 

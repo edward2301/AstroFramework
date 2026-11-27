@@ -9,7 +9,7 @@
 |---|---|---|
 | 页面与内容 | Astro 静态构建 → `dist/` | 无运行期服务端，不接数据库；`npm run build` 后即可部署 |
 | 托管、HTTPS、CDN、回滚 | Cloudflare Pages | 自动证书、预览部署、按部署版本回滚，无需管理服务器 |
-| 路由规则 | `public/_headers` / `public/_redirects` | 缓存头、404 直访、旧链接 301，随产物一起上传；尾斜杠由 Pages 默认补齐，不写在这两份文件里 |
+| 路由规则 | `public/_headers` / `public/_redirects` | 缓存头、404 直访、旧链接 301，随产物一起上传；型号旧路径 301 由构建期追加到 `dist/_redirects`，尾斜杠由 Pages 默认补齐 |
 | 交互数据 | Cloudflare D1 + Wrangler CLI | 询盘与运营记录由运维用 `wrangler d1` 写入、查询、导出 |
 
 > 询价页 `src/components/pages/QuoteBody.astro` 仍是纯前端 `mailto:` 表单，**不会自动写入 D1**。
@@ -211,6 +211,10 @@ curl -sI https://你的域名/products/category-a/ | head -1
 # ⑤ 中文路径的 404 必须是中文页
 curl -s https://你的域名/zh/this-does-not-exist/ | grep -o '<html lang="[^"]*"'
 # 期望 zh-CN；返回 en 说明 dist/zh/404.html 没有生成
+
+# ⑥ 型号旧路径 301 实际跳转（en/zh、带/不带斜杠，共 108 条）
+node scripts/check-redirects.mjs --base https://你的域名
+# 期望：108 条规则，108 条实际跳转；每条 301 → 200 → canonical 为扁平路径
 ```
 
 ① 返回 200 最严重：说明误配了通配 200 rewrite 或 SPA fallback，全站每个错误网址都会变成首页副本。
@@ -233,7 +237,7 @@ curl -s https://你的域名/zh/this-does-not-exist/ | grep -o '<html lang="[^"]
 | 尾斜杠补齐 | Cloudflare Pages 自动处理 | 目录式产物（`/x/index.html`）由 Pages 默认的 `auto-trailing-slash` 补齐，不要写通配 rewrite 覆盖 |
 | `_astro/` 长缓存 | `public/_headers` | 文件名带 hash，可缓存一年 |
 | sitemap 与 robots 不缓存 | `public/_headers` | 新页面能被及时发现 |
-| 旧链接 301 | `public/_redirects` | 用精确路径匹配，不写正则，避免误伤 |
+| 旧链接 301 | `public/_redirects` + 构建期生成 | 手工规则用精确路径匹配，不写正则；型号旧路径 `/products/<品类>/<型号>/` 由 `scripts/model-redirects.mjs` 在 `build:done` 追加到 `dist/_redirects`（含 `/zh` 与不带斜杠形式），源文件不重复维护 |
 
 `_astro/` 只写 `Cache-Control`、不叠加 `expires`；同一路径被两条规则匹配时响应头会被合并
 （如 `no-store, no-store`），所以 sitemap 只写通配 `/sitemap-*.xml` 一条，不再单列

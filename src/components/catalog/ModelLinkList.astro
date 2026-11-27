@@ -1,0 +1,66 @@
+---
+/**
+ * 型号链接列表：编码（等宽）+ 型号名，细线行。
+ *
+ * 用于详情页侧栏与正文的「推荐型号 / 配置型号 / 相关型号」。
+ * 只负责排版，链接统一走 detailPath.model(id) 的扁平路径。
+ */
+import { localizePath, type Locale } from '../../i18n/routing';
+import { detailPath } from '../../data/routes';
+
+interface Props {
+  locale: Locale;
+  models: { id: string; code: string; name: string }[];
+}
+
+const { locale, models } = Astro.props;
+---
+
+<ul class="model-links">
+  {
+    models.map((m) => (
+      <li>
+        <a href={localizePath(locale, detailPath.model(m.id))}>
+          <span class="model-code mono">{m.code}</span>
+          <span class="model-name">{m.name}</span>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .model-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .model-links li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .model-links a {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2) var(--space-4);
+    padding: var(--space-3) 0;
+    font-size: var(--fs-sm);
+    text-decoration: none;
+  }
+
+  .model-code {
+    font-weight: 600;
+    color: var(--color-ink);
+  }
+
+  .model-name {
+    color: var(--color-muted);
+  }
+
+  .model-links a:hover .model-code {
+    color: var(--color-link);
+  }
+</style>

@@ -37,10 +37,10 @@ const related = [
 ];
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={heading} lead={body.intro} />
+
 <section class="section">
   <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={heading} lead={body.intro} />
-
     {metrics.length > 0 && <MetricStrip items={metrics} />}
 
     {/* 栏目说明：有列表时同样要出现，否则页面只剩标题与卡片，正文全丢 */}
@@ -74,7 +74,7 @@ const related = [
         }
       </div>
 
-      <aside class="related-card">
+      <aside class="related">
         <h2>{dict.section.related}</h2>
         <ul class="links">
           {related.map((r) => (
@@ -88,9 +88,8 @@ const related = [
   </div>
 </section>
 
-
 <style>
-  /* 双栏：左侧栏目说明，右侧相关入口卡（与关于页、询价页一致） */
+  /* 指标条与下方正文的节奏（MetricStrip 为子组件，需 :global 触达） */
   :global(.metrics) {
     margin-bottom: var(--space-6);
   }
@@ -99,9 +98,10 @@ const related = [
   .section-current {
     max-width: 760px;
     margin: 0 0 var(--space-6);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
 
+  /* 主栏 + 320px 侧栏；≤1024 单列 */
   .section-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 320px;
@@ -109,39 +109,18 @@ const related = [
     align-items: start;
   }
 
-  /* 条目字母标记：无图集合也有一点色彩，避免整列纯文字 */
-  .item-mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    margin-bottom: var(--space-2);
-    border-radius: 8px;
-    background: var(--color-brand-50);
-    border: 1px solid var(--color-brand-100);
-    color: var(--color-brand);
-    font-size: var(--fs-sm);
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  .section-main h2 {
-    margin-top: var(--space-6);
-  }
-
   .status {
     max-width: 680px;
     margin: 0;
   }
 
-  /* 条目列表：两列卡片，标题 + 摘要 + 徽标 */
+  /* 条目列表：细线瓦片，列宽随容器自适应 */
   .items {
     list-style: none;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
     gap: var(--space-4);
   }
 
@@ -152,17 +131,26 @@ const related = [
     height: 100%;
     padding: var(--space-5);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    background: var(--color-bg);
+    background: var(--color-surface);
     text-decoration: none;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    transition: border-color var(--duration-1) var(--ease);
   }
 
+  /* hover 只换描边颜色：不抬升、不加影、不做蓝色底 */
   .items a:hover {
-    border-color: var(--color-brand);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-3px);
-    text-decoration: none;
+    border-color: var(--color-border-strong);
+  }
+
+  /* 序号：等宽小字 + 下方细线，纯装饰（aria-hidden） */
+  .item-mark {
+    align-self: flex-start;
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--color-border);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    color: var(--color-muted);
   }
 
   .items strong {
@@ -173,7 +161,7 @@ const related = [
 
   .items .meta {
     font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    color: var(--color-muted);
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -183,35 +171,39 @@ const related = [
   .items .badge {
     margin-top: auto;
     align-self: flex-start;
-    padding: 2px 8px;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
+  }
+
+  /* 侧栏：上下细线分段，无底色、无圆角 */
+  .related {
+    padding: var(--space-5) 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .related h2 {
+    margin: 0 0 var(--space-2);
     font-size: var(--fs-xs);
-    color: var(--color-brand);
-  }
-
-  .related-card {
-    padding: var(--space-5);
-    background: var(--color-bg-subtle);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-  }
-
-  .related-card h2 {
-    font-size: var(--fs-h3);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
   .links {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: var(--space-3);
+  }
+
+  .links li {
+    border-top: 1px solid var(--color-border-soft);
   }
 
   .links a {
+    display: block;
+    padding: var(--space-3) 0;
     font-size: var(--fs-sm);
-    color: var(--color-brand);
+    color: var(--color-link);
   }
 
   .links a:hover {
@@ -219,10 +211,6 @@ const related = [
   }
 
   @media (max-width: 1024px) {
-    .items {
-      grid-template-columns: minmax(0, 1fr);
-    }
-
     .section-layout {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-6);

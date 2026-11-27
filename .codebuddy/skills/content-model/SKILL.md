@@ -35,10 +35,12 @@ description: "新增、修改或删除工业品型号 JSON（code、keyParams、
 7. 补 `locales.zh` 必填：`name`、`keyParams`、`specGroups`、`seoTitle`、`seoDescription`。
 8. 引用只写已发布条目 id，不写型号 code：`category`、`replacement`、`applications`、`relatedCases`。
 9. 写 `seoTitle` / `seoDescription` 时按 `seo-copy` 的检查表自检：标题只写本体、宽度读 `SEO_LIMITS`、全站标题不重复。
-10. 跑 `npm run validate`；再跑 `npm run test`。开发态查看 `/products/<category>/<slug>/` 与 `/zh/products/<category>/<slug>/`。
+10. 跑 `npm run validate`；再跑 `npm run test`。开发态查看 `/products/<slug>/` 与 `/zh/products/<slug>/`（型号 URL 已扁平，品类不再进路径）。
 
 ## 不变量
 - 文件名 = `toSlug(code)`；条目 id 与文件名一致。
+- 型号 id 是全局 URL 段：不得与任何品类 id 相同，且必须匹配 `^[a-z0-9-]+$`；校验脚本与 `tests/content.test.ts` 会拦截。
+- 旧路径 `/products/<category>/<slug>/` 由构建期自动生成 301，不要手工往 `public/_redirects` 加重复规则。
 - `keyParams` 恰好 5 项；中英键集合分别覆盖同语言品类列。
 - 型号 `category` 用品类 id（文件名），不是品类显示名。
 - 引用必须存在且已发布；`replacement` 不得指向自身；草稿条目不能被引用。

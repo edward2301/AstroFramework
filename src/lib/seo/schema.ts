@@ -92,7 +92,7 @@ export function productSchema(input: {
   code: string;
   name: string;
   description: string;
-  /** 语言无关路径，如 /products/category-a/a1/ */
+  /** 语言无关路径，如 /products/a1/ */
   path: string;
   image?: string;
   brand: string;

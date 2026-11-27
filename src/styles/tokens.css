@@ -1,63 +1,93 @@
 /**
- * 设计变量。
- * 全站唯一来源，组件不写死颜色与间距。
- *
- * 色板对齐参考站 soukacatv.com 的实测值：白底、蓝色主色、蓝调深灰正文、
- * 浅灰分区。具体色值以下方 token 为准，注释不维护第二份。
- * 改主色只动 --color-brand 系列，按钮/链接/h2 竖条自动跟随。
+ * 设计变量（Industrial data catalog）
+ * 全站唯一来源：组件只消费语义 token，不写死色值/间距/字号。
+ * 仅保留两个迁移期例外：--color-brand（BaseLayout theme-color 正则依赖字面量）
+ * 与 --color-ink-soft（语义色，暂无更名计划）。
  */
 
 :root {
-  /* 色板 */
-  --color-bg: #ffffff;            /* 页面背景：白 */
-  --color-bg-subtle: #f5f7fa;     /* 分区浅底：带蓝调的中性灰，与品牌色同族 */
-  --color-surface: #f5f7fa;       /* 信息块浅底（与分区同色） */
-  --color-text: #1c2430;          /* 正文与标题：略带蓝调的深灰，不用纯黑 */
-  --color-text-muted: #626b78;    /* 次要文字：白底 5.3:1、浅灰底 4.7:1，过 AA */
-  --color-border: #e3e7ed;        /* 边框与分隔线：更轻，减少线条噪点 */
-  --color-border-strong: #cfd6e0; /* 需要强调的边框（输入框、表格外框） */
-  /* 语义化边框：组件统一取这两个令牌 */
+  /* ---------- L0 primitives ---------- */
+  --graphite-900: #0d1117;
+  --graphite-800: #161b22;
+  --graphite-700: #232a31;
+  --graphite-600: #3a424b;
+
+  --neutral-0: #ffffff;
+  --neutral-50: #f5f6f7;
+  --neutral-100: #e9ecef;
+  --neutral-200: #d7dce1;
+  --neutral-500: #7c858f;
+
+  --blue-600: #0b5fff;
+  --blue-700: #0a4fae;
+  --blue-800: #08459c;
+  --blue-50: #e8f0ff;
+
+  --red-700: #b3261e;
+  --on-dark: #f7f4ee;
+  --on-dark-muted: #c2ccd6;
+  --on-dark-active: #8fb8ff;
+
+  /* ---------- L1 surfaces / text / borders ---------- */
+  --color-bg: var(--neutral-0);
+  --color-surface: var(--neutral-0);
+  --color-subtle: var(--neutral-50);
+  --color-sunken: var(--neutral-100);
+  --color-text: var(--graphite-700);
+  --color-ink: var(--graphite-900);
+  /* 深色带的次级层次（深色面板底） */
+  --color-ink-soft: var(--graphite-800);
+  --color-muted: #5a6472;
+  --color-border: var(--neutral-200);
+  --color-border-strong: var(--neutral-500);
   --color-border-soft: color-mix(in srgb, var(--color-border) 55%, transparent);
-  --color-border-brand: color-mix(in srgb, var(--color-brand) 12%, var(--color-border));
-  --color-brand: #1863dc;         /* 主色：按钮、链接、h2 竖条 */
-  --color-brand-hover: #0056a7;   /* 主色悬停（深蓝） */
-  --color-brand-soft: #eaf1fc;    /* 主色浅底：图标块、强调信息背景 */
-  --color-link: #1863dc;
-  --color-link-hover: #0096de;    /* 链接悬停（亮蓝） */
-  --color-ink: #0a1e3c;           /* 深海军蓝：首页 hero 与页脚共用同一深色 */
-  --color-ink-soft: #10336b;      /* 深色渐变中段（hero 背景） */
-  /* 品牌色阶：由浅到深一套，避免各处自行 mix 出不同蓝 */
-  --color-brand-50: #f2f7fe;
-  --color-brand-100: #e2edfd;
-  --color-brand-200: #c6dbfb;
-  --color-brand-700: #0f47a8;
-  --color-brand-900: #0b2a5b;     /* 深色带（banner / metric 条）底色 */
-  /* 强调色：只用于数字与关键标记，占画面不超过 5%，避免与品牌蓝抢 */
-  --color-accent: #0d8a72;
-  --color-accent-soft: #e6f5f1;
+  --color-border-brand: color-mix(in srgb, var(--color-action) 14%, var(--color-border));
 
-  /* 排版 */
-  /* 中西文统一栈：西文系统字体 + 中文黑体，避免中文回落到衬线 */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
-    'Microsoft YaHei', 'Noto Sans SC', 'Helvetica Neue', Arial, sans-serif;
+  /* ---------- L2 action / status ---------- */
+  --color-action: var(--blue-600);
+  --color-action-hover: var(--blue-700);
+  --color-action-soft: var(--blue-50);
+  --color-link: var(--blue-700);
+  --color-link-hover: var(--blue-800);
+  --color-focus: var(--blue-600);
+  --color-data: var(--graphite-600);
+  --color-data-soft: var(--neutral-100);
+  --color-danger: var(--red-700);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-muted: var(--on-dark-muted);
+  --color-on-dark-active: var(--on-dark-active);
+
+  /* ---------- 迁移期例外 ---------- */
+  --color-brand: #0b5fff; /* 字面量：BaseLayout 从此处解析 theme-color；与 --color-action 同值 */
+  --color-ink-soft: var(--graphite-800);
+
+  /* ---------- L3 type ---------- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', 'Noto Sans SC', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  --fs-body: 16px;
-  --fs-lead: 19px;                /* 首屏导语 */
-  --fs-sm: 14px;
-  --fs-xs: 12px;
-  --fs-h1: 40px;
-  --fs-h2: 28px;
-  --fs-h3: 18px;
-  --lh-body: 1.75;
-  --lh-tight: 1.25;
-  --ls-tight: -0.02em;            /* 大字号收字距，视觉更紧实 */
-  --ls-wide: 0.05em;              /* 大写小标签的疏字距 */
 
-  /* 阴影 */
-  --shadow-sm: 0 2px 8px rgb(0 0 0 / 6%);
-  --shadow-md: 0 8px 24px rgb(0 0 0 / 10%);
+  --fs-h1: clamp(2.25rem, 1.3rem + 3.2vw, 4.5rem);
+  --fs-h2: clamp(1.5rem, 1.3rem + 0.9vw, 2.25rem);
+  --fs-h3: clamp(1.125rem, 1.07rem + 0.2vw, 1.3125rem);
+  --fs-h4: 1rem;
+  --fs-lead: clamp(1.0625rem, 1rem + 0.45vw, 1.375rem);
+  --fs-body: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.75rem;
+  --fs-data: 0.9375rem;
 
-  /* 间距 */
+  --lh-body: 1.65;
+  --lh-heading: 1.2;
+  --lh-tight: 1.05;
+  --lh-data: 1.45;
+  --ls-tight: -0.02em;
+  --ls-h3: -0.005em;
+  --ls-wide: 0.1em;
+
+  --measure: 68ch;
+  --measure-lead: 60ch;
+
+  /* ---------- L4 space / layout ---------- */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -66,18 +96,44 @@
   --space-6: 32px;
   --space-7: 48px;
   --space-8: 64px;
+  --space-9: 80px;
+  --space-10: 96px;
 
-  /* 布局 */
-  --container: 1400px; /* 宽屏留白利用：1920 屏两侧各 260px（原 1200 时为 360px） */
-  --container-narrow: 820px;
-  --radius: 6px;
+  --space-section: clamp(56px, 5vw, 112px);
+  --gutter: clamp(24px, 2.5vw, 40px);
+  --container: 1920px;
+  --container-narrow: 1280px;
+  --header-h: 72px;
+
+  /* ---------- L5 shape / elevation / motion ---------- */
+  /* 直角契约：变量名保留以兼容现有调用，值统一为 0 */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius: 0;
+  --radius-lg: 0;
+  --radius-pill: 0;
+
+  /* 无阴影：层级靠 1px 细线与底色差 */
+  --shadow-sm: none;
+  --shadow-md: none;
+  --shadow-1: var(--shadow-sm);
+  --shadow-2: var(--shadow-md);
+
+  --duration-1: 120ms;
+  --duration-2: 180ms;
+  --duration-3: 280ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --z-sticky: 10;
+  --z-header: 50;
+  --z-dropdown: 60;
+  --z-mobile-nav: 70;
+  --z-skip: 100;
 }
 
 @media (max-width: 768px) {
   :root {
-    --fs-h1: 30px;
-    --fs-h2: 23px;
-    --space-7: 32px;
-    --space-8: 44px;
+    --header-h: 60px;
+    --space-section: 48px;
   }
 }

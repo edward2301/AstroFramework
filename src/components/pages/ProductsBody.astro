@@ -1,13 +1,19 @@
 ---
 /**
- * 产品总览主体。只负责渲染，数据由路由层准备。
+ * 产品总览主体（工业数据目录版）。只负责渲染，数据由路由层准备。
+ *
+ * 结构：PageHeader → 品类筛选 pill + 搜索（默认隐藏）→ aria-live 计数
+ * → 全型号密集表（服务器渲染全部行）→ 空态 → CTA。
+ *
+ * JS 只做行过滤与计数（内联脚本，不进全站共享 JS）：
+ * 无 JS 时所有行可见、pill 直接跳品类页、搜索表单保持隐藏。
  */
 import PageHeader from '../layout/PageHeader.astro';
 import CtaBand from '../layout/CtaBand.astro';
-import CategoryRow from '../cards/CategoryRow.astro';
+import CatalogTable from '../catalog/CatalogTable.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
-import { detailPath } from '../../data/routes';
+import { detailPath, ROUTES } from '../../data/routes';
 import type { Crumb } from '../../lib/seo/breadcrumb';
 
 interface Props {
@@ -21,54 +27,325 @@ interface Props {
     /** 品类封面 = 该品类首个型号的主图（public/ 下路径） */
     image?: string;
   }[];
+  models: {
+    id: string;
+    categoryId: string;
+    categoryName: string;
+    code: string;
+    name: string;
+    status: 'active' | 'discontinued';
+    keyParams: { k: string; v: string }[];
+    image?: string;
+  }[];
   totalModels: number;
 }
 
-const { locale, crumbs, categories, totalModels } = Astro.props;
+const { locale, crumbs, categories, models, totalModels } = Astro.props;
 const dict = t(locale);
 ---
 
-<section class="section">
-  <div class="container">
-    <PageHeader locale={locale} crumbs={crumbs} title={dict.products.h1} />
-    <p class="lead">{dict.products.lead(categories.length, totalModels)}</p>
+<PageHeader
+  locale={locale}
+  crumbs={crumbs}
+  title={dict.products.h1}
+  lead={dict.products.lead(categories.length, totalModels)}
+  width="wide"
+/>
 
-    <div class="category-rows">
-      {
-        categories.map((c, i) => (
-          <CategoryRow
-            href={localizePath(locale, detailPath.category(c.id))}
-            name={c.name}
-            intro={`${c.intro.slice(0, 150)}…`}
-            linkLabel={dict.products.browseModels(c.modelCount)}
-            image={c.image}
-            flip={i % 2 === 1}
-          />
-        ))
-      }
+<section class="section" data-catalog>
+  <div class="container">
+    <div class="catalog-toolbar">
+      <nav class="filter-nav" aria-label={dict.products.filterLabel}>
+        <a
+          class="filter-pill"
+          href={localizePath(locale, ROUTES.products)}
+          data-filter="all"
+          aria-current="true">{dict.products.filterAll}</a>
+        {
+          categories.map((c) => (
+            <a
+              class="filter-pill"
+              href={localizePath(locale, detailPath.category(c.id))}
+              data-filter={c.id}
+            >
+              {c.name}
+            </a>
+          ))
+        }
+      </nav>
+
+      {/* 搜索默认 hidden：只有内联脚本接管后才显示，无 JS 不留一个不能用的表单 */}
+      <form class="catalog-search" role="search" data-catalog-search hidden>
+        <label class="visually-hidden" for="catalog-search-input">{dict.products.searchLabel}</label>
+        <input
+          id="catalog-search-input"
+          data-catalog-input
+          type="search"
+          name="q"
+          placeholder={dict.products.searchPlaceholder}
+          autocomplete="off"
+        />
+      </form>
     </div>
+
+    <p
+      class="catalog-count"
+      aria-live="polite"
+      aria-atomic="true"
+      data-count
+      data-unit-singular={dict.products.modelUnit}
+      data-unit-plural={dict.products.modelUnitPlural}>{dict.products.resultCount(totalModels)}</p>
+
+    <p class="table-hint">{dict.products.tableHint}</p>
+
+    <CatalogTable
+      locale={locale}
+      models={models}
+      scrollLabel={`${dict.products.h1} — ${dict.products.filterAll}`}
+    />
+
+    <p class="catalog-empty" data-empty hidden>{dict.products.empty}</p>
   </div>
 </section>
+
+<script is:inline>
+  (function () {
+    var page = document.querySelector('[data-catalog]');
+    if (!page) return;
+
+    var rows = Array.prototype.slice.call(page.querySelectorAll('[data-model-row]'));
+    var pills = Array.prototype.slice.call(page.querySelectorAll('[data-filter]'));
+    var form = page.querySelector('[data-catalog-search]');
+    var input = page.querySelector('[data-catalog-input]');
+    var count = page.querySelector('[data-count]');
+    var empty = page.querySelector('[data-empty]');
+    var table = page.querySelector('[data-catalog-table]');
+    if (rows.length === 0 || pills.length === 0 || !count || !empty || !table) return;
+
+    // 脚本可用才显示搜索表单
+    if (form) form.hidden = false;
+
+    var unitOne = count.getAttribute('data-unit-singular') || '';
+    var unitMany = count.getAttribute('data-unit-plural') || unitOne;
+    var category = 'all';
+    var query = '';
+
+    function setActive(id) {
+      for (var i = 0; i < pills.length; i += 1) {
+        if (pills[i].getAttribute('data-filter') === id) {
+          pills[i].setAttribute('aria-current', 'true');
+        } else {
+          pills[i].removeAttribute('aria-current');
+        }
+      }
+    }
+
+    function apply() {
+      var shown = 0;
+      for (var i = 0; i < rows.length; i += 1) {
+        var row = rows[i];
+        var inCategory = category === 'all' || row.getAttribute('data-category') === category;
+        var inQuery = query === '' || (row.getAttribute('data-search') || '').indexOf(query) !== -1;
+        var visible = inCategory && inQuery;
+        row.hidden = !visible;
+        if (visible) shown += 1;
+      }
+      count.textContent = shown + ' ' + (shown === 1 ? unitOne : unitMany);
+      empty.hidden = shown !== 0;
+      table.hidden = shown === 0;
+    }
+
+    function syncUrl() {
+      if (!window.history || !window.history.replaceState) return;
+      var url = new URL(window.location.href);
+      if (category === 'all') {
+        url.searchParams.delete('category');
+      } else {
+        url.searchParams.set('category', category);
+      }
+      window.history.replaceState(null, '', url.toString());
+    }
+
+    for (var p = 0; p < pills.length; p += 1) {
+      pills[p].addEventListener('click', function (event) {
+        // 修饰键/中键仍按浏览器默认开新标签，交给品类页
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+          return;
+        }
+        var id = this.getAttribute('data-filter');
+        if (!id) return;
+        event.preventDefault();
+        category = id;
+        setActive(id);
+        apply();
+        syncUrl();
+      });
+    }
+
+    if (input) {
+      input.addEventListener('input', function () {
+        query = this.value.trim().toLowerCase();
+        apply();
+      });
+    }
+
+    if (form) {
+      form.addEventListener('submit', function (event) {
+        event.preventDefault();
+      });
+    }
+
+    // 首次载入只接受目录里存在的品类 id；未知值按「全部型号」处理
+    var initial = new URLSearchParams(window.location.search).get('category');
+    if (initial) {
+      for (var k = 0; k < pills.length; k += 1) {
+        if (pills[k].getAttribute('data-filter') === initial) {
+          category = initial;
+          setActive(initial);
+          break;
+        }
+      }
+    }
+
+    apply();
+  })();
+</script>
 
 <CtaBand locale={locale} />
 
 <style>
-  .lead {
-    max-width: 700px;
-    color: var(--color-text-muted);
+  .catalog-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  /* 品类行之间用细线分隔：比纯留白更有目录节奏，也便于滚动时定位 */
-  .category-rows {
-    display: grid;
-    gap: var(--space-7);
-    margin-top: var(--space-6);
+  /* pill 是真实链接：无缝拼成一条细线工具条，直角、无圆角 */
+  .filter-nav {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
   }
 
-  .category-rows > * + * {
-    position: relative;
-    padding-top: var(--space-7);
-    /* 分隔线比正文边框更淡：只做节奏提示，不抢视线 */
-    border-top: 1px solid var(--color-border-soft);
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 14px;
+    margin-left: -1px;
+    border: 1px solid var(--color-border);
+    font-size: var(--fs-sm);
+    line-height: 1.2;
+    color: var(--color-text);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .filter-pill:first-child {
+    margin-left: 0;
+  }
+
+  .filter-pill:hover {
+    background: var(--color-subtle);
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .filter-pill[aria-current='true'] {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-on-dark);
+  }
+
+  .filter-pill[aria-current='true']:hover {
+    background: var(--color-ink-soft);
+    color: var(--color-on-dark);
+  }
+
+  /* 移动端触控高度：35px → 44px */
+  @media (max-width: 768px) {
+    .filter-pill {
+      min-height: 44px;
+      padding: 0 14px;
+    }
+  }
+
+  .catalog-search {
+    display: flex;
+    align-items: center;
+    flex: 0 1 320px;
+    min-width: 220px;
+  }
+
+  /* 覆盖 display，否则 [hidden] 会被上面的 flex 顶掉 */
+  .catalog-search[hidden] {
+    display: none;
+  }
+
+  .catalog-search input {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    font: inherit;
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-sm);
+  }
+
+  .catalog-search input::placeholder {
+    color: var(--color-muted);
+  }
+
+  .catalog-search input:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 1px;
+  }
+
+  /* 搜索框同步到 44px 触控高度（后置规则才能覆盖上面的 40px） */
+  @media (max-width: 768px) {
+    .catalog-search input {
+      height: 44px;
+    }
+  }
+
+  .catalog-count {
+    margin: var(--space-3) 0 var(--space-4);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .catalog-empty {
+    margin: var(--space-6) 0 0;
+    padding: var(--space-6);
+    border: 1px solid var(--color-border);
+    text-align: center;
+    color: var(--color-muted);
+  }
+
+  .catalog-empty[hidden] {
+    display: none;
+  }
+
+  /* 表内横滚提示：仅 769–1024 的表格滚动形态出现；≤768 已卡片化 */
+  .table-hint {
+    display: none;
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .table-hint {
+      display: block;
+      margin: 0 0 var(--space-2);
+      font-size: var(--fs-xs);
+      color: var(--color-muted);
+    }
   }
 </style>

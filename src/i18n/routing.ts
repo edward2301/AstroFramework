@@ -2,8 +2,8 @@
  * 语言与路径映射。
  *
  * 站点采用「默认语言不带前缀、其余语言带前缀」的结构：
- *   英文  /products/category-a/a1/
- *   中文  /zh/products/category-a/a1/
+ *   英文  /products/a1/
+ *   中文  /zh/products/a1/
  *
  * 选这种结构而不是 `/en/` + `/zh/` 双前缀，是因为英文站是面向海外买家的主站，
  * 根路径即英文可以少一层跳转，canonical 与外链地址也保持简洁。

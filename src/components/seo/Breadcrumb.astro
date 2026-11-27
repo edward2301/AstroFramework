@@ -36,7 +36,8 @@ const { items, label = 'Breadcrumb' } = Astro.props;
 
 <style>
   .breadcrumb {
-    font-size: 13px;
+    font-size: var(--fs-xs);
+    letter-spacing: 0.04em;
     margin-bottom: 20px;
   }
   .breadcrumb ol {
@@ -51,7 +52,7 @@ const { items, label = 'Breadcrumb' } = Astro.props;
     display: flex;
     align-items: center;
     gap: 4px;
-    color: var(--color-text-muted);
+    color: var(--color-muted);
   }
   .breadcrumb a {
     color: var(--color-link);

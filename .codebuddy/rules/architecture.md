@@ -22,9 +22,9 @@ src/content/** → src/content.config.ts → src/lib/content/*
 
 ## 校验脚本（scripts/）
 
-- `validate-content.mjs`：宽度按 `SEO_LIMITS` 与显示宽度；标题全站唯一；文件名/引用/对比表列/缺译/路径/导航/图片属性。对比表键名不一致时构建不报错，对应单元格渲染 `—`，是本仓最易踩的坑。
+- `validate-content.mjs`：宽度按 `SEO_LIMITS` 与显示宽度；标题全站唯一；文件名/引用/对比表列/缺译/路径/导航/图片属性；型号 id 不得与品类 id 相同（两者同为 `/products/` 下一段）。对比表键名不一致时构建不报错，对应单元格渲染 `—`，是本仓最易踩的坑。
 - `check-links.mjs`：站内断链 + 语言版本配对（`PENDING_ROUTES` / `SINGLE_LOCALE_PAGES` 例外）。
-- `build-guard.mjs`：把体检与链接检查挂进构建，并复制分语言 404。
+- `build-guard.mjs`：把体检与链接检查挂进构建，复制分语言 404，并在 `build:done` 调 `model-redirects.mjs` 把旧 `/products/<品类>/<型号>/` 301 写进 `dist/_redirects`。
 
 ## 关键修改点速查
 
@@ -35,6 +35,7 @@ src/content/** → src/content.config.ts → src/lib/content/*
 | 导航与页脚 | 页面条目的 `nav` 字段（`src/data/pages/entries/*.ts`） |
 | 页面 SEO | `src/data/pages/entries/*.ts` 的 `seo` |
 | 设计变量 | `src/styles/tokens.css` 与 `global.css` |
+| 型号 URL | `/products/<modelId>/`（`src/data/routes.ts` 的 `detailPath.model`）；旧三层路径由构建期生成 301 |
 | 加新语言 | 从 `src/i18n/routing.ts` 的 `LOCALES` 起；完整清单见 `add-locale` 技能 |
 | 部署 | `wrangler.toml`、`deploy/cloudflare/README.md` |
 | D1 | `wrangler.toml` 的 `[[d1_databases]]`；命令见 `deploy/cloudflare/README.md` |

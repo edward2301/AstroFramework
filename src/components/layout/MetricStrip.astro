@@ -1,9 +1,9 @@
 ﻿---
 /**
- * 指标条：3~4 个数字指标横排，用于替代「形容词式的自我介绍」。
+ * 指标条：数量由数据决定（auto-fit），用于替代「形容词式的自我介绍」。
  *
- * 数字用强调色、说明用次要灰——先给可核对的量，再给解释。
- * tone="light" 用于白底页面，tone="deep" 用于深色带（深海军蓝底反白）。
+ * 每项顶部一条细线，数字用等宽字体，说明用小号大写标签。
+ * tone="light" 用于白底页面，tone="deep" 用于深色带（石墨底反白）。
  */
 interface Props {
   items: { value: string; label: string }[];
@@ -30,35 +30,40 @@ const { items, tone = 'light' } = Astro.props;
     margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+    column-gap: var(--space-5);
+    row-gap: var(--space-6);
   }
 
+  /* 每项一条顶部细线，替代左侧色条 */
   .metrics li {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    padding-left: var(--space-4);
-    border-left: 2px solid var(--color-brand-200);
+    gap: var(--space-2);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
   }
 
   .metrics strong {
-    font-size: 30px;
-    line-height: 1.1;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--color-brand);
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
+    font-size: clamp(1.75rem, 1.45rem + 1.1vw, 2.5rem);
+    line-height: var(--lh-tight);
+    font-weight: 600;
+    letter-spacing: var(--ls-tight);
+    color: var(--color-ink);
   }
 
   .metrics span {
-    font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: var(--ls-wide);
+    color: var(--color-muted);
   }
 
-  /* 深色带：反白，数字用浅蓝，避免在白底页上突兀 */
+  /* 深色带：反白 */
   .metrics--deep li {
-    border-left-color: rgb(255 255 255 / 25%);
+    border-top-color: rgb(255 255 255 / 25%);
   }
 
   .metrics--deep strong {
@@ -66,17 +71,6 @@ const { items, tone = 'light' } = Astro.props;
   }
 
   .metrics--deep span {
-    color: rgb(255 255 255 / 72%);
-  }
-
-  @media (max-width: 767px) {
-    .metrics {
-      grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-4);
-    }
-
-    .metrics strong {
-      font-size: 24px;
-    }
+    color: var(--color-on-dark-muted);
   }
 </style>

@@ -7,6 +7,8 @@ import type { RenderedContent } from '../../lib/content/guides';
  * 不涉及跨语言回落：中文页取到的就是中文问题与中文答案。
  */
 import PageHeader from '../layout/PageHeader.astro';
+import DetailLayout from '../layout/DetailLayout.astro';
+import ModelLinkList from '../catalog/ModelLinkList.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
 import { detailPath } from '../../data/routes';
@@ -24,62 +26,74 @@ interface Props {
 
 const { locale, crumbs, question, Content, models, related } = Astro.props;
 const dict = t(locale);
+const hasAside = models.length > 0 || related.length > 0;
 ---
 
+<PageHeader locale={locale} crumbs={crumbs} title={question} width="narrow" />
+
 <section class="section">
-  <div class="container narrow">
-    <PageHeader locale={locale} crumbs={crumbs} title={question} />
+  <div class="container container-narrow">
+    <DetailLayout aside={hasAside}>
+      <div class="prose">
+        <Content />
+      </div>
 
-    <div class="prose">
-      <Content />
-    </div>
+      {
+        models.length > 0 && (
+          <div slot="aside">
+            <p class="aside-title">{dict.detail.relatedModels}</p>
+            <ModelLinkList locale={locale} models={models} />
+          </div>
+        )
+      }
 
-    {
-      models.length > 0 && (
-        <>
-          <h2>{dict.detail.relatedModels}</h2>
-          <ul class="model-links">
-            {models.map((m) => (
-              <li>
-                <a href={localizePath(locale, detailPath.model(m.categoryId, m.id))}>
-                  {m.code} — {m.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    }
-
-    {
-      related.length > 0 && (
-        <>
-          <h2>{dict.detail.relatedFaqs}</h2>
-          <ul class="model-links">
-            {related.map((f) => (
-              <li>
-                <a href={localizePath(locale, detailPath.faq(f.id))}>{f.question}</a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    }
-
+      {
+        related.length > 0 && (
+          <div slot="aside">
+            <p class="aside-title">{dict.detail.relatedFaqs}</p>
+            <ul class="aside-links">
+              {related.map((f) => (
+                <li>
+                  <a href={localizePath(locale, detailPath.faq(f.id))}>{f.question}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+    </DetailLayout>
   </div>
 </section>
 
 <style>
-  .prose {
-    max-width: 760px;
+  .aside-title {
+    margin: 0 0 var(--space-3);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
-  .model-links {
-    max-width: 760px;
+  /* 相关问题：与 ModelLinkList 相同的细线行，无缩进无符号 */
+  .aside-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
 
-  .model-links a {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  .aside-links li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .aside-links li:last-child {
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .aside-links a {
+    display: block;
+    padding: var(--space-3) 0;
+    font-size: var(--fs-sm);
+    line-height: var(--lh-body);
   }
 </style>

@@ -28,7 +28,7 @@ Node 版本以 `.nvmrc` 为准，`.node-version` 与 `package.json` 的 `engines
 项目级技能在 `.codebuddy/skills/`，按任务族分组（`/skills` 查看触发描述）：
 
 - 内容录入：`content-model` · `content-category` · `content-application-case` · `content-resources` · `seo-copy`
-- 页面与组件：`page-entry` · `layout-body` · `nav-footer` · `ui-component`
+- 页面与组件：`page-entry` · `layout-body` · `nav-footer` · `ui-component` · `industrial-design`
 - 质量与多语言：`validate-fix` · `add-locale`
 - 运维：`deploy-ops`
 - 文档同步：`doc-sync`
