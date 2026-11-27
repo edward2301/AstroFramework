@@ -231,6 +231,15 @@ const dict = t(locale);
     .hero--en h1 {
       font-size: clamp(2rem, 10vw, 2.25rem);
     }
+
+    /* 568px 首屏：导语降一档、按钮间距收紧，两个 CTA 可完整落在首屏内 */
+    .hero--en .lead {
+      font-size: var(--fs-body);
+    }
+
+    .hero--en .actions {
+      gap: var(--space-2);
+    }
   }
 
   /* 色带挂在 section 上，通栏到底；内容仍由 .container 约束 */
