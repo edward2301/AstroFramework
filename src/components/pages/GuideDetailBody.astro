@@ -34,7 +34,7 @@ const hasAside = models.length > 0;
     <DetailLayout aside={hasAside}>
       <div class="stack">
         <div class="lede">
-          <p class="meta mono">{dict.detail.updated(guide.updated)}</p>
+          <p class="detail-meta mono">{dict.detail.updated(guide.updated)}</p>
           <p class="intro">{guide.tldr}</p>
         </div>
 
@@ -55,39 +55,3 @@ const hasAside = models.length > 0;
   </div>
 </section>
 
-<style>
-  .stack {
-    display: grid;
-    gap: var(--space-8);
-  }
-
-  .lede {
-    display: grid;
-    gap: var(--space-3);
-  }
-
-  .meta {
-    margin: 0;
-    font-size: var(--fs-xs);
-    letter-spacing: var(--ls-wide);
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-
-  .intro {
-    margin: 0;
-    max-width: var(--measure-lead);
-    font-size: var(--fs-lead);
-    line-height: var(--lh-body);
-    color: var(--color-text);
-  }
-
-  .aside-title {
-    margin: 0 0 var(--space-3);
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--ls-wide);
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-</style>

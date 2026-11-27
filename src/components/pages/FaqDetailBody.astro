@@ -66,16 +66,7 @@ const hasAside = models.length > 0 || related.length > 0;
 </section>
 
 <style>
-  .aside-title {
-    margin: 0 0 var(--space-3);
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--ls-wide);
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-
-  /* 相关问题：与 ModelLinkList 相同的细线行，无缩进无符号 */
+  /* 独有样式：相关问题列表（.aside-title 走全局工具类） */
   .aside-links {
     list-style: none;
     margin: 0;

@@ -38,7 +38,7 @@ const dict = t(locale);
     <DetailLayout>
       <div class="stack">
         <div class="lede">
-          <p class="meta mono">{dict.detail.date(caseStudy.date)}</p>
+          <p class="detail-meta mono">{dict.detail.date(caseStudy.date)}</p>
           <p class="intro">{caseStudy.background}</p>
         </div>
 
@@ -77,77 +77,10 @@ const dict = t(locale);
 </section>
 
 <style>
-  .stack {
-    display: grid;
-    gap: var(--space-8);
-  }
-
-  .lede {
-    display: grid;
-    gap: var(--space-3);
-  }
-
-  .meta {
-    margin: 0;
-    font-size: var(--fs-xs);
-    letter-spacing: var(--ls-wide);
-    text-transform: uppercase;
-    color: var(--color-muted);
-  }
-
-  .intro {
-    margin: 0;
-    max-width: var(--measure-lead);
-    font-size: var(--fs-lead);
-    line-height: var(--lh-body);
-    color: var(--color-text);
-  }
-
+  /* 独有样式：正文段落（其余 .stack/.lede/.detail-meta/.intro/.points/.aside-title 走全局工具类） */
   .body-text {
     margin: 0;
     max-width: var(--measure);
     line-height: var(--lh-body);
-  }
-
-  /* 客户需求 / 运行效果：mono 序号 + 细线行，无彩色底 */
-  .points {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    counter-reset: point;
-  }
-
-  .points li {
-    counter-increment: point;
-    display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-    gap: var(--space-3);
-    padding: var(--space-3) 0;
-    border-top: 1px solid var(--color-border);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-body);
-    color: var(--color-text);
-  }
-
-  .points li::before {
-    content: counter(point, decimal-leading-zero);
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: var(--ls-wide);
-    color: var(--color-muted);
-  }
-
-  .points li:last-child {
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .aside-title {
-    margin: 0 0 var(--space-3);
-    font-size: var(--fs-xs);
-    font-weight: 600;
-    letter-spacing: var(--ls-wide);
-    text-transform: uppercase;
-    color: var(--color-muted);
   }
 </style>

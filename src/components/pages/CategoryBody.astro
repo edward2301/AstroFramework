@@ -130,7 +130,7 @@ const metaLine = [
         category.selectionPoints.length > 0 && (
           <div class="about-side">
             <p class="about-kicker">{dict.category.howToSelect}</p>
-            <ol class="about-points">
+            <ol class="points">
               {category.selectionPoints.map((p) => (
                 <li>{p}</li>
               ))}
@@ -224,39 +224,6 @@ const metaLine = [
     letter-spacing: var(--ls-wide);
     text-transform: uppercase;
     color: var(--color-muted);
-  }
-
-  /* 选型要点：编号 mono + 细线分隔 */
-  .about-points {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    counter-reset: point;
-  }
-
-  .about-points li {
-    counter-increment: point;
-    display: grid;
-    grid-template-columns: 2.5rem minmax(0, 1fr);
-    gap: var(--space-3);
-    padding: var(--space-3) 0;
-    border-top: 1px solid var(--color-border);
-    font-size: var(--fs-sm);
-    line-height: var(--lh-body);
-    color: var(--color-text);
-  }
-
-  .about-points li::before {
-    content: counter(point, decimal-leading-zero);
-    font-family: var(--font-mono);
-    font-size: var(--fs-xs);
-    font-variant-numeric: tabular-nums;
-    letter-spacing: var(--ls-wide);
-    color: var(--color-muted);
-  }
-
-  .about-points li:last-child {
-    border-bottom: 1px solid var(--color-border);
   }
 
   @media (max-width: 1024px) {

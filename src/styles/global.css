@@ -202,6 +202,90 @@ caption {
   letter-spacing: 0.01em;
 }
 
+/* ---------- 详情页复用片段 ---------- */
+
+/*
+ * 应用 / 案例 / 指南 / 问答四个详情页（及品类页选型要点）共用的排版片段。
+ * 类名是组件间的公共契约：改名需同步所有使用方（见各 *DetailBody.astro）。
+ */
+
+/* 正文纵向节奏 */
+.stack {
+  display: grid;
+  gap: var(--space-8);
+}
+
+/* 首段：日期行 + 导语 */
+.lede {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* 导语段 */
+.intro {
+  margin: 0;
+  max-width: var(--measure-lead);
+  font-size: var(--fs-lead);
+  line-height: var(--lh-body);
+  color: var(--color-text);
+}
+
+/* 日期 / 更新日期行（与 .mono 连用保持等宽） */
+.detail-meta {
+  margin: 0;
+  font-size: var(--fs-xs);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* 侧栏分组标题 */
+.aside-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* 编号细线列表：mono 序号 + 上下细线，无彩色底 */
+.points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: point;
+}
+
+.points li {
+  counter-increment: point;
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--color-border);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--color-text);
+}
+
+.points li::before {
+  content: counter(point, decimal-leading-zero);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--ls-wide);
+  color: var(--color-muted);
+}
+
+.points li:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.points--muted li {
+  color: var(--color-muted);
+}
+
 /* ---------- components ---------- */
 
 /* 按钮：全站唯一一套；局部样式一律删除 */
