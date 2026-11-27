@@ -35,12 +35,24 @@ interface Props {
 
 const { locale, categories, models, totalModels } = Astro.props;
 const dict = t(locale);
+/** 中文标题在逗号后固定断行，避免 16ch 上限在「参数」等词中间折断 */
+const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
 ---
 
 <section class:list={['hero', locale === 'en' && 'hero--en', locale === 'zh' && 'hero--zh']}>
   <div class="container hero-inner">
     <div class="hero-copy">
-      <h1>{dict.home.h1}</h1>
+      <h1>
+        {
+          zhH1 ? (
+            <>
+              {zhH1[0]}，<br /><span class="zh-h1-tail">{zhH1.slice(1).join('，')}</span>
+            </>
+          ) : (
+            dict.home.h1
+          )
+        }
+      </h1>
       <p class="lead">{dict.home.lead(categories.length, totalModels)}</p>
       <div class="actions">
         <a class="btn btn--primary btn--lg" href={localizePath(locale, ROUTES.products)}>
@@ -150,6 +162,11 @@ const dict = t(locale);
   .hero h1 {
     max-width: 16ch;
     color: var(--color-on-dark);
+  }
+
+  /* 逗号后的整句保持一行，避免 320px 只剩一个「项」的孤字 */
+  .zh-h1-tail {
+    white-space: nowrap;
   }
 
   .lead {
