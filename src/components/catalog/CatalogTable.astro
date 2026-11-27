@@ -228,16 +228,14 @@ const searchIndex = (m: ModelRow) =>
     background: var(--color-subtle);
   }
 
+  /* 字重与颜色走全局 .model-code/.model-name；这里只补表格语境的字号与行高 */
   .model-code {
     font-size: var(--fs-sm);
-    font-weight: 600;
-    color: var(--color-ink);
   }
 
   .model-name {
     font-size: var(--fs-sm);
     line-height: var(--lh-data);
-    color: var(--color-muted);
   }
 
   /* 参数：5 组键值按 2 列网格紧凑排布，键值同行、过长自然折行 */

@@ -176,7 +176,7 @@ const metaLine = [
     border-top: 1px solid var(--color-border);
   }
 
-  /* 表内横滚提示：只在会溢出的宽度出现 */
+  /* 表内横滚提示：只在会溢出的宽度出现（排版走全局 .table-hint） */
   .table-hint {
     display: none;
   }
@@ -184,9 +184,6 @@ const metaLine = [
   @media (max-width: 1024px) {
     .table-hint {
       display: block;
-      margin: 0 0 var(--space-2);
-      font-size: var(--fs-xs);
-      color: var(--color-muted);
     }
   }
 

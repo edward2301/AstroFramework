@@ -312,6 +312,16 @@ caption {
   gap: var(--space-2);
 }
 
+/* 型号编码 + 名称的公共字重与颜色；字号/行高由使用方按语境补充 */
+.model-code {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.model-name {
+  color: var(--color-muted);
+}
+
 /* ---------- components ---------- */
 
 /* 按钮：全站唯一一套；局部样式一律删除 */
@@ -463,11 +473,11 @@ caption {
   scrollbar-width: thin;
 }
 
-/* 提示块：石墨细线，不再用铜色 */
-.notice {
-  padding: var(--space-4);
-  border-left: 2px solid var(--color-ink);
-  background: var(--color-subtle);
+/* 表内横滚提示的排版；显示与否（display）由各页面自己的媒体查询决定 */
+.table-hint {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-xs);
+  color: var(--color-muted);
 }
 
 /* 表单字段 */

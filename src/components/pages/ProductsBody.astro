@@ -386,7 +386,7 @@ const dict = t(locale);
     display: none;
   }
 
-  /* 表内横滚提示：仅 769–1024 的表格滚动形态出现；≤768 已卡片化 */
+  /* 表内横滚提示：仅 769–1024 的表格滚动形态出现；≤768 已卡片化（排版走全局 .table-hint） */
   .table-hint {
     display: none;
   }
@@ -394,9 +394,6 @@ const dict = t(locale);
   @media (min-width: 769px) and (max-width: 1024px) {
     .table-hint {
       display: block;
-      margin: 0 0 var(--space-2);
-      font-size: var(--fs-xs);
-      color: var(--color-muted);
     }
   }
 
