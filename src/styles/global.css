@@ -188,6 +188,11 @@ caption {
   border-top: 0;
 }
 
+/* 同理：停产型号页的通知条紧跟页头时去掉顶线，避免双线夹空白 */
+.page-header + .section .notice:first-child {
+  border-top: 0;
+}
+
 .grid-12 {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
