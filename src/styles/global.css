@@ -203,6 +203,16 @@ caption {
   border-top: 0;
 }
 
+/* 首页深色 hero 之后的同款处理：收紧上边距 + 首标题去线（hero 深色带本身即分隔） */
+.hero + .section {
+  padding-top: var(--space-5);
+}
+
+.hero + .section .section-title:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
 /* 同理：停产型号页的通知条紧跟页头时去掉顶线，避免双线夹空白 */
 .page-header + .section .notice:first-child {
   border-top: 0;
