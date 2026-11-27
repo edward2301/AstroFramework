@@ -24,7 +24,7 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 - **无阴影**：`--shadow-*` 为 `none`；层级靠 1px 细线与底色差。
 - **颜色**：白 + 冷石墨（`--graphite-900 #0d1117` … `--graphite-600 #3a424b`）；蓝色只用于主按钮、链接、焦点；不再用铜色装饰。
 - **字体**：大标题 `--fs-h1` 上限 4.5rem、`--lh-tight 1.05`、`--ls-tight -0.02em`；小标签 `--fs-xs` + `--ls-wide 0.1em` + 大写；型号编码一律 `.mono`。
-- **网格**：不新增断点；卡片/规格网格用 `repeat(auto-fit|auto-fill, minmax(min(100%, Npx), 1fr))`。
+- **网格**：不新增断点；卡片/规格网格用 `repeat(auto-fit|auto-fill, minmax(min(100%, Npx), 1fr))`；同一断点在组件内只开一个 `@media` 块，新规则并入既有块（置于 base 规则之后）。
 - **表格**：`.data-table` / `.spec-table` 更紧，数字 `tabular-nums`；外层必须 `.table-scroll`（`tabindex="0"` + `role="region"` + `aria-label`）。
 - **按钮**：只用全局 `.btn` 变体；每个视口区域一个填充主按钮。
 
