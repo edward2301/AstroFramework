@@ -95,6 +95,15 @@ const { href, code, name, firstParamLabel, firstParam, image } = Astro.props;
     color: var(--color-link-hover);
   }
 
+  /* 型号名是卡片唯一入口：移动端补到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .model-card-name a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
   /* 一个参数：细线上方一行 k/v */
   .model-card-param {
     display: flex;

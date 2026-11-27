@@ -96,4 +96,13 @@ const { href, name, intro, linkLabel, image } = Astro.props;
   .category-card-link:hover {
     color: var(--color-link-hover);
   }
+
+  /* 卡片入口链接：移动端补到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .category-card-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
 </style>

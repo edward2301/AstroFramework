@@ -42,7 +42,7 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 - 颜色、间距、字号一律用 token；组件不写死色值（深色带上的 `#fff` 例外）。信号蓝（`--color-action/link/focus`）只用于主按钮填充、链接、焦点；`--color-data` 已改为石墨，不再用铜色装饰。
 - 全宽契约：`--container` 1920px、`--container-narrow` 1280px、`--gutter` 24–40px；背景色带挂 `<section>`，不挂 `.container`。
 - 形状契约：`--radius-*` 全为 0，`--shadow-*` 为 none；不要再新写圆角、阴影或 hover 抬升。
-- 移动端可点击目标（按钮 / 筛选 pill / 输入框）≥44px；会横滚的表格在 ≤1024 显示一行「左右滑动」提示。
+- 移动端可点击目标（按钮 / 筛选 pill / 输入框 / 卡片入口链接）≥44px；会横滚的表格在 ≤1024 显示一行「左右滑动」提示。
 - 型号编码用全局 `.mono`；表格表头小号大写 + `--ls-wide`。
 - 按钮全站唯一：任何局部 `.btn-*`/`.cta-*`/`.header-cta`/`.cat-cta` 都是违规，一律迁到全局变体；每个视口区域只一个填充主按钮。
 - PageHeader 是 full-bleed 带、放 `.section` 之外（内部自带 container），全站唯一 h1；SectionTitle 管 h2；related 分组用 h3。
