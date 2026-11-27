@@ -174,11 +174,18 @@ caption {
 
 /*
  * PageHeader 自带 32px 下内边距，其后的首个内容区不再叠加
- * --space-section 的 56–112px 上边距——否则页头与首块内容之间
- * 会出现 ~130px 空带（几乎所有内容页都有）。页尾的 .section 底边距不受影响。
+ * --space-section 的 56–112px 上边距；上边距收紧为 24px。
+ * 首个板块标题（.section-title:first-child）同时去掉自己的分隔线与上内边距：
+ * 页头下边线已经完成分隔，两条细线夹一块空白会像渲染残留。
+ * 页尾的 .section 底边距不受影响。
  */
 .page-header + .section {
-  padding-top: var(--space-6);
+  padding-top: var(--space-5);
+}
+
+.page-header + .section .section-title:first-child {
+  padding-top: 0;
+  border-top: 0;
 }
 
 .grid-12 {
