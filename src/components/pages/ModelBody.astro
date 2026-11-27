@@ -1,4 +1,4 @@
-﻿---
+---
 /**
  * 型号页主体（工业数据目录版）。
  *
@@ -136,11 +136,17 @@ const quoteHref = localizePath(locale, ROUTES.quote);
       }
     </div>
 
-    <SectionTitle title={dict.model.dimensionsAndCompliance} />
-    <dl class="facts">
-      {model.dimensions && (<><dt>{dict.model.dimensions}</dt><dd>{model.dimensions}</dd></>)}
-      {model.interface && (<><dt>{dict.model.interface}</dt><dd>{model.interface}</dd></>)}
-    </dl>
+    {
+      (model.dimensions || model.interface) && (
+        <>
+          <SectionTitle title={dict.model.dimensionsAndCompliance} />
+          <dl class="facts">
+            {model.dimensions && (<><dt>{dict.model.dimensions}</dt><dd>{model.dimensions}</dd></>)}
+            {model.interface && (<><dt>{dict.model.interface}</dt><dd>{model.interface}</dd></>)}
+          </dl>
+        </>
+      )
+    }
 
     {
       (replacements.length > 0 ||

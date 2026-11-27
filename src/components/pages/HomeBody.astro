@@ -85,7 +85,7 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
             <CategoryCard
               href={localizePath(locale, detailPath.category(c.id))}
               name={c.name}
-              intro={`${c.intro.slice(0, 80)}…`}
+              intro={c.intro.length > 80 ? `${c.intro.slice(0, 80)}…` : c.intro}
               linkLabel={`${dict.home.viewModels} →`}
               image={c.image}
             />

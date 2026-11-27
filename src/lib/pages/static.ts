@@ -44,6 +44,9 @@ export async function loadStaticPage(
     case 'home': {
       const categories = await getAllCategories();
       const applications = await getAllApplications();
+      // 导语声明的是「目录内型号总数」：按目录口径统计（含停产），
+      // 与 /products/ 的计数同源；不能按应用推荐累加（会重复/漏计）
+      const catalogModels = await getAllModels(true);
 
       const categoryCards = categories.map((c) => {
         const v = categoryView(c, locale);
@@ -83,7 +86,7 @@ export async function loadStaticPage(
           locale,
           categories: categoryCards,
           applications: applicationCards,
-          totalModels: applications.reduce((sum, a) => sum + a.data.recommended.length, 0),
+          totalModels: catalogModels.length,
         },
       };
     }

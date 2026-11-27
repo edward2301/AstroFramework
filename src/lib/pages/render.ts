@@ -13,6 +13,7 @@
  * 本模块不做渲染，只做取数与 SEO 装配 —— 渲染统一由各 *Body 组件承担。
  */
 import { existsSync } from 'node:fs';
+import type { CollectionEntry } from 'astro:content';
 import type { RenderedContent } from '../content/guides';
 import { buildMeta } from '../seo/meta';
 import {
@@ -63,6 +64,20 @@ function faqAnswerText(body: string | undefined): string {
     .map((paragraph) => paragraph.trim())
     .filter((paragraph) => paragraph.length > 0)
     .join('\n\n');
+}
+
+/**
+ * 详情页「相关型号」列表共用的引用映射（应用 / 案例 / 指南 / 问答四处同构）。
+ * 编码与名称按当前语言本地化，categoryId 供类型层对齐（链接统一走扁平路径）。
+ */
+function modelRef(entry: CollectionEntry<'models'>, locale: Locale) {
+  const mv = modelView(entry, locale);
+  return {
+    id: entry.id,
+    categoryId: entry.data.category.id,
+    code: mv.code,
+    name: mv.name,
+  };
 }
 
 /**
@@ -189,8 +204,6 @@ export type RenderedPage = PageCommon &
             cells: string[];
             /** 型号主图（public/ 路径）——品类页的卡片网格需要图 */
             image?: string;
-            firstParamKey: string;
-            firstParam: string;
           }[];
           discontinuedCount: number;
         };
@@ -326,8 +339,6 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
           name: mv.name,
           status: mv.status,
           image: mv.image,
-          firstParamKey: mv.keyParams[0].k,
-          firstParam: mv.keyParams[0].v,
           cells: view.comparisonParams.map(
             (param) => mv.keyParams.find((p) => p.k === param)?.v ?? '—'
           ),
@@ -488,15 +499,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
         path
       );
 
-      const models = detail.models.map((m) => {
-        const mv = modelView(m, locale);
-        return {
-          id: m.id,
-          categoryId: m.data.category.id,
-          code: mv.code,
-          name: mv.name,
-        };
-      });
+      const models = detail.models.map((m) => modelRef(m, locale));
 
       /*
        * 应用方向页本质是一组推荐型号的集合页：面包屑之外补 CollectionPage + ItemList。
@@ -584,15 +587,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
             results: v.results,
             date: v.date.toISOString().slice(0, 10),
           },
-          models: detail.models.map((m) => {
-            const mv = modelView(m, locale);
-            return {
-              id: m.id,
-              categoryId: m.data.category.id,
-              code: mv.code,
-              name: mv.name,
-            };
-          }),
+          models: detail.models.map((m) => modelRef(m, locale)),
         },
       };
     }
@@ -644,15 +639,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
             updated: d.updated.toISOString().slice(0, 10),
           },
           Content: detail.Content,
-          models: detail.models.map((m) => {
-            const mv = modelView(m, locale);
-            return {
-              id: m.id,
-              categoryId: m.data.category.id,
-              code: mv.code,
-              name: mv.name,
-            };
-          }),
+          models: detail.models.map((m) => modelRef(m, locale)),
         },
       };
     }
@@ -691,15 +678,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
           crumbs,
           question: d.question,
           Content: detail.Content,
-          models: detail.models.map((m) => {
-            const mv = modelView(m, locale);
-            return {
-              id: m.id,
-              categoryId: m.data.category.id,
-              code: mv.code,
-              name: mv.name,
-            };
-          }),
+          models: detail.models.map((m) => modelRef(m, locale)),
           related: detail.related.map((f) => ({
             id: f.slug,
             question: f.data.question,

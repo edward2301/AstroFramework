@@ -1,4 +1,4 @@
-﻿/**
+/**
  * 内容契约测试。
  *
  * validate-content.mjs 在构建时跑，但坏内容应在 `npm test` 阶段就被拦住；

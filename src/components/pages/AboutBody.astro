@@ -1,4 +1,4 @@
-﻿---
+---
 /**
  * 关于我们：条带页头 → 指标条 → 三组图文行（生产 / 文档 / 响应）→ 联系区。
  *
@@ -10,6 +10,7 @@ import MetricStrip from '../layout/MetricStrip.astro';
 import FeatureRow from '../layout/FeatureRow.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
+import { ROUTES } from '../../data/routes';
 import type { Crumb } from '../../lib/seo/breadcrumb';
 import { organizationFor } from '../../data/organization';
 
@@ -55,7 +56,7 @@ const images = [
       <div class="about-contact-text">
         <h2>{dict.aboutPage.contactTitle}</h2>
         <p>{dict.quote.lead}</p>
-        <a class="btn btn--primary" href={localizePath(locale, '/contact/quote/')}>{dict.home.requestQuote} →</a>
+        <a class="btn btn--primary" href={localizePath(locale, ROUTES.quote)}>{dict.home.requestQuote} →</a>
       </div>
 
       <dl class="about-contact-facts">
