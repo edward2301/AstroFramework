@@ -37,7 +37,7 @@ const { locale, categories, models, totalModels } = Astro.props;
 const dict = t(locale);
 ---
 
-<section class:list={['hero', locale === 'en' && 'hero--en']}>
+<section class:list={['hero', locale === 'en' && 'hero--en', locale === 'zh' && 'hero--zh']}>
   <div class="container hero-inner">
     <div class="hero-copy">
       <h1>{dict.home.h1}</h1>
@@ -239,6 +239,11 @@ const dict = t(locale);
 
     .hero--en .actions {
       gap: var(--space-2);
+    }
+
+    /* 中文标题更短：顶部留白 124 → 120，让第三条证明完整落在 568px 首屏内 */
+    .hero--zh {
+      padding-top: calc(var(--header-h) + var(--space-8) - var(--space-1));
     }
   }
 
