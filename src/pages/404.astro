@@ -11,6 +11,8 @@
  *     无尾斜杠，find 失败后 getCustom404Route 的正则 /^\/404\/?$/ 又只认根 404。
  *     本地预览中文 404 直接访问 /zh/404/（内容为中文，状态码 200）。
  *     已具备向 Astro 上报的完整证据链；线上不受影响（见下）。
+ *     缓解：本页面按路径前缀动态推断语言（见下方 locale 推断），dev 的
+ *     /zh/ 未知路径也能渲染中文 404，不再出现「导航英文、正文英文」。
  *
  *   · 线上（静态产物）：Cloudflare Pages 按路径前缀就近查找 404.html，
  *     默认语言落到 dist/404.html，其余语言落到 dist/<prefix>/404.html
@@ -31,8 +33,22 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import NotFoundBody from '../components/pages/NotFoundBody.astro';
 import { buildMeta } from '../lib/seo/meta';
 import { pageSeo } from '../data/pages';
+import { DEFAULT_LOCALE, LOCALES, LOCALE_PREFIX } from '../i18n/routing';
 
-const locale = 'en' as const;
+/**
+ * 语言推断：构建期本页只落在 /404/（默认语言）。dev 下任意未知路径都会
+ * 回落到根 404 路由（Astro 的错误路由匹配不到带前缀的 404，见上）——
+ * 这里按路径前缀动态推断语言，让 dev 的 /zh/ 未知路径也渲染中文 404
+ * （页眉、页脚、html lang 全部跟随）。线上不受影响：Cloudflare Pages
+ * 按 dist/<前缀>/404.html 就近返回中文页，本页只产出默认语言的 dist/404.html。
+ */
+const path = Astro.url.pathname;
+const matched = LOCALES.find(
+  (l) =>
+    l !== DEFAULT_LOCALE &&
+    (path === LOCALE_PREFIX[l] || path.startsWith(`${LOCALE_PREFIX[l]}/`))
+);
+const locale = matched ?? DEFAULT_LOCALE;
 
 const seo = pageSeo('notFound', locale);
 const meta = buildMeta(seo.title, seo.description, `404:${locale}`);
