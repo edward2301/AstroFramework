@@ -159,6 +159,7 @@ export interface Dict {
   notFound: {
     h1: string;
     lead: string;
+    backHome: string;
     browseProducts: string;
     requestQuote: string;
   };
@@ -353,6 +354,7 @@ const en: Dict = {
   notFound: {
     h1: 'This page does not exist',
     lead: 'The address may have changed, or the model may have been retired. The product range and quote form are still one click away.',
+    backHome: 'Back to homepage',
     browseProducts: 'Browse products',
     requestQuote: 'Request a quote',
   },
@@ -552,6 +554,7 @@ const zh: Dict = {
   notFound: {
     h1: '页面不存在',
     lead: '该地址可能已变更，或型号已下线。产品目录与询价入口仍可一键到达。',
+    backHome: '返回首页',
     browseProducts: '浏览产品',
     requestQuote: '获取报价',
   },
