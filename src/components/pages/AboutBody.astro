@@ -137,4 +137,13 @@ const images = [
       gap: var(--space-5);
     }
   }
+
+  /* 联系方式是可点击的整行入口，移动端补到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .about-contact-facts dd a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
 </style>

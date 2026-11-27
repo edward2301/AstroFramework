@@ -363,6 +363,16 @@ const mailLabels = {
     color: var(--color-link);
   }
 
+  /* 次要链接与联系入口也按 44px 触控目标处理 */
+  @media (max-width: 768px) {
+    .link,
+    .aside-card dd a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
   /* 侧栏：桌面 sticky 在页头下方；≤1024 回到常规流 */
   .quote-aside {
     display: grid;
