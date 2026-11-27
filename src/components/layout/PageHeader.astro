@@ -4,6 +4,8 @@
  *
  * 必须放在 `.section` 之外（紧贴页头下方），内部自带 container；
  * 放进 `.section > .container` 会出现双重内缩。
+ * 紧跟其后的首个 `.section` 由全局规则 `.page-header + .section` 收紧上边距，
+ * 避免页头与首块内容之间出现空带。
  */
 import Breadcrumb from '../seo/Breadcrumb.astro';
 import { t } from '../../i18n/ui';

@@ -172,6 +172,15 @@ caption {
   padding: var(--space-section) 0;
 }
 
+/*
+ * PageHeader 自带 32px 下内边距，其后的首个内容区不再叠加
+ * --space-section 的 56–112px 上边距——否则页头与首块内容之间
+ * 会出现 ~130px 空带（几乎所有内容页都有）。页尾的 .section 底边距不受影响。
+ */
+.page-header + .section {
+  padding-top: var(--space-6);
+}
+
 .grid-12 {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
