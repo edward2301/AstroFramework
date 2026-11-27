@@ -5,13 +5,12 @@
  * 只负责渲染，不取数、不拼 SEO —— 数据与元标签由路由层准备后传入。
  * 中英文路由共用本组件，差异只来自 locale 与已本地化的数据。
  *
- * 结构：纯石墨 hero（8/4 栏，左文案 + 右编号事实）→ 品类网格 → 精选型号色带 → CTA。
- * 轮播已移除：网格让所有卡片进入服务端 HTML 的同一屏流，不再有半空页。
+ * 结构：纯石墨 hero（8/4 栏，左文案 + 右编号事实）→ 品类网格 → 按应用选型色带 → CTA。
  */
 import CtaBand from '../layout/CtaBand.astro';
 import SectionTitle from '../layout/SectionTitle.astro';
 import CategoryCard from '../cards/CategoryCard.astro';
-import ModelCard from '../cards/ModelCard.astro';
+import ApplicationCard from '../catalog/ApplicationCard.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
 import { ROUTES, detailPath } from '../../data/routes';
@@ -19,21 +18,17 @@ import { ROUTES, detailPath } from '../../data/routes';
 interface Props {
   locale: Locale;
   categories: { id: string; name: string; intro: string; image?: string }[];
-  models: {
+  applications: {
     id: string;
-    categoryId: string;
-    code: string;
     name: string;
-    firstParamKey: string;
-    firstParam: string;
-    /** 主图公开路径（public/ 下），来自内容条目的 image 字段 */
-    image?: string;
+    condition: string;
+    modelCount: number;
   }[];
-  /** 目录内型号总数：导语用它，与首页展示的卡片数（models）是两个数 */
+  /** 目录内型号总数：导语用它 */
   totalModels: number;
 }
 
-const { locale, categories, models, totalModels } = Astro.props;
+const { locale, categories, applications, totalModels } = Astro.props;
 const dict = t(locale);
 /** 中文标题在逗号后固定断行，避免 16ch 上限在「参数」等词中间折断 */
 const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
@@ -102,20 +97,20 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
 </section>
 
 {
-  models.length > 0 && (
+  applications.length > 0 && (
     <section class="section band">
       <div class="container">
         <SectionTitle title={dict.home.selectedModels} />
-        <ul class="card-grid card-grid--models">
-          {models.map((m) => (
+        <ul class="app-grid">
+          {applications.map((a) => (
             <li>
-              <ModelCard
-                href={localizePath(locale, detailPath.model(m.id))}
-                code={m.code}
-                name={m.name}
-                firstParamLabel={m.firstParamKey}
-                firstParam={m.firstParam}
-                image={m.image}
+              <ApplicationCard
+                href={localizePath(locale, detailPath.application(a.id))}
+                name={a.name}
+                condition={a.condition}
+                modelCount={a.modelCount}
+                modelCountLabel={dict.products.modelsUnit(a.modelCount)}
+                linkLabel={dict.category.detailLink}
               />
             </li>
           ))}
@@ -288,8 +283,18 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   }
 
-  .card-grid--models {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  /* 按应用选型：3 列桌面、2 列平板、1 列手机 */
+  .app-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--space-5);
+  }
+
+  .app-grid > li {
+    display: flex;
   }
 
   /* li 用 flex 让卡片在同行拉齐 */

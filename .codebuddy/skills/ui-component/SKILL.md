@@ -22,7 +22,7 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 - 全局：`src/styles/global.css`（reset、排版、容器与 12 栏、`.section`、链接、`.btn` 变体、`.card/.badge/.chip`、`.data-table/.spec-table/.table-scroll`、`.field`、focus-visible、reduced-motion）。
 - 共享组件：`src/components/layout/`（PageHeader、SectionTitle、CtaBand、MetricStrip、FeatureRow、Header、Footer）。
 - 目录组件：`src/components/catalog/`（ComparisonTable、PurchaseFacts）。
-- 卡片：`src/components/cards/`（CategoryCard、ModelCard、ModelTile）。
+- 卡片：`src/components/cards/`（CategoryCard）；`src/components/catalog/`（ApplicationCard、ModelTile）。
 - 页面 Body：`src/components/pages/*Body.astro`。
 - 样式作用域警告：`src/pages/[...slug].astro` 顶部注释（所有 Body 共享一份 CSS）。
 
@@ -47,7 +47,7 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 - 按钮全站唯一：任何局部 `.btn-*`/`.cta-*`/`.header-cta`/`.cat-cta` 都是违规，一律迁到全局变体；每个视口区域只一个填充主按钮。
 - PageHeader 是 full-bleed 带、放 `.section` 之外（内部自带 container），全站唯一 h1；SectionTitle 管 h2；related 分组用 h3。
 - 表格必须套 `.table-scroll`（`tabindex="0"` + `role="region"` + `aria-label`），只在表内横滚。
-- `CategoryCard` 与 `ModelCard` / `ModelTile`（含 `compact`）是刻意拆分（网格卡 vs 次级磁贴），不盲目合并。
+- `CategoryCard` 与 `ApplicationCard` / `ModelTile`（含 `compact`）是刻意拆分（网格卡 vs 应用选型卡 vs 次级磁贴），不盲目合并。
 - 组件不取数、不调用 `getCollection`、不写内容文案。
 - 所有 Body 经 `[...slug].astro` 共享一份 CSS；低频样式先评估体积，404 继续独立路由。
 - 一次只改一个变量；禁止把尺寸、断点、布局方案捆在一次改动里。

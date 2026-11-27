@@ -43,41 +43,21 @@ export async function loadStaticPage(
   switch (def.layout) {
     case 'home': {
       const categories = await getAllCategories();
-      const models = await getAllModels();
-
-      /**
-       * 首页机型卡：总量封顶，按品类均分。
-       *
-       * 上限是页面设计参数（恒定，不随数据变化），名额在品类间均分、
-       * 余数分给前面的品类 —— 任何品类都至少占一份，首页规模也不随
-       * 型号总数增长。
-       */
-      const HOME_MODEL_CARDS = 12;
-      const groups = categories.map((c) =>
-        models.filter((m) => m.data.category.id === c.id)
-      );
-      const perGroup = Math.max(1, Math.floor(HOME_MODEL_CARDS / Math.max(1, groups.length)));
-      const remainder = HOME_MODEL_CARDS - perGroup * groups.length;
-
-      const featured = groups.flatMap((list, i) =>
-        list.slice(0, perGroup + (i < remainder ? 1 : 0))
-      );
+      const applications = await getAllApplications();
 
       const categoryCards = categories.map((c) => {
         const v = categoryView(c, locale);
         return { id: c.id, name: v.name, intro: v.intro, image: c.data.image };
       });
 
-      const modelCards = featured.map((m) => {
-        const v = modelView(m, locale);
+      /** 按应用选型卡：工况名 + 条件摘要 + 推荐型号数 */
+      const applicationCards = applications.map((a) => {
+        const v = applicationView(a, locale);
         return {
-          id: m.id,
-          categoryId: m.data.category.id,
-          code: v.code,
+          id: a.id,
           name: v.name,
-          firstParamKey: v.keyParams[0].k,
-          firstParam: v.keyParams[0].v,
-          image: v.image,
+          condition: v.condition,
+          modelCount: a.data.recommended.length,
         };
       });
 
@@ -85,29 +65,25 @@ export async function loadStaticPage(
         locale,
         path,
         ...meta,
-        /** 首页分享图用品牌横幅（其余页面走 SITE.ogImage 全站默认图） */
         image: '/og-home.png',
-        // 首页精选型号以 ItemList 结构化数据声明，强化「主推产品」信号
         schemas: [
           collectionSchema({
             locale,
             name: meta.title,
             description: meta.description,
             path,
-            items: modelCards.map((m) => ({
-              name: m.code,
-              path: detailPath.model(m.id),
+            items: applicationCards.map((a) => ({
+              name: a.name,
+              path: detailPath.application(a.id),
             })),
           }),
         ],
         body: 'home',
-        // totalModels 是目录里的真实型号数：导语引用它，
-        // 首页机型卡有上限，两个数字不能混用
         bodyProps: {
           locale,
           categories: categoryCards,
-          models: modelCards,
-          totalModels: models.length,
+          applications: applicationCards,
+          totalModels: applications.reduce((sum, a) => sum + a.data.recommended.length, 0),
         },
       };
     }

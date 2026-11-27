@@ -39,7 +39,7 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 ## 四页配方
 
 ### Home
-纯石墨 hero（无渐变，8/4 栏，事实列表用编号 + 细线；英文 ≤480 标题 32–36px、导语 16px、按钮间距 8px、顶部 112–124px；中文 320–480 顶部 120px，481–512 平滑回到 124px；中文标题在逗号后固定换行）→ 品类网格（图上文下）→ 精选型号网格（图上文下、`.mono` 编码）→ `CtaBand`。
+纯石墨 hero（无渐变，8/4 栏，事实列表用编号 + 细线；英文 ≤480 标题 32–36px、导语 16px、按钮间距 8px、顶部 112–124px；中文 320–480 顶部 120px，481–512 平滑回到 124px；中文标题在逗号后固定换行）→ 品类网格（图上文下）→ 按应用选型（工况卡：无图片、数据驱动、44px 链接）→ `CtaBand`。
 
 ### Products
 `PageHeader` + 品类 pill（真实链接到品类页）+ 默认隐藏的搜索表单 + `aria-live` 计数 + 密集表：
@@ -64,7 +64,7 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 
 | Lane | 只允许修改 |
 |---|---|
-| A 首页 | `src/components/pages/HomeBody.astro`、`cards/CategoryCard.astro`、`cards/ModelCard.astro` |
+| A 首页 | `src/components/pages/HomeBody.astro`、`cards/CategoryCard.astro`、`catalog/ApplicationCard.astro` |
 | B 产品总览 | `src/components/pages/ProductsBody.astro`、新建 `catalog/CatalogTable.astro` |
 | C 品类 | `src/components/pages/CategoryBody.astro`、`catalog/ComparisonTable.astro`、`catalog/PurchaseFacts.astro`、`cards/ModelTile.astro` |
 | D 型号 | `src/components/pages/ModelBody.astro` |

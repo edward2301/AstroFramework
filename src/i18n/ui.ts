@@ -226,7 +226,7 @@ const en: Dict = {
     browseProducts: 'Browse products',
     requestQuote: 'Get selection advice',
     categories: 'Product categories',
-    selectedModels: 'Selected models',
+    selectedModels: 'Select by application',
     viewModels: 'View models',
     trust: {
       facts: [
@@ -421,7 +421,7 @@ const zh: Dict = {
     browseProducts: '浏览产品',
     requestQuote: '获取选型建议',
     categories: '产品品类',
-    selectedModels: '常用型号',
+    selectedModels: '按应用选型',
     viewModels: '查看型号',
     trust: {
       facts: [

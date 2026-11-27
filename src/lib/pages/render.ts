@@ -124,13 +124,11 @@ export type RenderedPage = PageCommon &
         bodyProps: {
           locale: Locale;
           categories: { id: string; name: string; intro: string; image?: string }[];
-          models: {
+          applications: {
             id: string;
-            categoryId: string;
-            code: string;
             name: string;
-            firstParamKey: string;
-            firstParam: string;
+            condition: string;
+            modelCount: number;
           }[];
           /** 目录内的型号总数 —— 导语引用它，与首页展示的卡片数是两回事 */
           totalModels: number;
