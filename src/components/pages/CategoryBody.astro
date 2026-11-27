@@ -161,6 +161,14 @@ const metaLine = [
     display: flex;
   }
 
+  /* 移动端 2 列：7 个型号从 7 屏缩到 4 行，仍保留图上文下的目录节奏 */
+  @media (max-width: 768px) {
+    .tile-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-3);
+    }
+  }
+
   /* 对比表：细线分隔的数据板，不自带标题（caption 即区块标签） */
   .compare-block {
     margin-top: var(--space-8);
