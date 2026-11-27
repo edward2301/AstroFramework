@@ -156,14 +156,14 @@ export async function loadStaticPage(
     }
 
     case 'about': {
-      // 指标数字由内容集合统计，组件只负责渲染（组件不取数）
+      // 指标并入页头 meta 行（与品类 / 栏目页同一模式），组件不再渲染指标条
       const dict = t(locale);
       const [categories, models] = await Promise.all([getAllCategories(), getAllModels()]);
-      const metrics = [
-        { value: String(categories.length), label: dict.home.categories },
-        { value: String(models.length), label: dict.category.modelsTitle },
-        { value: dict.aboutPage.responseValue, label: dict.aboutPage.responseLabel },
-      ];
+      const metaLine = [
+        dict.products.categoriesUnit(categories.length),
+        dict.products.modelsUnit(models.length),
+        `${dict.aboutPage.responseValue} ${dict.aboutPage.responseLabel}`,
+      ].join(' · ');
       const crumbs = [
         homeCrumb(locale),
         crumb(crumbLabel(def, locale), localizePath(locale, path)),
@@ -176,7 +176,7 @@ export async function loadStaticPage(
         schemas: [breadcrumbSchema(crumbs)],
         body: 'about',
         // 标题来自条目（heading），改标题只需改条目
-        bodyProps: { locale, crumbs, heading: def.heading?.[locale] ?? seo.title, metrics },
+        bodyProps: { locale, crumbs, heading: def.heading?.[locale] ?? seo.title, metaLine },
       };
     }
 

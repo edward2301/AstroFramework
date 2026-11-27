@@ -53,6 +53,7 @@ export interface Dict {
     lead: (categories: number, models: number) => string;
     /** 品类行按钮：动作 + 型号数 */
     browseModels: (count: number) => string;
+    categoriesUnit: (count: number) => string;
     modelsUnit: (count: number) => string;
     /** 全型号目录：筛选、搜索、表头与空态 */
     filterAll: string;
@@ -246,6 +247,7 @@ const en: Dict = {
     lead: (categories, models) =>
       `${categories} categories and ${models} models, each with full specifications, mounting dimensions and datasheet links. Filter by category or search the full catalog, then open any model for the complete picture.`,
     browseModels: (count) => `Browse ${count} models →`,
+    categoriesUnit: (count) => `${count} categories`,
     modelsUnit: (count) => `${count} models`,
     filterAll: 'All models',
     filterLabel: 'Filter by category',
@@ -445,6 +447,7 @@ const zh: Dict = {
     lead: (categories, models) =>
       `共 ${categories} 个品类、${models} 个型号，每个型号页都提供完整规格、安装尺寸与资料下载。可按品类筛选或搜索全部型号，再进入型号页查看全部细节。`,
     browseModels: (count) => `浏览 ${count} 个型号 →`,
+    categoriesUnit: (count) => `${count} 个品类`,
     modelsUnit: (count) => `${count} 个型号`,
     filterAll: '全部型号',
     filterLabel: '按品类筛选',

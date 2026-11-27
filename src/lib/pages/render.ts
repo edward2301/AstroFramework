@@ -149,7 +149,7 @@ export type RenderedPage = PageCommon &
           totalModels: number;
         };
       }
-    | { body: 'about'; bodyProps: { locale: Locale; crumbs: Crumb[]; heading: string; metrics: { value: string; label: string }[] } }
+    | { body: 'about'; bodyProps: { locale: Locale; crumbs: Crumb[]; heading: string; metaLine: string } }
     | {
         body: 'section';
         bodyProps: {

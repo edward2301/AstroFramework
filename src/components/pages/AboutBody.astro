@@ -1,12 +1,11 @@
 ---
 /**
- * 关于我们：条带页头 → 指标条 → 三组图文行（生产 / 文档 / 响应）→ 联系区。
+ * 关于我们：条带页头（含指标 meta 行）→ 三组图文行（生产 / 文档 / 响应）→ 联系区。
  *
  * 采用「数字 + 图 + 短句」的节奏，图文交替形成 Z 字阅读动线；
  * 数字取自内容集合，不编造。
  */
 import PageHeader from '../layout/PageHeader.astro';
-import MetricStrip from '../layout/MetricStrip.astro';
 import FeatureRow from '../layout/FeatureRow.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
@@ -18,10 +17,11 @@ interface Props {
   locale: Locale;
   crumbs: Crumb[];
   heading: string;
-  metrics: { value: string; label: string }[];
+  /** 指标 meta 行（品类 / 型号 / 响应），由静态装配层组好 */
+  metaLine: string;
 }
 
-const { locale, crumbs, heading, metrics } = Astro.props;
+const { locale, crumbs, heading, metaLine } = Astro.props;
 const dict = t(locale);
 const org = organizationFor(locale);
 
@@ -32,12 +32,16 @@ const images = [
 ];
 ---
 
-<PageHeader locale={locale} crumbs={crumbs} title={heading} lead={org.description} />
+<PageHeader
+  locale={locale}
+  crumbs={crumbs}
+  title={heading}
+  lead={org.description}
+  meta={metaLine}
+/>
 
 <section class="section">
   <div class="container">
-    <MetricStrip items={metrics} />
-
     <div class="about-rows">
       {
         dict.aboutPage.sections.slice(0, -1).map((sec, i) => (
