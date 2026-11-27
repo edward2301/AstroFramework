@@ -96,7 +96,7 @@ function exists(distDir, target) {
   if (target.endsWith('/')) {
     // 默认语言的 404 特例：Astro 固定产出根级 404.html（Cloudflare Pages 根目录
     // 约定），没有 404/index.html —— 与 toRoute 把 404.html 归一化为 /404/ 配套，
-    // 否则 404 页页脚语言切换的自链 /404/ 会被误判为断链。
+    // 否则指向 /404/ 的站内链接会被误判为断链。
     // clean 只去掉前导斜杠（/404/ → '404/'），比较前先去掉尾部斜杠。
     if (clean.replace(/\/+$/, '') === '404' && fs.existsSync(path.join(distDir, '404.html'))) {
       return true;

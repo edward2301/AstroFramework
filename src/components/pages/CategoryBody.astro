@@ -71,7 +71,7 @@ const metaLine = [
     <SectionTitle title={dict.category.modelsTitle} />
 
     {/* 型号视觉网格：图上文下，参数留给对比表 */}
-    <ul class="tile-grid">
+    <ul class="grid-list tile-grid">
       {
         models.map((m) => (
           <li>
@@ -147,10 +147,6 @@ const metaLine = [
 <style>
   /* 瓦片网格：240px 起，auto-fill 保持目录列宽一致 */
   .tile-grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
     gap: var(--space-4);
   }

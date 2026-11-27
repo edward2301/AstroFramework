@@ -78,7 +78,7 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
       href={localizePath(locale, ROUTES.products)}
       linkLabel={dict.home.browseProducts}
     />
-    <ul class="card-grid card-grid--categories">
+    <ul class="grid-list card-grid card-grid--categories">
       {
         categories.map((c) => (
           <li>
@@ -101,7 +101,7 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
     <section class="section band">
       <div class="container">
         <SectionTitle title={dict.home.selectedModels} />
-        <ul class="app-grid">
+        <ul class="grid-list app-grid">
           {applications.map((a) => (
             <li>
               <ApplicationCard
@@ -272,10 +272,6 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
   }
 
   .card-grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
     gap: var(--space-5);
   }
 
@@ -285,10 +281,6 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
 
   /* 按应用选型：3 列桌面、2 列平板、1 列手机 */
   .app-grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: var(--space-5);
   }

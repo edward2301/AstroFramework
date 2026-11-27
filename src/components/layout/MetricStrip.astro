@@ -13,7 +13,7 @@ interface Props {
 const { items, tone = 'light' } = Astro.props;
 ---
 
-<ul class:list={['metrics', `metrics--${tone}`]}>
+<ul class:list={['grid-list', 'metrics', `metrics--${tone}`]}>
   {
     items.map((it) => (
       <li>
@@ -26,10 +26,6 @@ const { items, tone = 'light' } = Astro.props;
 
 <style>
   .metrics {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
     column-gap: var(--space-5);
     row-gap: var(--space-6);

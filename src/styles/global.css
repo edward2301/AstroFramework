@@ -286,6 +286,32 @@ caption {
   color: var(--color-muted);
 }
 
+/* ---------- 共享列表工具 ---------- */
+
+/*
+ * 卡片网格与 chip 列表的公共 reset。全局类与原 class 成对出现
+ * （如 `class="grid-list tile-grid"`），各自的 template-columns / gap /
+ * 修饰规则仍留在组件作用域里。
+ */
+
+/* 列表型卡片网格的 reset（tile-grid / card-grid / app-grid / items / metrics） */
+.grid-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+}
+
+/* chip 横排列表的 reset（cert-chips / sibling-chips） */
+.chip-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
 /* ---------- components ---------- */
 
 /* 按钮：全站唯一一套；局部样式一律删除 */

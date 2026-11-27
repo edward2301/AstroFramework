@@ -103,7 +103,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
 
         {
           model.certifications.length > 0 && (
-            <ul class="cert-chips" aria-label={dict.model.certifications}>
+            <ul class="chip-list cert-chips" aria-label={dict.model.certifications}>
               {model.certifications.map((c) => (
                 <li class="chip">{c}</li>
               ))}
@@ -209,7 +209,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
         siblings.length > 0 && (
           <section class="related-group">
             <h3>{dict.model.otherModels}</h3>
-            <ul class="sibling-chips">
+            <ul class="chip-list sibling-chips">
               {siblings.map((m) => (
                 <li>
                   <a class="chip mono" href={localizePath(locale, detailPath.model(m.id))}>
@@ -317,14 +317,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
     color: var(--color-ink);
   }
 
-  .cert-chips {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
+  /* 认证 chip：reset 走全局 .chip-list，无其余专有样式 */
 
   /* 规格：auto-fit 网格，组标题小号大写，表格行更紧 */
   .spec-grid {
@@ -423,16 +416,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
     font-size: var(--fs-sm);
   }
 
-  /* 同品类其他型号：方形 chip，编码等宽 */
-  .sibling-chips {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-  }
-
+  /* 同品类其他型号：方形 chip，编码等宽（reset 走全局 .chip-list） */
   .sibling-chips .chip {
     text-decoration: none;
     color: var(--color-link);

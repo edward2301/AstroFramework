@@ -19,7 +19,7 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 
 ## 事实源
 - 令牌：`src/styles/tokens.css`（L0 primitives → L1 面/文字/边 → L2 动作/数据 → L3 排版 → L4 布局 → L5 形状/动效/z）。
-- 全局：`src/styles/global.css`（reset、排版、容器与 12 栏、`.section`、链接、`.btn` 变体、`.card/.badge/.chip`、`.data-table/.spec-table/.table-scroll`、`.field`、详情页复用片段 `.stack/.lede/.intro/.detail-meta/.aside-title/.points`、focus-visible、reduced-motion）。
+- 全局：`src/styles/global.css`（reset、排版、容器与 12 栏、`.section`、链接、`.btn` 变体、`.card/.badge/.chip`、`.data-table/.spec-table/.table-scroll`、`.field`、详情页复用片段 `.stack/.lede/.intro/.detail-meta/.aside-title/.points`、列表工具 `.grid-list/.chip-list`、focus-visible、reduced-motion）。
 - 共享组件：`src/components/layout/`（PageHeader、SectionTitle、CtaBand、MetricStrip、FeatureRow、Header、Footer）。
 - 目录组件：`src/components/catalog/`（ComparisonTable、PurchaseFacts）。
 - 卡片：`src/components/cards/`（CategoryCard）；`src/components/catalog/`（ApplicationCard、ModelTile）。
