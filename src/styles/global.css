@@ -172,6 +172,21 @@ caption {
   padding: var(--space-section) 0;
 }
 
+/* 浅灰通栏色带：标出支撑性/次要内容（品类说明、相关型号、按应用选型等），
+   与白底正文、石墨 CtaBand 构成「白 → 灰 → 石墨」的底色节奏 */
+.band {
+  background: var(--color-subtle);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* 侧栏/次要面板：浅灰底 + 细线，区分于白底正文（详情页相关栏、栏目页相关入口） */
+.aside-panel {
+  background: var(--color-subtle);
+  border: 1px solid var(--color-border);
+  padding: var(--space-5);
+}
+
 /*
  * PageHeader 自带 32px 下内边距，其后的首个内容区不再叠加
  * --space-section 的 56–112px 上边距；上边距收紧为 24px。

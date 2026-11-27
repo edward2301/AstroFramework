@@ -74,7 +74,7 @@ const related = [
         }
       </div>
 
-      <aside class="related">
+      <aside class="related aside-panel">
         <h2>{dict.section.related}</h2>
         <ul class="links">
           {related.map((r) => (
@@ -164,13 +164,7 @@ const related = [
     align-self: flex-start;
   }
 
-  /* 侧栏：上下细线分段，无底色、无圆角 */
-  .related {
-    padding: var(--space-5) 0;
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
-
+  /* 侧栏样式走全局 .aside-panel；这里只保留标题与链接的排版 */
   .related h2 {
     margin: 0 0 var(--space-2);
     font-size: var(--fs-xs);

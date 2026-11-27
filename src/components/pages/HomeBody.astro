@@ -264,13 +264,7 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
     }
   }
 
-  /* 色带挂在 section 上，通栏到底；内容仍由 .container 约束 */
-  .band {
-    background: var(--color-subtle);
-    border-top: 1px solid var(--color-border);
-    border-bottom: 1px solid var(--color-border);
-  }
-
+  /* 色带走全局 .band；这里只保留卡片网格节奏 */
   .card-grid {
     gap: var(--space-5);
   }

@@ -147,17 +147,18 @@ const quoteHref = localizePath(locale, ROUTES.quote);
         </>
       )
     }
+  </div>
+</section>
 
-    {
-      (replacements.length > 0 ||
-        applications.length > 0 ||
-        cases.length > 0 ||
-        siblings.length > 0) && (
+{
+  (replacements.length > 0 ||
+    applications.length > 0 ||
+    cases.length > 0 ||
+    siblings.length > 0) && (
+    <section class="section band">
+      <div class="container">
         <SectionTitle title={dict.section.related} />
-      )
-    }
-
-    <div class="related-groups">
+        <div class="related-groups">
       {
         replacements.length > 0 && (
           <section class="related-group">
@@ -221,9 +222,11 @@ const quoteHref = localizePath(locale, ROUTES.quote);
           </section>
         )
       }
-    </div>
-  </div>
-</section>
+        </div>
+      </div>
+    </section>
+  )
+}
 
 <CtaBand locale={locale} />
 
