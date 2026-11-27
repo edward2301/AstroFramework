@@ -317,14 +317,6 @@ const dict = t(locale);
     color: var(--color-on-dark);
   }
 
-  /* 移动端触控高度：35px → 44px */
-  @media (max-width: 768px) {
-    .filter-pill {
-      min-height: 44px;
-      padding: 0 14px;
-    }
-  }
-
   .catalog-search {
     display: flex;
     align-items: center;
@@ -358,8 +350,13 @@ const dict = t(locale);
     outline-offset: 1px;
   }
 
-  /* 搜索框同步到 44px 触控高度（后置规则才能覆盖上面的 40px） */
+  /* ≤768 触控高度 44px：筛选 pill 与搜索框（搜索框须后置于上面的 40px 基础规则才能覆盖） */
   @media (max-width: 768px) {
+    .filter-pill {
+      min-height: 44px;
+      padding: 0 14px;
+    }
+
     .catalog-search input {
       height: 44px;
     }
