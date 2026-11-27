@@ -9,7 +9,6 @@
  * 集合有内容后，由各自的路由在此处追加列表渲染。
  */
 import PageHeader from '../layout/PageHeader.astro';
-import MetricStrip from '../layout/MetricStrip.astro';
 import { localizePath, type Locale } from '../../i18n/routing';
 import { ROUTES } from '../../data/routes';
 import { t } from '../../i18n/ui';
@@ -29,6 +28,9 @@ interface Props {
 const { locale, crumbs, heading, body, items, metrics } = Astro.props;
 const dict = t(locale);
 
+/** 栏目指标并入页头 meta 行（与品类页同一模式），不再单独渲染悬浮指标条 */
+const metaLine = metrics.map((m) => `${m.value} ${m.label}`).join(' · ');
+
 /** 空状态下的替代入口：都是站内真实页面，避免栏目页成为死路 */
 const related = [
   { href: localizePath(locale, ROUTES.products), label: dict.nav.products },
@@ -37,12 +39,10 @@ const related = [
 ];
 ---
 
-<PageHeader locale={locale} crumbs={crumbs} title={heading} lead={body.intro} />
+<PageHeader locale={locale} crumbs={crumbs} title={heading} lead={body.intro} meta={metaLine} />
 
 <section class="section">
   <div class="container">
-    {metrics.length > 0 && <MetricStrip items={metrics} />}
-
     {/* 栏目说明：有列表时同样要出现，否则页面只剩标题与卡片，正文全丢 */}
     {body.current.trim() !== '' && <p class="section-current">{body.current}</p>}
 
@@ -89,11 +89,6 @@ const related = [
 </section>
 
 <style>
-  /* 指标条与下方正文的节奏（MetricStrip 为子组件，需 :global 触达） */
-  :global(.metrics) {
-    margin-bottom: var(--space-6);
-  }
-
   /* 栏目说明段：与列表同宽、灰字，读起来像导语而不是正文墙 */
   .section-current {
     max-width: 760px;
