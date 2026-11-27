@@ -377,7 +377,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
       <thead><tr><th style="width:190px">SEO 要求</th><th>落地位置</th></tr></thead>
       <tbody>
         <tr><td>不存在的路径返回真 404</td><td>静态产物不含多余路径 + <code>_redirects</code> 不设兜底</td></tr>
-        <tr><td>一个页面一个 URL</td><td><code>trailingSlash: 'always'</code> + 目录式产物，Pages 自动补齐尾斜杠</td></tr>
+        <tr><td>一个页面一个 URL</td><td><code>trailingSlash: 'ignore'</code>（链接层统一尾斜杠，dev 由集成 308 归一） + 目录式产物，Pages 自动补齐尾斜杠</td></tr>
         <tr><td>404 页不被收录</td><td>页面本身 <code>noindex</code>；404 产物 <code>no-store</code>；直访 301 到首页</td></tr>
         <tr><td>分语言错误页</td><td>Pages 按语言前缀就近查找 <code>&lt;前缀&gt;/404.html</code>；构建守卫按 <code>LOCALES</code> 从 <code>&lt;前缀&gt;/404/index.html</code> 复制</td></tr>
         <tr><td>新页面及时被发现</td><td>sitemap / robots 不缓存；<code>lastmod</code> 取源文件最后提交时间（Git 集成构建需完整历史）</td></tr>
@@ -438,7 +438,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
   <p class="lead">十项。目标是让第 1 节列出的工程缺陷在新架构里<strong>不可能再发生</strong>。</p>
 
   <h3>5.1 URL 与路由：用目录把层级写死</h3>
-  <p>所有 URL 末尾带斜杠（<code>trailingSlash: 'always'</code>），产物是目录式 <code>/path/index.html</code>。Pages 默认的 <code>auto-trailing-slash</code> 会自动补齐缺斜杠的请求，不产生重复 URL。旧链接 301 在 <code>_redirects</code> 里用精确路径逐条登记，<strong>不要用正则或通配，避免误伤正常页面</strong>。</p>
+  <p>所有 URL 末尾带斜杠（链接层统一，匹配策略 <code>trailingSlash: 'ignore'</code>，dev 由集成 308 归一），产物是目录式 <code>/path/index.html</code>。Pages 默认的 <code>auto-trailing-slash</code> 会自动补齐缺斜杠的请求，不产生重复 URL。旧链接 301 在 <code>_redirects</code> 里用精确路径逐条登记，<strong>不要用正则或通配，避免误伤正常页面</strong>。</p>
 
   <h3>5.2 内容模型：用 schema 卡住字段</h3>
   <p>内容集合的 schema 集中在 <code>src/content.config.ts</code>：型号必须有 5 项关键参数、品类 <code>intro</code> 不少于 300 字、译文 <code>intro</code> 不少于 150 字。<code>draft: true</code> 的条目不生成路由、不进列表；已发布条目引用草稿会在体检阶段报错。</p>

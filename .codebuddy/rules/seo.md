@@ -15,7 +15,7 @@
 
 ## URL 形态
 
-- 全部 URL 带尾斜杠（`trailingSlash: 'always'`）+ 目录式产物（`build.format: 'directory'`）。
+- 全部 URL 带尾斜杠：链接层由 `localizePath` 统一（canonical、内链、sitemap 全部以 `/` 结尾），产物目录式（`build.format: 'directory'`）。匹配策略 `trailingSlash: 'ignore'`——`'always'` 会让 astro dev 在路由前拦截无尾斜杠请求（合法页 404、未知页弹品牌提示页）；dev 的 308 归一由 `astro.config.mjs` 的 dev-trailing-slash 集成完成，与 Pages 线上行为一致。
 
 ## sitemap 与 hreflang
 

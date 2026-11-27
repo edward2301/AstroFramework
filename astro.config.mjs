@@ -13,6 +13,50 @@ const site = 'https://example.com';
 const lastmodFor = createLastmod(process.cwd());
 
 /**
+ * dev 尾斜杠归一（仅 astro dev 生效，构建产物不受影响）。
+ *
+ * trailingSlash: 'ignore' 时，astro dev 会在进路由前拦截无尾斜杠的请求
+ * （7.4.13 实测）：合法页面直接吃默认 404、未知路径弹 Astro 品牌提示页，
+ * 且此场景下中间件不会执行。这里用 astro:server:setup 把 308 归一挂在
+ * dev 服务器路由层之前，与线上 Cloudflare Pages 的行为对齐：
+ * 无尾斜杠先跳带斜杠版本，未知路径再落就近 404（每语言一份）。
+ *
+ * 豁免：根路径、带扩展名的路径（robots.txt、/_astro/*.css、图片等资源）。
+ */
+function devTrailingSlash() {
+  return {
+    name: 'dev-trailing-slash',
+    hooks: {
+      /**
+       * @param {{ server: import('vite').ViteDevServer }} ctx
+       */
+      'astro:server:setup': (ctx) => {
+        const server = ctx.server;
+        const normalize = (
+          /** @type {import('http').IncomingMessage} */ req,
+          /** @type {import('http').ServerResponse} */ res,
+          /** @type {() => void} */ next
+        ) => {
+          const raw = req.url ?? '/';
+          const [path, search] = raw.split('?');
+          if (path === '/' || path.endsWith('/') || /\.[a-zA-Z0-9]+$/.test(path)) {
+            next();
+            return;
+          }
+          res.writeHead(308, { Location: `${path}/${search ? `?${search}` : ''}` });
+          res.end();
+        };
+        /*
+         * 必须 unshift 到 connect 栈顶：Astro 自己的路由/尾斜杠拦截器注册在前，
+         * 追加（use）的处理器的排不到 —— 无尾斜杠请求永远先被它 404 掉。
+         */
+        server.middlewares.stack.unshift({ route: '', handle: normalize });
+      },
+    },
+  };
+}
+
+/**
  * 域名守卫：CI 或显式要求时，占位域名直接让构建失败。
  * 本地构建不启用，避免没有真实域名时无法验证产物。
  */
@@ -32,8 +76,14 @@ export default defineConfig({
    */
   site,
 
-  /** 与 URL 规范一致：所有地址末尾带斜杠 */
-  trailingSlash: 'always',
+  /**
+   * 尾斜杠策略：链接层由 localizePath 统一带斜杠（canonical、内链、sitemap 全部
+   * 以 / 结尾），构建产物为目录式。匹配策略用 'ignore' 而非 'always'——
+   * 'always' 会让 astro dev 在路由前拦截无尾斜杠请求（合法页直接 404、
+   * 未知页弹 Astro 品牌提示页，中间件也拦不到）；'ignore' 让这类请求正常
+   * 走进 devTrailingSlash 集成，308 归一到带斜杠路径，与线上行为一致。
+   */
+  trailingSlash: 'ignore',
 
   /** 目录式产物：/products/x/ 输出为 /products/x/index.html，便于 Cloudflare Pages 按路径前缀就近查找 404.html */
   build: {
@@ -52,6 +102,7 @@ export default defineConfig({
 
   /** 站点地图（带 hreflang 互指）与构建守卫：内容体检 + 产物链接检查 */
   integrations: [
+    devTrailingSlash(),
     sitemap({
       i18n: {
         defaultLocale: DEFAULT_LOCALE,
