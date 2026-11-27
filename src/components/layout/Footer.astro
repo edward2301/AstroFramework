@@ -211,6 +211,20 @@ const localeLinks = LOCALES.map((item) => ({
     color: #fff;
   }
 
+  /* 移动端：页脚栏目链接与备案链接补到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .footer-col li a {
+      min-width: 44px;
+      min-height: 44px;
+    }
+
+    .footer-icp a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+
   .footer-bottom {
     margin-top: var(--space-5);
     padding-top: var(--space-4);
