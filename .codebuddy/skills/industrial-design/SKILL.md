@@ -47,7 +47,7 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 所有行服务器渲染；JS 只做行过滤与计数；脚本用 `<script is:inline>`，不得进入全站共享 JS。
 
 ### Category
-`PageHeader` + 型号视觉网格（移动端 2 列，桌面 `auto-fill 360px`）→ 参数对比表 → 采购信息 4-up → 品类说明（8/4）→ `CtaBand`。
+`PageHeader` + 型号视觉网格（≤1024 两列，桌面 `auto-fill 360px`；≤768 收紧间距）→ 参数对比表 → 采购信息 4-up → 品类说明（8/4）→ `CtaBand`。
 对比表首列 sticky；停产行降对比度；采购信息用细线定义网格。
 
 ### Model
