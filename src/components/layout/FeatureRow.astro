@@ -40,10 +40,10 @@ const { title, body, points = [], image, imageAlt, reverse = false } = Astro.pro
 <style>
   .feature-row {
     display: grid;
-    /* 图列略窄于文字列：图是情绪，文字是信息，别让图占满半屏 */
-    grid-template-columns: minmax(0, 0.92fr) minmax(0, 1fr);
+    /* 图列固定窄宽（装饰图，不是产品主图），文字列吃剩余；顶部对齐避免短文本漂浮在图片中线 */
+    grid-template-columns: minmax(0, 380px) minmax(0, 1fr);
     gap: var(--space-7);
-    align-items: center;
+    align-items: start;
     margin-bottom: var(--space-7);
   }
 
@@ -70,6 +70,7 @@ const { title, body, points = [], image, imageAlt, reverse = false } = Astro.pro
   }
 
   .feature-row-body p {
+    max-width: var(--measure);
     color: var(--color-muted);
   }
 
@@ -99,9 +100,20 @@ const { title, body, points = [], image, imageAlt, reverse = false } = Astro.pro
     background: var(--color-data);
   }
 
-  /* 交替：图移到右列（DOM 顺序不变，读屏与 SEO 仍是先文后图） */
+  /* 交替：文字在左（宽列）、图在右（窄列）——列宽随之互换，
+     否则图会落进 1fr 宽列变成大图（显式列位，不用 order） */
+  .feature-row.is-reversed {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+  }
+
   .is-reversed .feature-row-media {
-    order: 2;
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .is-reversed .feature-row-body {
+    grid-column: 1;
+    grid-row: 1;
   }
 
   @media (max-width: 1024px) {
@@ -110,8 +122,14 @@ const { title, body, points = [], image, imageAlt, reverse = false } = Astro.pro
       gap: var(--space-5);
     }
 
-    .is-reversed .feature-row-media {
-      order: 0;
+    .feature-row.is-reversed {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .is-reversed .feature-row-media,
+    .is-reversed .feature-row-body {
+      grid-column: auto;
+      grid-row: auto;
     }
   }
 </style>
