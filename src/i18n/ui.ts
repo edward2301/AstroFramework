@@ -64,6 +64,7 @@ export interface Dict {
     modelUnit: string;
     modelUnitPlural: string;
     empty: string;
+    tableHint: string;
     modelColumn: string;
     categoryColumn: string;
     keyParamsColumn: string;
@@ -250,6 +251,7 @@ const en: Dict = {
     modelUnit: 'model',
     modelUnitPlural: 'models',
     empty: 'No models match this filter.',
+    tableHint: 'Swipe horizontally to see all columns.',
     modelColumn: 'Model',
     categoryColumn: 'Category',
     keyParamsColumn: 'Key parameters',
@@ -444,6 +446,7 @@ const zh: Dict = {
     modelUnit: '个型号',
     modelUnitPlural: '个型号',
     empty: '没有符合条件的型号。',
+    tableHint: '左右滑动查看完整参数。',
     modelColumn: '型号',
     categoryColumn: '品类',
     keyParamsColumn: '关键参数',

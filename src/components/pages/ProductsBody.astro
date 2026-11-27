@@ -96,6 +96,8 @@ const dict = t(locale);
       data-unit-singular={dict.products.modelUnit}
       data-unit-plural={dict.products.modelUnitPlural}>{dict.products.resultCount(totalModels)}</p>
 
+    <p class="table-hint">{dict.products.tableHint}</p>
+
     <CatalogTable
       locale={locale}
       models={models}
@@ -264,6 +266,14 @@ const dict = t(locale);
     color: var(--color-on-dark);
   }
 
+  /* 移动端触控高度：35px → 44px */
+  @media (max-width: 768px) {
+    .filter-pill {
+      min-height: 44px;
+      padding: 0 14px;
+    }
+  }
+
   .catalog-search {
     display: flex;
     align-items: center;
@@ -297,6 +307,13 @@ const dict = t(locale);
     outline-offset: 1px;
   }
 
+  /* 搜索框同步到 44px 触控高度（后置规则才能覆盖上面的 40px） */
+  @media (max-width: 768px) {
+    .catalog-search input {
+      height: 44px;
+    }
+  }
+
   .catalog-count {
     margin: var(--space-3) 0 var(--space-4);
     font-size: var(--fs-xs);
@@ -316,5 +333,19 @@ const dict = t(locale);
 
   .catalog-empty[hidden] {
     display: none;
+  }
+
+  /* 表内横滚提示：只在会溢出的宽度出现 */
+  .table-hint {
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .table-hint {
+      display: block;
+      margin: 0 0 var(--space-2);
+      font-size: var(--fs-xs);
+      color: var(--color-muted);
+    }
   }
 </style>

@@ -324,6 +324,13 @@ function isActive(href: string): boolean {
     flex-shrink: 0;
   }
 
+  /* 移动端把页眉 CTA 提到 44px 触控高度 */
+  @media (max-width: 768px) {
+    .header-cta {
+      min-height: 44px;
+    }
+  }
+
   /*
    * 首页透明浮层上把 CTA 降权为白描边：首屏只留「浏览产品」一个蓝色主按钮，
    * 页眉不与 hero 抢焦点。滚动变实底（.is-scrolled）后恢复信号蓝实底。

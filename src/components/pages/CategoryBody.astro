@@ -96,6 +96,7 @@ const metaLine = [
 
     {/* 参数对比表：全页参数唯一出处 */}
     <div class="compare-block">
+      <p class="table-hint">{dict.products.tableHint}</p>
       <ComparisonTable
         locale={locale}
         categoryId={categoryId}
@@ -165,6 +166,20 @@ const metaLine = [
     margin-top: var(--space-8);
     padding-top: var(--space-6);
     border-top: 1px solid var(--color-border);
+  }
+
+  /* 表内横滚提示：只在会溢出的宽度出现 */
+  .table-hint {
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .table-hint {
+      display: block;
+      margin: 0 0 var(--space-2);
+      font-size: var(--fs-xs);
+      color: var(--color-muted);
+    }
   }
 
   .purchase-block {
