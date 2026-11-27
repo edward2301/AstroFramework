@@ -17,6 +17,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { LOCALES, DEFAULT_LOCALE, LOCALE_PREFIX } from '../src/i18n/routing.ts';
 import { checkLinks } from './check-links.mjs';
+import { appendModelRedirects } from './model-redirects.mjs';
 
 export default function contentGuard() {
   const root = process.cwd();
@@ -45,6 +46,11 @@ export default function contentGuard() {
           }
           fs.copyFileSync(src, path.join(distDir, prefix, '404.html'));
         }
+
+        // 型号旧路径 301：/products/<品类>/<型号>/ → /products/<型号>/
+        // 规则由内容文件生成，写到产物 _redirects；源文件 public/_redirects 不动。
+        const redirects = appendModelRedirects(distDir);
+        if (redirects > 0) logger.info(`已写入 ${redirects} 条型号旧路径 301。`);
 
         const { errors, warnings, files } = checkLinks(distDir);
 

@@ -54,14 +54,6 @@ function entryId(root: string, base: string, file: string): string {
     .replace(/\.(json|md)$/, '');
 }
 
-function readJson(file: string): Record<string, unknown> | null {
-  try {
-    return JSON.parse(readFileSync(file, 'utf8')) as Record<string, unknown>;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * 一次 `git log` 取全部文件的提交时间。
  *
@@ -128,14 +120,11 @@ function pageSources(root: string): PageSources {
     register(detailPath.category(entryId(root, 'src/content/categories', file)), file, allLocales);
   }
 
-  /* 型号页路径含品类，只能从条目里的 category 字段还原 */
+  /* 型号页 URL 已扁平：/products/<型号>/，不再需要读条目里的 category */
   const models = join(root, 'src/content/models');
   for (const file of listFiles(models)) {
     if (!file.endsWith('.json')) continue;
-    const data = readJson(file);
-    const category = typeof data?.category === 'string' ? data.category : null;
-    if (!category) continue;
-    register(detailPath.model(category, entryId(root, 'src/content/models', file)), file, allLocales);
+    register(detailPath.model(entryId(root, 'src/content/models', file)), file, allLocales);
   }
 
   const applications = join(root, 'src/content/applications');

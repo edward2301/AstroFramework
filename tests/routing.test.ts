@@ -8,6 +8,7 @@ import {
   parsePath,
   switchLocalePath,
 } from '../src/i18n/routing';
+import { detailPath } from '../src/data/routes';
 
 describe('localizePath', () => {
   it('默认语言不加前缀', () => {
@@ -69,5 +70,16 @@ describe('alternatePaths', () => {
 
     const def = paths.find((p) => p.hreflang === 'x-default')!;
     expect(def.path).toBe(localizePath(DEFAULT_LOCALE, '/about/'));
+  });
+});
+
+describe('detailPath', () => {
+  it('型号 URL 扁平为 /products/<型号>/，不再带品类', () => {
+    expect(detailPath.model('a1')).toBe('/products/a1/');
+    expect(detailPath.model('sx-200')).toBe('/products/sx-200/');
+  });
+
+  it('品类 URL 保持 /products/<品类>/', () => {
+    expect(detailPath.category('category-a')).toBe('/products/category-a/');
   });
 });

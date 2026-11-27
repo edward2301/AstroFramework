@@ -43,6 +43,8 @@ description: "解读并修复 npm run validate、build、check-links 的失败�
 | `缺少中文译文` / `译文缺少字段` | 对应 `content-*`；新语言用 `add-locale` |
 | `缺少中文版本，应新建 .../zh/xxx.md` / 正文为空 | `content-resources` |
 | `型号编码 ... 与文件名 ... 不一致` | `content-model` |
+| `型号 id ... 与品类 id 冲突` / `型号 id 不是合法 slug` | `content-model`（model id 是全局 URL 段，不能与品类同名） |
+| 旧型号 URL `/products/<category>/<model>/` 404 / 301 缺失 | 查 `scripts/model-redirects.mjs` 与 `build-guard` 的 `dist/_redirects`；不要手工改 dist |
 | `category / replacement / recommended / config 引用 ... 不存在` | 对应 `content-*` |
 | `image ... 在 public/ 下不存在` | `content-model` / `content-category` |
 | `<img> 缺少 width, height, alt, loading` | `ui-component` / `layout-body` |

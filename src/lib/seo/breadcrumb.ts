@@ -55,7 +55,7 @@ export function modelCrumbs(
 ): Crumb[] {
   return [
     ...categoryCrumbs(locale, categoryName, categoryId),
-    crumb(modelCode, localizePath(locale, detailPath.model(categoryId, modelId))),
+    crumb(modelCode, localizePath(locale, detailPath.model(modelId))),
   ];
 }
 

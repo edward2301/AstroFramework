@@ -190,6 +190,9 @@ const index = {
   faqs: new Set(publishedFaqs.flatMap((f) => [f.id, f.slug])),
 };
 
+/** 品类与型号共享 /products/ 下一段 URL，id 必须不相交 */
+const categoryRouteIds = new Set(publishedCategories.map((c) => c.id.split('/').pop()));
+
 /* ---------- 1. 标题与描述（内容集合 + 页面级文案） ---------- */
 
 const seenTitles = new Map();
@@ -533,6 +536,12 @@ for (const m of publishedModels) {
   const basename = m.id.split('/').pop();
   if (expected !== basename) {
     fail(m.file, `型号编码 ${m.data.code} 对应的 slug 为 ${expected}，与文件名 ${m.id} 不一致`);
+  }
+  if (!/^[a-z0-9-]+$/.test(basename)) {
+    fail(m.file, `型号 id ${basename} 不是合法 slug（只允许小写字母、数字与连字符）`);
+  }
+  if (categoryRouteIds.has(basename)) {
+    fail(m.file, `型号 id ${basename} 与品类 id 冲突：两者同为 /products/${basename}/`);
   }
   if (!index.categories.has(m.data.category)) {
     fail(m.file, `category 引用 ${m.data.category} 不存在`);

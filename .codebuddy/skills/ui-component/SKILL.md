@@ -35,11 +35,14 @@ description: "修改设计令牌、共享组件、按钮与卡片样式。当用
 6. 界面文案进 `src/i18n/ui.ts`，不写死在组件里；内容文案来自内容集合。
 7. 所有 `<img>` 必须有 `width`、`height`、`alt`、`loading`；主图按现有约定用 eager/lazy。
 8. 检查可访问性：PageHeader 是全站唯一 `<h1>`、标题层级不跳级、`focus-visible`、`aria-current`、表单 label、页脚栏标题用 `<p>` 避免标题跳级。
-9. 断点只用 480 / 768 / 1024 / 1280 / 1440；不新增断点。
+9. 断点只用 480 / 768 / 1024 / 1280 / 1440；不新增断点；卡片/规格网格优先用 `repeat(auto-fit|auto-fill, minmax(min(100%, Npx), 1fr))`。
 10. 跑 `npm run check` 与 `npm run build`；对比构建前后 CSS 体积。
 
 ## 不变量
-- 颜色、间距、字号一律用 token；组件不写死色值（深色带上的 `#fff` 例外）。信号蓝（`--color-action/link/focus`）只用于主按钮填充、链接、焦点；铜色（`--color-data`）只做数据标记，视口约 5%。
+- 颜色、间距、字号一律用 token；组件不写死色值（深色带上的 `#fff` 例外）。信号蓝（`--color-action/link/focus`）只用于主按钮填充、链接、焦点；`--color-data` 已改为石墨，不再用铜色装饰。
+- 全宽契约：`--container` 1920px、`--gutter` 24–40px；背景色带挂 `<section>`，不挂 `.container`。
+- 形状契约：`--radius-*` 全为 0，`--shadow-*` 为 none；不要再新写圆角、阴影或 hover 抬升。
+- 型号编码用全局 `.mono`；表格表头小号大写 + `--ls-wide`。
 - 按钮全站唯一：任何局部 `.btn-*`/`.cta-*`/`.header-cta`/`.cat-cta` 都是违规，一律迁到全局变体；每个视口区域只一个填充主按钮。
 - PageHeader 是 full-bleed 带、放 `.section` 之外（内部自带 container），全站唯一 h1；SectionTitle 管 h2；related 分组用 h3。
 - 表格必须套 `.table-scroll`（`tabindex="0"` + `role="region"` + `aria-label`），只在表内横滚。

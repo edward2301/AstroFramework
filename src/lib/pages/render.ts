@@ -78,7 +78,7 @@ function faqAnswerText(body: string | undefined): string {
 export type PageInput =
   | { kind: 'static'; pageId: PageId; locale: Locale }
   | { kind: 'category'; locale: Locale; categoryId: string }
-  | { kind: 'model'; locale: Locale; categoryId: string; modelId: string }
+  | { kind: 'model'; locale: Locale; modelId: string }
   | { kind: 'application'; locale: Locale; entryId: string }
   | { kind: 'caseStudy'; locale: Locale; entryId: string }
   | { kind: 'guide'; locale: Locale; entryId: string }
@@ -163,6 +163,16 @@ export type RenderedPage = PageCommon &
             /** 品类封面 = 该品类首个型号的主图（public/ 下路径） */
             image?: string;
           }[];
+          models: {
+            id: string;
+            categoryId: string;
+            categoryName: string;
+            code: string;
+            name: string;
+            status: 'active' | 'discontinued';
+            keyParams: { k: string; v: string }[];
+            image?: string;
+          }[];
           totalModels: number;
         };
       }
@@ -176,6 +186,7 @@ export type RenderedPage = PageCommon &
           models: {
             id: string;
             code: string;
+            name: string;
             status: 'active' | 'discontinued';
             cells: string[];
             /** 型号主图（public/ 路径）——品类页的卡片网格需要图 */
@@ -314,6 +325,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
         return {
           id: m.id,
           code: mv.code,
+          name: mv.name,
           status: mv.status,
           image: mv.image,
           firstParamKey: mv.keyParams[0].k,
@@ -341,7 +353,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
           path: detailPath.category(categoryId),
           items: rows.map((r) => ({
             name: r.code,
-            path: detailPath.model(categoryId, r.id),
+            path: detailPath.model(r.id),
           })),
         }),
         breadcrumbSchema(crumbs),
@@ -366,13 +378,14 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
 
     case 'model': {
       const modelId = input.modelId!;
-      const categoryId = input.categoryId!;
 
       const detail = await getModelDetail(modelId);
       if (!detail) {
         throw new Error(`型号 ${modelId} 在路由分发中解析失败`);
       }
 
+      // 品类不再进 URL，但面包屑、对比表与同品类内链仍需要它
+      const categoryId = detail.data.category.id;
       const categoryEntry = await getCategory(categoryId);
       if (!categoryEntry) {
         throw new Error(`型号 ${modelId} 引用的品类 ${categoryId} 不存在`);
@@ -386,7 +399,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
         view.seoDescription,
         `model:${modelId}:${locale}`
       );
-      const path = detailPath.model(categoryId, modelId);
+      const path = detailPath.model(modelId);
 
       // 资料文件位于 public/，构建期确认存在再输出链接，避免产物里出现死链
       const hasDatasheet = detail.data.datasheet
@@ -499,7 +512,7 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
           path,
           items: models.map((m) => ({
             name: `${m.code} ${m.name}`,
-            path: detailPath.model(m.categoryId, m.id),
+            path: detailPath.model(m.id),
           })),
         }),
         breadcrumbSchema(crumbs),

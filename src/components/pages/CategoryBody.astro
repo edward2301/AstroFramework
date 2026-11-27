@@ -2,10 +2,10 @@
 /**
  * 品类页主体（工业数据目录版）。
  *
- * 结构：PageHeader（meta 数据行 + 询价按钮）→ 对比表（参数唯一出处）
- * → 采购信息 4-up → 型号速览（次级紧凑卡）→ 品类说明 → CTA。
+ * 结构：PageHeader（meta 数据行 + 询价按钮）→ 型号视觉网格
+ * → 参数对比表（参数唯一出处）→ 采购信息 4-up → 品类说明（8/4）→ CTA。
  *
- * 参数只在对比表出现一次，卡片退为「图 + 编码 + 状态」的次级入口；
+ * 参数只在对比表出现一次，瓦片退为「图 + 编码 + 状态」的入口；
  * purchaseInfo 来自品类条目（经 categoryView 本地化），这里只排版。
  */
 import PageHeader from '../layout/PageHeader.astro';
@@ -39,9 +39,12 @@ interface Props {
   models: {
     id: string;
     code: string;
+    name: string;
     status: 'active' | 'discontinued';
     cells: string[];
     image?: string;
+    firstParamKey: string;
+    firstParam: string;
   }[];
   discontinuedCount: number;
 }
@@ -69,33 +72,15 @@ const metaLine = [
   <div class="container">
     <SectionTitle title={dict.category.modelsTitle} />
 
-    <ComparisonTable
-      locale={locale}
-      categoryId={categoryId}
-      categoryName={category.name}
-      comparisonParams={category.comparisonParams}
-      models={models}
-      scrollLabel={`${category.name} — ${dict.category.modelsTitle}`}
-    />
-
-    <PurchaseFacts
-      purchaseInfo={category.purchaseInfo}
-      labels={{
-        moq: dict.category.moq,
-        leadTime: dict.category.leadTime,
-        payment: dict.category.payment,
-        certifications: dict.model.certifications,
-      }}
-    />
-
-    {/* 型号速览：次级入口，参数以对比表为准，不再重复 */}
+    {/* 型号视觉网格：图上文下，参数留给对比表 */}
     <ul class="tile-grid">
       {
         models.map((m) => (
           <li>
             <ModelTile
-              href={localizePath(locale, detailPath.model(categoryId, m.id))}
+              href={localizePath(locale, detailPath.model(m.id))}
               code={m.code}
+              name={m.name}
               status={m.status}
               discontinuedLabel={dict.category.discontinued}
               params={[]}
@@ -108,6 +93,30 @@ const metaLine = [
         ))
       }
     </ul>
+
+    {/* 参数对比表：全页参数唯一出处 */}
+    <div class="compare-block">
+      <ComparisonTable
+        locale={locale}
+        categoryId={categoryId}
+        categoryName={category.name}
+        comparisonParams={category.comparisonParams}
+        models={models}
+        scrollLabel={`${category.name} — ${dict.category.modelsTitle}`}
+      />
+    </div>
+
+    <div class="purchase-block">
+      <PurchaseFacts
+        purchaseInfo={category.purchaseInfo}
+        labels={{
+          moq: dict.category.moq,
+          leadTime: dict.category.leadTime,
+          payment: dict.category.payment,
+          certifications: dict.model.certifications,
+        }}
+      />
+    </div>
   </div>
 </section>
 
@@ -116,15 +125,18 @@ const metaLine = [
     <SectionTitle title={dict.category.about} />
 
     <div class="grid-12 about-grid">
-      <p class="span-8">{category.intro}</p>
+      <p class="about-intro">{category.intro}</p>
 
       {
         category.selectionPoints.length > 0 && (
-          <ul class="span-4 about-points">
-            {category.selectionPoints.map((p) => (
-              <li>{p}</li>
-            ))}
-          </ul>
+          <div class="about-side">
+            <p class="about-kicker">{dict.category.howToSelect}</p>
+            <ol class="about-points">
+              {category.selectionPoints.map((p) => (
+                <li>{p}</li>
+              ))}
+            </ol>
+          </div>
         )
       }
     </div>
@@ -134,12 +146,13 @@ const metaLine = [
 <CtaBand locale={locale} />
 
 <style>
+  /* 瓦片网格：240px 起，auto-fill 保持目录列宽一致 */
   .tile-grid {
     list-style: none;
-    margin: var(--space-6) 0 0;
+    margin: 0;
     padding: 0;
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
     gap: var(--space-4);
   }
 
@@ -147,16 +160,15 @@ const metaLine = [
     display: flex;
   }
 
-  @media (min-width: 768px) {
-    .tile-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+  /* 对比表：细线分隔的数据板，不自带标题（caption 即区块标签） */
+  .compare-block {
+    margin-top: var(--space-8);
+    padding-top: var(--space-6);
+    border-top: 1px solid var(--color-border);
   }
 
-  @media (min-width: 1024px) {
-    .tile-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+  .purchase-block {
+    margin-top: var(--space-7);
   }
 
   .about-section {
@@ -167,47 +179,62 @@ const metaLine = [
     margin-top: 0;
   }
 
-  .about-grid > p {
-    margin: 0;
-    color: var(--color-muted);
+  .about-intro {
     grid-column: span 8 / span 8;
+    margin: 0;
+    max-width: var(--measure-lead);
+    color: var(--color-muted);
   }
 
+  .about-side {
+    grid-column: span 4 / span 4;
+  }
+
+  .about-kicker {
+    margin: 0 0 var(--space-3);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  /* 选型要点：编号 mono + 细线分隔 */
   .about-points {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    gap: var(--space-2);
-    grid-column: span 4 / span 4;
-    align-content: start;
+    counter-reset: point;
   }
 
   .about-points li {
-    position: relative;
-    padding-left: 14px;
+    counter-increment: point;
+    display: grid;
+    grid-template-columns: 2.5rem minmax(0, 1fr);
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-border);
     font-size: var(--fs-sm);
+    line-height: var(--lh-body);
+    color: var(--color-text);
+  }
+
+  .about-points li::before {
+    content: counter(point, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--ls-wide);
     color: var(--color-muted);
   }
 
-  /* 铜色小方点：选型要点是数据类内容，用 data 色标记 */
-  .about-points li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.55em;
-    width: 6px;
-    height: 6px;
-    border-radius: var(--radius-xs);
-    background: var(--color-data);
+  .about-points li:last-child {
+    border-bottom: 1px solid var(--color-border);
   }
 
   @media (max-width: 1024px) {
-    .about-grid > p {
-      grid-column: span 12 / span 12;
-    }
-
-    .about-points {
+    .about-intro,
+    .about-side {
       grid-column: span 12 / span 12;
     }
   }

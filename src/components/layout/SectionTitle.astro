@@ -43,17 +43,22 @@ const { title, href, linkLabel, meta } = Astro.props;
   .section-title h2 {
     margin: 0;
     font-size: var(--fs-h2);
+    font-weight: 600;
   }
 
   .section-title-meta {
     margin: var(--space-1) 0 0;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
     color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
   }
 
   .section-title-link {
     flex-shrink: 0;
     font-size: var(--fs-sm);
+    font-weight: 500;
     color: var(--color-link);
   }
 

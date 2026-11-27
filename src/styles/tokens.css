@@ -7,16 +7,16 @@
 
 :root {
   /* ---------- L0 primitives ---------- */
-  --graphite-900: #0b1520;
-  --graphite-800: #121d2a;
-  --graphite-700: #1d2733;
-  --graphite-600: #333f4d;
+  --graphite-900: #0d1117;
+  --graphite-800: #161b22;
+  --graphite-700: #232a31;
+  --graphite-600: #3a424b;
 
   --neutral-0: #ffffff;
-  --neutral-50: #f7f4ee;
-  --neutral-100: #efeae0;
-  --neutral-200: #e3ded3;
-  --neutral-500: #8f887c;
+  --neutral-50: #f5f6f7;
+  --neutral-100: #e9ecef;
+  --neutral-200: #d7dce1;
+  --neutral-500: #7c858f;
 
   --blue-600: #0b5fff;
   --blue-700: #0a4fae;
@@ -52,8 +52,8 @@
   --color-link: var(--blue-700);
   --color-link-hover: var(--blue-800);
   --color-focus: var(--blue-600);
-  --color-data: var(--copper-700);
-  --color-data-soft: var(--copper-50);
+  --color-data: var(--graphite-600);
+  --color-data-soft: var(--neutral-100);
   --color-danger: var(--red-700);
   --color-on-dark: var(--on-dark);
   --color-on-dark-muted: var(--on-dark-muted);
@@ -68,11 +68,11 @@
     'Microsoft YaHei', 'Noto Sans SC', Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  --fs-h1: clamp(2rem, 1.35rem + 2.2vw, 3.25rem);
-  --fs-h2: clamp(1.5rem, 1.3rem + 0.8vw, 2.125rem);
+  --fs-h1: clamp(2.25rem, 1.3rem + 3.2vw, 4.5rem);
+  --fs-h2: clamp(1.5rem, 1.3rem + 0.9vw, 2.25rem);
   --fs-h3: clamp(1.125rem, 1.07rem + 0.2vw, 1.3125rem);
   --fs-h4: 1rem;
-  --fs-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+  --fs-lead: clamp(1.0625rem, 1rem + 0.45vw, 1.375rem);
   --fs-body: 1rem;
   --fs-sm: 0.875rem;
   --fs-xs: 0.75rem;
@@ -80,11 +80,11 @@
 
   --lh-body: 1.65;
   --lh-heading: 1.2;
-  --lh-tight: 1.12;
+  --lh-tight: 1.05;
   --lh-data: 1.45;
-  --ls-tight: -0.015em;
+  --ls-tight: -0.02em;
   --ls-h3: -0.005em;
-  --ls-wide: 0.08em;
+  --ls-wide: 0.1em;
 
   --measure: 68ch;
   --measure-lead: 60ch;
@@ -101,21 +101,23 @@
   --space-9: 80px;
   --space-10: 96px;
 
-  --space-section: clamp(48px, 4vw, 80px);
-  --gutter: clamp(16px, 3vw, 32px);
-  --container: 1280px;
+  --space-section: clamp(56px, 5vw, 112px);
+  --gutter: clamp(24px, 2.5vw, 40px);
+  --container: 1920px;
   --container-narrow: 880px;
   --header-h: 72px;
 
   /* ---------- L5 shape / elevation / motion ---------- */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius: 6px;
-  --radius-lg: 10px;
-  --radius-pill: 999px;
+  /* 直角契约：变量名保留以兼容现有调用，值统一为 0 */
+  --radius-xs: 0;
+  --radius-sm: 0;
+  --radius: 0;
+  --radius-lg: 0;
+  --radius-pill: 0;
 
-  --shadow-sm: 0 1px 2px rgb(11 21 32 / 6%);
-  --shadow-md: 0 8px 24px rgb(11 21 32 / 10%);
+  /* 无阴影：层级靠 1px 细线与底色差 */
+  --shadow-sm: none;
+  --shadow-md: none;
   --shadow-1: var(--shadow-sm);
   --shadow-2: var(--shadow-md);
 

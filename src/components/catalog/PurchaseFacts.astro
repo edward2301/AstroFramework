@@ -1,6 +1,6 @@
 ---
 /**
- * 采购信息块（工业数据目录版）：起订量 / 交货期 / 付款方式 / 认证，4-up 网格。
+ * 采购信息块（工业数据目录版）：起订量 / 交货期 / 付款方式 / 认证。
  *
  * 数据全部来自品类条目的 purchaseInfo（经 categoryView 本地化回落），
  * 这里只负责排版，不造数、不改写文案。
@@ -45,40 +45,34 @@ const cells = [
 </dl>
 
 <style>
-  /* 4-up：桌面一行四个，768 两列，移动一列；铜色顶线标记这是数据区 */
+  /* 4-up 细线定义网格：每格只有顶部一条细线，无底色、无侧边强调 */
   .purchase-facts {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--space-4);
-    margin: var(--space-6) 0 0;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    column-gap: var(--space-6);
+    row-gap: var(--space-5);
+    margin: 0;
   }
 
   .fact {
-    padding: var(--space-4) var(--space-4) var(--space-5);
-    background: var(--color-data-soft);
-    border-radius: var(--radius);
-    border-top: 2px solid var(--color-data);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
   }
 
   .fact dt {
     font-size: var(--fs-xs);
-    text-transform: uppercase;
-    letter-spacing: var(--ls-wide);
-    color: var(--color-data);
     font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
   .fact dd {
     margin: var(--space-2) 0 0;
+    font-family: var(--font-mono);
     font-size: var(--fs-data);
-    font-weight: 500;
-    color: var(--color-ink);
+    line-height: var(--lh-data);
     font-variant-numeric: tabular-nums;
-  }
-
-  @media (max-width: 1024px) {
-    .purchase-facts {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    color: var(--color-ink);
   }
 </style>

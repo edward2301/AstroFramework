@@ -42,7 +42,7 @@ const dict = t(locale);
 
 <style>
   .page-header {
-    background: var(--color-subtle);
+    background: var(--color-bg);
     border-bottom: 1px solid var(--color-border);
     padding: var(--space-6) 0;
   }
@@ -64,7 +64,9 @@ const dict = t(locale);
 
   .page-header h1 {
     margin: var(--space-2) 0 0;
+    max-width: 22ch;
     font-size: var(--fs-h1);
+    font-weight: 600;
     color: var(--color-ink);
   }
 
@@ -78,7 +80,9 @@ const dict = t(locale);
 
   .page-header-meta {
     margin: var(--space-2) 0 0;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
     color: var(--color-muted);
     font-variant-numeric: tabular-nums;
   }

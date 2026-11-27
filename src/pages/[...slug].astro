@@ -70,9 +70,8 @@ export const getStaticPaths = (async () => {
     }
 
     for (const m of models) {
-      push(locale, detailPath.model(m.data.category.id, m.id), {
+      push(locale, detailPath.model(m.id), {
         kind: 'model',
-        categoryId: m.data.category.id,
         modelId: m.id,
         locale,
       });

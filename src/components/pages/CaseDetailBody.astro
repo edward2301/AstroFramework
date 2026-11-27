@@ -49,7 +49,7 @@ const dict = t(locale);
       {
         models.map((m) => (
           <li>
-            <a href={localizePath(locale, detailPath.model(m.categoryId, m.id))}>
+            <a href={localizePath(locale, detailPath.model(m.id))}>
               {m.code} — {m.name}
             </a>
           </li>

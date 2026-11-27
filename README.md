@@ -4,7 +4,7 @@
 
 B2B 工业品出口品牌站。Astro 静态构建，静态产物托管在 Cloudflare Pages，交互数据存 Cloudflare D1 并由 Wrangler CLI 保存与读写；页面无运行期服务端，内容以文件形式随代码同仓。
 
-**中英文双语**：英文在根路径（`/products/category-a/a1/`），中文在 `/zh` 前缀下（`/zh/products/category-a/a1/`）。
+**中英文双语**：英文在根路径（`/products/a1/`），中文在 `/zh` 前缀下（`/zh/products/a1/`）。
 除分语言 404 由独立页面产出外，两种语言由同一个路由分发器 `src/pages/[...slug].astro` 按 `LOCALES` 产出：静态页载荷由 `src/lib/pages/static.ts` 按版式装配（文案在 `src/data/pages/entries/`，一页一文件），内容页载荷由 `src/lib/pages/render.ts` 按集合装配，导航由 `src/lib/nav.ts` 从页面条目派生。
 
 - 想快速上手（怎么跑、改哪里、怎么排查）：[`docs/上手指南.md`](docs/上手指南.md)

@@ -2,8 +2,9 @@
 /**
  * 型号页主体（工业数据目录版）。
  *
- * 布局：PageHeader（询价 + 资料按钮）→ 7/5 栏 hero（左图 / 右关键参数 + 认证 chip）
- * → 技术规格（两栏 .spec-table）→ 尺寸与接口（definition grid）→ 相关（分组 h3）
+ * 布局：PageHeader（询价 + 资料按钮）→ 停产细线通知条 → 7/5 栏 hero
+ * （左图 contain / 右关键参数 + 认证 chip）→ 技术规格（auto-fit 420px 网格）
+ * → 尺寸与接口（细线定义网格）→ 相关（auto-fit 260px 网格）
  * → 页尾 CTA；≤1024 另有固定底部询价条。
  *
  * 取舍：图片与关键参数进首屏，规格表退到第二层；询价入口在页头与底部条出现，
@@ -94,7 +95,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
             model.keyParams.map((p) => (
               <div>
                 <dt>{p.k}</dt>
-                <dd>{p.v}</dd>
+                <dd class="mono">{p.v}</dd>
               </div>
             ))
           }
@@ -118,16 +119,18 @@ const quoteHref = localizePath(locale, ROUTES.quote);
         model.specGroups.map((group) => (
           <div class="spec-group">
             <h3>{group.title}</h3>
-            <table class="spec-table">
-              <tbody>
-                {group.rows.map((row) => (
-                  <tr>
-                    <th scope="row">{row.k}</th>
-                    <td>{row.v}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <div class="table-scroll" tabindex="0" role="region" aria-label={group.title}>
+              <table class="spec-table">
+                <tbody>
+                  {group.rows.map((row) => (
+                    <tr>
+                      <th scope="row">{row.k}</th>
+                      <td>{row.v}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ))
       }
@@ -156,7 +159,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
             <ul class="related">
               {replacements.map((r) => (
                 <li>
-                  <a href={localizePath(locale, detailPath.model(r.categoryId, r.id))}>
+                  <a href={localizePath(locale, detailPath.model(r.id))}>
                     {r.code} {r.name}
                   </a>
                 </li>
@@ -203,7 +206,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
             <ul class="sibling-chips">
               {siblings.map((m) => (
                 <li>
-                  <a class="chip" href={localizePath(locale, detailPath.model(m.categoryId, m.id))}>
+                  <a class="chip mono" href={localizePath(locale, detailPath.model(m.id))}>
                     {m.code}
                   </a>
                 </li>
@@ -220,67 +223,92 @@ const quoteHref = localizePath(locale, ROUTES.quote);
 
 {/* ≤1024 固定底部询价条：型号编码 + 询价按钮；桌面隐藏 */}
 <div class="quote-bar">
-  <span class="quote-bar-code">{model.code}</span>
+  <span class="quote-bar-code mono">{model.code}</span>
   <a class="btn btn--primary btn--sm" href={quoteHref}>{dict.home.requestQuote}</a>
 </div>
 
 <style>
-  /* 首屏 7/5 栏：左图（黄金比）+ 右信息（参数与认证 chip） */
+  /* 停产通知：上下 1px 细线的通栏条，不做卡片 */
+  .notice {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-6);
+    padding: var(--space-3) 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    border-left: 0;
+    background: transparent;
+    font-size: var(--fs-sm);
+    color: var(--color-muted);
+  }
+
+  .notice strong {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+
+  /* 首屏 7/5 栏：左图（黄金比、contain）+ 右信息（参数与认证 chip） */
   .product-hero {
     display: grid;
     grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
     gap: var(--space-7);
-    align-items: start;
+    align-items: stretch;
     margin-bottom: var(--space-8);
   }
 
   .hero-media {
+    width: 100%;
+    max-width: 960px;
     margin: 0;
   }
 
-  .hero-media :global(img) {
+  .hero-media img {
     display: block;
     width: 100%;
     height: auto;
     aspect-ratio: 1.618;
-    object-fit: cover;
+    object-fit: contain;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    background: var(--color-subtle);
+    background: var(--color-sunken);
   }
 
   .product-side {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     gap: var(--space-5);
   }
 
-  /* 关键参数：两列，标签小灰字在上、值在下 */
+  /* 关键参数：两列，顶部细线分格，值用等宽 */
   .key-params {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4) var(--space-5);
+    gap: var(--space-4) var(--space-6);
     margin: 0;
   }
 
   .key-params div {
-    padding-bottom: var(--space-2);
-    border-bottom: 1px solid var(--color-border-soft);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
   }
 
   .key-params dt {
     font-size: var(--fs-xs);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: var(--ls-wide);
     color: var(--color-muted);
   }
 
   .key-params dd {
-    margin: 2px 0 0;
+    margin: var(--space-1) 0 0;
     font-size: var(--fs-data);
     font-weight: 600;
     color: var(--color-ink);
-    font-variant-numeric: tabular-nums;
   }
 
   .cert-chips {
@@ -292,59 +320,104 @@ const quoteHref = localizePath(locale, ROUTES.quote);
     gap: var(--space-2);
   }
 
-  /* 规格：两组并排，铺满内容宽度 */
+  /* 规格：auto-fit 网格，组标题小号大写，表格行更紧 */
   .spec-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5) var(--space-7);
-    margin-bottom: var(--space-6);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: var(--space-6) var(--space-7);
+    margin-bottom: var(--space-8);
+  }
+
+  .spec-group {
+    min-width: 0;
   }
 
   .spec-group h3 {
-    font-size: var(--fs-sm);
+    margin: 0 0 var(--space-2);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
     color: var(--color-muted);
-    margin-bottom: var(--space-2);
   }
 
-  /* 尺寸与接口：definition grid，认证已上移为 hero 的 chip */
+  .spec-table {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .spec-table th,
+  .spec-table td {
+    padding: 6px 10px;
+    line-height: var(--lh-data);
+  }
+
+  /* 尺寸与接口：max-content / 1fr 定义网格，行间细线 */
   .facts {
     display: grid;
     grid-template-columns: max-content 1fr;
-    gap: var(--space-2) var(--space-5);
-    margin: 0;
+    gap: 0;
+    margin: 0 0 var(--space-8);
+    border-top: 1px solid var(--color-border);
     font-size: var(--fs-sm);
   }
 
+  .facts dt,
+  .facts dd {
+    margin: 0;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
   .facts dt {
+    padding-right: var(--space-6);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
     color: var(--color-muted);
   }
 
   .facts dd {
-    margin: 0;
     font-variant-numeric: tabular-nums;
   }
 
-  /* 相关：分组 h3 + 列表；两栏铺开避免窄长 */
+  /* 相关：auto-fit 网格，组标题小号大写，条目按细线行排列 */
   .related-groups {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5) var(--space-7);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: var(--space-6) var(--space-7);
+  }
+
+  .related-group {
+    min-width: 0;
   }
 
   .related-group h3 {
-    font-size: var(--fs-h4);
-    margin-bottom: var(--space-2);
+    margin: 0 0 var(--space-3);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 
   .related {
-    max-width: none;
+    list-style: none;
     margin: 0;
-    padding-left: 18px;
+    padding: 0;
+    border-bottom: 1px solid var(--color-border);
   }
 
-  /* 同品类其他型号：chip 横排一行，便于逐个对比 */
+  .related li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .related a {
+    display: block;
+    padding: var(--space-3) 0;
+    font-size: var(--fs-sm);
+  }
+
+  /* 同品类其他型号：方形 chip，编码等宽 */
   .sibling-chips {
     list-style: none;
     margin: 0;
@@ -362,6 +435,7 @@ const quoteHref = localizePath(locale, ROUTES.quote);
   .sibling-chips .chip:hover {
     border-color: var(--color-link);
     color: var(--color-link-hover);
+    text-decoration: none;
   }
 
   /* 固定底部询价条：仅 ≤1024 出现；高度 56px + 底部安全区 */
@@ -373,11 +447,6 @@ const quoteHref = localizePath(locale, ROUTES.quote);
     .product-hero {
       grid-template-columns: minmax(0, 1fr);
       gap: var(--space-5);
-    }
-
-    .spec-grid,
-    .related-groups {
-      grid-template-columns: minmax(0, 1fr);
     }
 
     .quote-bar {
@@ -394,12 +463,17 @@ const quoteHref = localizePath(locale, ROUTES.quote);
       padding: 0 var(--gutter) env(safe-area-inset-bottom);
       background: var(--color-surface);
       border-top: 1px solid var(--color-border);
-      box-shadow: var(--shadow-md);
     }
 
     /* 页脚最后几行不被固定条遮住 */
     :global(body:has(.quote-bar)) {
       padding-bottom: calc(56px + env(safe-area-inset-bottom));
+    }
+  }
+
+  @media (max-width: 768px) {
+    .key-params {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 </style>

@@ -44,6 +44,15 @@ describe('型号', () => {
     expect(bad.map((m) => m.file)).toEqual([]);
   });
 
+  it('型号 id 是合法 slug，且不与品类 id 冲突', () => {
+    const categoryIds = new Set(categories.map((c) => c.file.replace(/\.json$/, '')));
+    for (const m of models.filter((entry) => entry.data.draft !== true)) {
+      const id = m.file.replace(/\.json$/, '');
+      expect(id, m.file).toMatch(/^[a-z0-9-]+$/);
+      expect(categoryIds.has(id), `${m.file} 与品类 id 冲突`).toBe(false);
+    }
+  });
+
   it('停产型号给出了替代路径或明确标注', () => {
     const discontinued = models.filter((m) => m.data.status === 'discontinued');
     for (const m of discontinued) {

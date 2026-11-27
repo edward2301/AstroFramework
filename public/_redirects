@@ -9,4 +9,6 @@
 /zh/404/index.html  /zh/  301
 
 # 旧链接 301：精确匹配，新增条目写在下面，不要用通配以免误伤。
+# 型号旧路径 /products/<品类>/<型号>/ 由 scripts/model-redirects.mjs 在构建期
+# 追加到 dist/_redirects，不要在这里手工重复。
 # /products/category-a/old-model/  /products/category-a/new-model/  301

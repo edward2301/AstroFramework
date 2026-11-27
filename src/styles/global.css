@@ -152,6 +152,10 @@ caption {
 
 /* ---------- layout ---------- */
 
+/*
+ * 全宽流式：容器上限 1920px，边距由 --gutter 控制。
+ * 背景色带必须挂在 <section> 上，不能挂进 .container，否则会被 1920 截断。
+ */
 .container {
   width: 100%;
   max-width: var(--container);
@@ -191,6 +195,13 @@ caption {
   max-width: var(--measure);
 }
 
+/* 型号编码 / 数据编号：全站唯一等宽工具 */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
 /* ---------- components ---------- */
 
 /* 按钮：全站唯一一套；局部样式一律删除 */
@@ -204,7 +215,7 @@ caption {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   font-size: var(--fs-sm);
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.2;
   text-align: center;
   cursor: pointer;
@@ -298,7 +309,7 @@ caption {
   color: var(--color-text);
 }
 
-/* 数据表：表头浅底、行分隔、数字对齐 */
+/* 数据表：表头小号大写、行分隔、数字对齐 */
 .data-table th,
 .data-table td {
   padding: 10px 12px;
@@ -308,16 +319,18 @@ caption {
 
 .data-table thead th {
   background: var(--color-subtle);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-xs);
   font-weight: 600;
-  color: var(--color-ink);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--color-muted);
 }
 
 .data-table td {
   font-variant-numeric: tabular-nums;
 }
 
-/* 规格表：行内键值对 */
+/* 规格表：行内键值对；标签列固定更窄，数据更密 */
 .spec-table th,
 .spec-table td {
   padding: 8px 12px;
@@ -327,9 +340,10 @@ caption {
 }
 
 .spec-table th[scope='row'] {
-  width: 30%;
+  width: 34%;
   color: var(--color-muted);
   font-weight: 500;
+  font-size: var(--fs-sm);
 }
 
 /* 横向滚动容器：表格只在内部滚，页面不溢出 */
@@ -339,12 +353,11 @@ caption {
   scrollbar-width: thin;
 }
 
-/* 提示块 */
+/* 提示块：石墨细线，不再用铜色 */
 .notice {
   padding: var(--space-4);
-  border-left: 3px solid var(--color-data);
-  border-radius: var(--radius-sm);
-  background: var(--color-data-soft);
+  border-left: 2px solid var(--color-ink);
+  background: var(--color-subtle);
 }
 
 /* 表单字段 */

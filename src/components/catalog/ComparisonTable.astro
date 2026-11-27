@@ -29,7 +29,7 @@ interface Props {
   scrollLabel: string;
 }
 
-const { locale, categoryId, categoryName, comparisonParams, models, scrollLabel } = Astro.props;
+const { locale, categoryName, comparisonParams, models, scrollLabel } = Astro.props;
 const dict = t(locale);
 ---
 
@@ -59,7 +59,7 @@ const dict = t(locale);
                 />
               )}
               <span class="compare-code">
-                <a href={localizePath(locale, detailPath.model(categoryId, m.id))}>{m.code}</a>
+                <a href={localizePath(locale, detailPath.model(m.id))}>{m.code}</a>
                 {m.status === 'discontinued' && <span class="badge">{dict.category.discontinued}</span>}
               </span>
             </th>
@@ -72,9 +72,9 @@ const dict = t(locale);
 </div>
 
 <style>
+  /* 细线包边，不加圆角卡片外壳 */
   .compare-scroll {
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
   }
 
   /* 表格最小宽度触发表内横滚；页面容器不随之溢出 */
@@ -82,25 +82,47 @@ const dict = t(locale);
     min-width: 720px;
   }
 
+  .compare caption {
+    padding: var(--space-3) var(--space-4) 0;
+    text-align: left;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
   .compare th,
   .compare td {
-    padding: var(--space-3) var(--space-3);
+    padding: var(--space-3) var(--space-4);
     text-align: left;
     border-bottom: 1px solid var(--color-border);
     font-size: var(--fs-data);
   }
 
+  /* 表头：小号大写标签 */
   .compare thead th {
     background: var(--color-subtle);
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     font-weight: 600;
-    color: var(--color-ink);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
     white-space: nowrap;
   }
 
   .compare tbody tr:last-child th,
   .compare tbody tr:last-child td {
     border-bottom: 0;
+  }
+
+  /* 行悬停只换底色 */
+  .compare tbody tr {
+    transition: background var(--duration-1) var(--ease);
+  }
+
+  .compare tbody tr:hover {
+    background: var(--color-subtle);
   }
 
   /* 首列：滚动时钉住，型号编码始终可见 */
@@ -110,7 +132,7 @@ const dict = t(locale);
     width: 180px;
     min-width: 180px;
     background: var(--color-surface);
-    font-weight: 600;
+    font-weight: 500;
     white-space: nowrap;
   }
 
@@ -120,6 +142,11 @@ const dict = t(locale);
     z-index: 1;
   }
 
+  /* 钉住的单元格有自己的底色，悬停时跟随行底色 */
+  .compare tbody tr:hover th[scope='row'] {
+    background: var(--color-subtle);
+  }
+
   /* 单元格数值：tabular 对齐；缺失值渲染为 — */
   .compare td {
     color: var(--color-text);
@@ -127,8 +154,19 @@ const dict = t(locale);
     white-space: nowrap;
   }
 
+  /* 停产行降对比度 */
+  .is-discontinued th[scope='row'],
   .is-discontinued td {
     color: var(--color-muted);
+  }
+
+  .is-discontinued .compare-code a {
+    color: var(--color-muted);
+  }
+
+  .is-discontinued .compare-thumb {
+    filter: grayscale(1);
+    opacity: 0.55;
   }
 
   .compare-thumb {
@@ -138,7 +176,6 @@ const dict = t(locale);
     aspect-ratio: 1.618;
     object-fit: cover;
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-xs);
   }
 
   .compare-code {
@@ -148,6 +185,9 @@ const dict = t(locale);
   }
 
   .compare-code a {
+    font-family: var(--font-mono);
+    font-size: var(--fs-sm);
     font-weight: 600;
+    letter-spacing: 0.01em;
   }
 </style>
