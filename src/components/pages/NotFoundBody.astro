@@ -37,15 +37,32 @@ const dict = t(locale);
 </section>
 
 <style>
+  /* 404：等宽大号数字作视觉锚点，标题与正文回到可读层级 */
   .code {
-    margin: 0 0 var(--space-2);
-    font-size: var(--fs-sm);
-    letter-spacing: 0.12em;
-    color: var(--color-muted);
+    margin: 0 0 var(--space-5);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-ink);
+    font-family: var(--font-mono);
+    font-size: var(--fs-h1);
+    font-weight: 600;
+    line-height: var(--lh-tight);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1 {
+    max-width: 24ch;
+    margin: 0 0 var(--space-4);
+    font-size: var(--fs-h2);
+    line-height: var(--lh-heading);
   }
 
   .lead {
-    max-width: 640px;
+    max-width: var(--measure-lead);
+    margin: 0;
+    font-size: var(--fs-lead);
     color: var(--color-muted);
   }
 
@@ -53,6 +70,8 @@ const dict = t(locale);
     display: flex;
     gap: var(--space-3);
     flex-wrap: wrap;
-    margin-top: var(--space-5);
+    margin: var(--space-6) 0 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
   }
 </style>

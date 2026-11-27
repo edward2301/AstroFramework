@@ -61,7 +61,6 @@ const { title, body, points = [], image, imageAlt, reverse = false } = Astro.pro
     height: auto;
     aspect-ratio: 1.618;
     object-fit: cover;
-    border-radius: var(--radius);
     border: 1px solid var(--color-border);
     background: var(--color-sunken);
   }
@@ -89,6 +88,7 @@ const { title, body, points = [], image, imageAlt, reverse = false } = Astro.pro
     color: var(--color-text);
   }
 
+  /* 要点标记：6px 石墨小方块（无圆角、无蓝色） */
   .feature-row-body li::before {
     content: '';
     position: absolute;
@@ -96,7 +96,6 @@ const { title, body, points = [], image, imageAlt, reverse = false } = Astro.pro
     top: 0.55em;
     width: 6px;
     height: 6px;
-    border-radius: var(--radius-xs);
     background: var(--color-data);
   }
 

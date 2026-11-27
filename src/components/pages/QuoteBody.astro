@@ -6,7 +6,7 @@
  * 所有字段都有可见标签与错误提示，未填必填项时不提交。
  * 交互记录不在这里落库：由运维用 Wrangler 写入 Cloudflare D1，见 deploy/cloudflare/README.md。
  *
- * 结构：12 栏（桌面 8 栏表单 / 4 栏 sticky 侧栏）→ 表单之后的三步流程。
+ * 结构：主栏表单 + 360px sticky 侧栏（≤1024 堆叠）→ 表单之后的三步流程。
  * 不加 CtaBand：本页本身就是转化终点。
  */
 import PageHeader from '../layout/PageHeader.astro';
@@ -242,29 +242,28 @@ const mailLabels = {
 </script>
 
 <style>
-  /* 12 栏：桌面 8 栏表单 / 4 栏侧栏；DOM 顺序表单在前 */
+  /* 主栏 + 360px 侧栏；≤1024 堆叠为单列 */
   .quote-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 360px;
     gap: var(--space-7);
     align-items: start;
   }
 
-  @media (min-width: 1024px) {
-    .quote-grid {
-      grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
-    }
-  }
-
-  /* 表单占满所在列，不再设 760px 上限 */
+  /* 表单：两列字段，标题跨列并以细线收口 */
   .quote-form {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-4);
+    gap: var(--space-4) var(--space-5);
+    align-content: start;
   }
 
   .quote-form h2 {
     grid-column: 1 / -1;
+    margin: 0;
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-ink);
+    font-size: var(--fs-h2);
   }
 
   .field {
@@ -278,20 +277,28 @@ const mailLabels = {
     grid-column: 1 / -1;
   }
 
-  label {
-    font-size: var(--fs-sm);
+  .field label {
+    margin: 0;
+    font-size: var(--fs-xs);
+    font-weight: 500;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
     color: var(--color-muted);
   }
 
-  /* 输入框基础样式由全局 .field 提供（16px 防 iOS 聚焦缩放），这里只管焦点态 */
-  input:focus,
-  textarea:focus {
-    outline: none;
+  /* 输入框几何由全局 .field 提供；焦点用细描边，不用阴影 */
+  .field input:focus,
+  .field textarea:focus {
     border-color: var(--color-action);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-action) 18%, transparent);
   }
 
-  textarea {
+  .field input:focus-visible,
+  .field textarea:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 1px;
+  }
+
+  .field textarea {
     resize: vertical;
   }
 
@@ -305,24 +312,23 @@ const mailLabels = {
   .form-error {
     grid-column: 1 / -1;
     margin: 0;
-    padding: var(--space-3);
-    border-radius: var(--radius-sm);
-    background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+    padding: var(--space-3) var(--space-4);
+    border-left: 2px solid var(--color-danger);
+    background: color-mix(in srgb, var(--color-danger) 8%, var(--color-surface));
     color: var(--color-danger);
     font-size: var(--fs-sm);
   }
 
-  /* 兜底面板：浅底 + 等宽正文，方便整段选中复制 */
+  /* 兜底面板：上下细线 + 等宽正文，方便整段选中复制 */
   .mail-fallback {
     grid-column: 1 / -1;
-    padding: var(--space-4);
-    background: var(--color-action-soft);
-    border: 1px solid var(--color-border-brand);
-    border-radius: var(--radius);
+    padding: var(--space-4) 0;
+    border-top: 1px solid var(--color-ink);
+    border-bottom: 1px solid var(--color-border);
   }
 
   .mail-fallback p {
-    margin: 0 0 var(--space-2);
+    margin: 0 0 var(--space-3);
     font-size: var(--fs-sm);
     color: var(--color-muted);
   }
@@ -330,8 +336,7 @@ const mailLabels = {
   .mail-fallback-text {
     margin: 0;
     padding: var(--space-3);
-    background: var(--color-surface);
-    border-radius: var(--radius-sm);
+    background: var(--color-subtle);
     border: 1px solid var(--color-border);
     font-family: var(--font-mono);
     font-size: var(--fs-xs);
@@ -341,12 +346,16 @@ const mailLabels = {
     word-break: break-word;
   }
 
+  /* 操作区：上方细线与字段区隔开 */
   .form-actions {
     grid-column: 1 / -1;
     display: flex;
     align-items: center;
     gap: var(--space-5);
     flex-wrap: wrap;
+    margin-top: var(--space-2);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
   }
 
   .link {
@@ -354,77 +363,118 @@ const mailLabels = {
     color: var(--color-link);
   }
 
-  /* 侧栏：桌面 sticky 在页头下方 */
+  /* 侧栏：桌面 sticky 在页头下方；≤1024 回到常规流 */
   .quote-aside {
     display: grid;
-    gap: var(--space-5);
+    gap: 0;
+    position: sticky;
+    top: calc(var(--header-h) + 16px);
+    border-bottom: 1px solid var(--color-border);
   }
 
-  @media (min-width: 1024px) {
-    .quote-aside {
-      position: sticky;
-      top: calc(var(--header-h) + 16px);
-    }
-  }
-
+  /* 卡片改为细线账本：无底色、无圆角、无阴影 */
   .aside-card {
-    padding: var(--space-5);
-    background: var(--color-subtle);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius);
+    padding: var(--space-5) 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .aside-card:first-child {
+    border-top-color: var(--color-ink);
   }
 
   .aside-card h2 {
+    margin: 0 0 var(--space-3);
     font-size: var(--fs-h3);
   }
 
   .checklist {
+    list-style: none;
     margin: 0;
-    padding-left: var(--space-5);
-    color: var(--color-muted);
+    padding: 0;
   }
 
   .checklist li {
-    margin-bottom: var(--space-2);
-  }
-
-  .aside-card dl {
-    display: grid;
-    gap: var(--space-2);
-    margin: 0;
-  }
-
-  .aside-card dt {
+    position: relative;
+    padding: var(--space-2) 0 var(--space-2) var(--space-5);
+    border-top: 1px solid var(--color-border);
     font-size: var(--fs-sm);
     color: var(--color-muted);
   }
 
-  .aside-card dd {
-    margin: 0 0 var(--space-2);
+  .checklist li:first-child {
+    border-top: 0;
   }
 
-  /* 三步流程：表单之后的紧凑 3-up，数字用铜色数据强调 */
+  /* 方形项目符号 */
+  .checklist li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: calc(var(--space-2) + 0.62em);
+    width: 6px;
+    height: 6px;
+    background: var(--color-ink);
+  }
+
+  .aside-card dl {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+
+  .aside-card dt {
+    margin-top: var(--space-4);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .aside-card dt:first-child {
+    margin-top: 0;
+  }
+
+  .aside-card dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--fs-sm);
+    overflow-wrap: anywhere;
+  }
+
+  /* 三步流程：细线分栏，编号用等宽数字 */
   .steps {
     list-style: none;
-    margin: var(--space-8) 0 0;
-    padding: var(--space-5) 0 0;
-    border-top: 1px solid var(--color-border);
+    margin: var(--space-9) 0 0;
+    padding: 0;
+    border-top: 1px solid var(--color-ink);
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-6);
+    gap: 0;
   }
 
   .steps li {
     display: grid;
+    align-content: start;
     gap: var(--space-2);
+    padding: var(--space-5) var(--space-6) 0 0;
+    border-right: 1px solid var(--color-border);
+  }
+
+  .steps li + li {
+    padding-left: var(--space-6);
+  }
+
+  .steps li:last-child {
+    padding-right: 0;
+    border-right: 0;
   }
 
   .step-num {
+    font-family: var(--font-mono);
     font-size: var(--fs-h2);
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1;
-    letter-spacing: var(--ls-tight);
-    color: var(--color-data);
+    letter-spacing: 0;
+    color: var(--color-ink);
     font-variant-numeric: tabular-nums;
   }
 
@@ -435,13 +485,35 @@ const mailLabels = {
   }
 
   @media (max-width: 1024px) {
+    .quote-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .quote-aside {
+      position: static;
+    }
+
     .quote-form {
       grid-template-columns: minmax(0, 1fr);
     }
 
     .steps {
       grid-template-columns: minmax(0, 1fr);
-      gap: var(--space-4);
+      margin-top: var(--space-8);
+    }
+
+    .steps li {
+      padding: var(--space-4) 0;
+      border-right: 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .steps li + li {
+      padding-left: 0;
+    }
+
+    .steps li:last-child {
+      border-bottom: 0;
     }
   }
 </style>

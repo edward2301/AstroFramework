@@ -7,9 +7,10 @@ import type { RenderedContent } from '../../lib/content/guides';
  * 不涉及跨语言回落：中文页取到的就是中文正文。页面层只负责排版。
  */
 import PageHeader from '../layout/PageHeader.astro';
+import DetailLayout from '../layout/DetailLayout.astro';
+import ModelLinkList from '../catalog/ModelLinkList.astro';
 import { t } from '../../i18n/ui';
-import { localizePath, type Locale } from '../../i18n/routing';
-import { detailPath } from '../../data/routes';
+import type { Locale } from '../../i18n/routing';
 import type { Crumb } from '../../lib/seo/breadcrumb';
 
 interface Props {
@@ -23,59 +24,70 @@ interface Props {
 
 const { locale, crumbs, guide, Content, models } = Astro.props;
 const dict = t(locale);
+const hasAside = models.length > 0;
 ---
 
 <PageHeader locale={locale} crumbs={crumbs} title={guide.title} width="narrow" />
 
 <section class="section">
   <div class="container container-narrow">
-    <p class="meta">{dict.detail.updated(guide.updated)}</p>
-    <p class="intro">{guide.tldr}</p>
+    <DetailLayout aside={hasAside}>
+      <div class="stack">
+        <div class="lede">
+          <p class="meta mono">{dict.detail.updated(guide.updated)}</p>
+          <p class="intro">{guide.tldr}</p>
+        </div>
 
-    <div class="prose">
-      <Content />
-    </div>
+        <div class="prose">
+          <Content />
+        </div>
+      </div>
 
-    {
-      models.length > 0 && (
-        <>
-          <h2>{dict.detail.relatedModels}</h2>
-          <ul class="model-links">
-            {models.map((m) => (
-              <li>
-                <a href={localizePath(locale, detailPath.model(m.id))}>
-                  {m.code} — {m.name}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </>
-      )
-    }
-
+      {
+        hasAside && (
+          <div slot="aside">
+            <p class="aside-title">{dict.detail.relatedModels}</p>
+            <ModelLinkList locale={locale} models={models} />
+          </div>
+        )
+      }
+    </DetailLayout>
   </div>
 </section>
 
 <style>
+  .stack {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .lede {
+    display: grid;
+    gap: var(--space-3);
+  }
+
   .meta {
-    font-size: var(--fs-sm);
+    margin: 0;
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
     color: var(--color-muted);
   }
 
   .intro {
-    max-width: 760px;
+    margin: 0;
+    max-width: var(--measure-lead);
+    font-size: var(--fs-lead);
+    line-height: var(--lh-body);
+    color: var(--color-text);
   }
 
-  .prose {
-    max-width: 760px;
-  }
-
-  .model-links {
-    max-width: 760px;
-  }
-
-  .model-links a {
-    text-decoration: underline;
-    text-underline-offset: 3px;
+  .aside-title {
+    margin: 0 0 var(--space-3);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: var(--ls-wide);
+    text-transform: uppercase;
+    color: var(--color-muted);
   }
 </style>

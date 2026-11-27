@@ -46,7 +46,7 @@ description: "新增页面版式、Body 组件或调整页面结构。当用户�
    - `loadPage` 加取数、面包屑、schema、`bodyProps` 分支；
    - 再加 `BodyKey`/`RenderedPage` 变体与分发器分支。详情版式不需要 entry；若要栏目入口页，另按 `page-entry` 建。
 7. 所有 `<img>` 补 `width`、`height`、`alt`、`loading`；主图按现有约定决定 eager/lazy。
-8. 全宽契约：内容用 `.container`（1920px 上限），背景色带挂 `<section>`；不要新增 1280/880 之外的宽度变体。
+8. 全宽契约：内容用 `.container`（1920px 上限），详情页用 `.container-narrow`（1280px）+ `DetailLayout`；不要新增 1920/1280 之外的宽度变体。
 9. 产品目录类页面用 `catalog/CatalogTable.astro` 的密集表；筛选脚本必须 `<script is:inline>`，只在本页生效。
 10. 跑 `npm run check` 与 `npm run build`；对比构建前后 CSS 体积。
 

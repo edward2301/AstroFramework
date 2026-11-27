@@ -58,7 +58,7 @@ const images = [
         <a class="btn btn--primary" href={localizePath(locale, '/contact/quote/')}>{dict.home.requestQuote} →</a>
       </div>
 
-      <dl class="about-contact-card">
+      <dl class="about-contact-facts">
         <div>
           <dt>{dict.quote.emailLabel}</dt>
           <dd><a href={`mailto:${org.contactPoint.email}`}>{org.contactPoint.email}</a></dd>
@@ -83,41 +83,52 @@ const images = [
     margin-top: var(--space-8);
   }
 
+  /* 联系区：正文在左、事实网格在右，顶部一条细线分带 */
   .about-contact {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 380px;
+    grid-template-columns: minmax(0, 1fr) 360px;
     gap: var(--space-7);
-    align-items: center;
+    align-items: start;
     margin-top: var(--space-8);
     padding-top: var(--space-6);
-    border-top: 1px solid var(--color-border-soft);
+    border-top: 1px solid var(--color-border);
   }
 
   .about-contact-text p {
     color: var(--color-muted);
   }
 
-  .about-contact-card {
+  /* 事实网格：行间细线，无底色、无圆角 */
+  .about-contact-facts {
     margin: 0;
-    padding: var(--space-5);
-    background: var(--color-action-soft);
-    border: 1px solid var(--color-border-brand);
-    border-radius: var(--radius);
-    display: grid;
-    gap: var(--space-4);
+    border-top: 1px solid var(--color-border);
   }
 
-  .about-contact-card dt {
+  .about-contact-facts > div {
+    display: grid;
+    gap: 2px;
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .about-contact-facts dt {
     font-size: var(--fs-xs);
     text-transform: uppercase;
     letter-spacing: var(--ls-wide);
     color: var(--color-muted);
   }
 
-  .about-contact-card dd {
-    margin: 2px 0 0;
+  .about-contact-facts dd {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     font-size: var(--fs-sm);
+    line-height: var(--lh-data);
     color: var(--color-ink);
+  }
+
+  .about-contact-facts dd a {
+    color: var(--color-link);
   }
 
   @media (max-width: 1024px) {

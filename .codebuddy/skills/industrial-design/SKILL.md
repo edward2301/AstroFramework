@@ -19,7 +19,7 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 
 ## 设计契约（唯一事实源：`src/styles/tokens.css`）
 
-- **全宽流式**：`--container: 1920px`；`--gutter: clamp(24px, 2.5vw, 40px)`；背景色带挂在 `<section>` 上，内容用 `.container`。
+- **全宽流式**：`--container: 1920px`；`--container-narrow: 1280px`（详情页）；`--gutter: clamp(24px, 2.5vw, 40px)`；背景色带挂在 `<section>` 上，内容用 `.container`。
 - **直角**：`--radius-*` 全部 `0`；不再新增圆角组件。
 - **无阴影**：`--shadow-*` 为 `none`；层级靠 1px 细线与底色差。
 - **颜色**：白 + 冷石墨（`--graphite-900 #0d1117` … `--graphite-600 #3a424b`）；蓝色只用于主按钮、链接、焦点；不再用铜色装饰。
@@ -52,6 +52,13 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 
 ### Model
 `PageHeader`（`code name` 作 h1）+ 停产通知条 + 7/5 hero（图 `contain`、上限 960px；关键参数 `.mono`）+ 规格 `auto-fit minmax(420px,1fr)` + 尺寸/接口定义网格 + 相关分组 + `CtaBand` + ≤1024 固定询价条。
+
+### 其余页面（二期）
+- 详情页（应用/案例/指南/问答）：`.container.container-narrow` + `DetailLayout`（760px 正文 + 320px sticky 相关栏）；型号链接用 `ModelLinkList`；≤1024 堆叠。
+- 栏目页（`SectionBody`）：`MetricStrip` 顶线 + mono 数字；条目用 `auto-fill minmax(min(100%, 300px), 1fr)` 细线卡；侧栏上下细线，无底色。
+- 关于页：`FeatureRow` 1px 图框、无阴影；联系区用细线定义网格，不要蓝色卡。
+- 询价页：表单 8/4 + 360px aside，`aside-card` 只留细线；表单 JS / 字段名不得改。
+- 404：大号 mono 代码 + 细线动作区。
 
 ## 并行 lane 与文件所有权
 

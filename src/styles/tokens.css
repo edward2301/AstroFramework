@@ -104,7 +104,7 @@
   --space-section: clamp(56px, 5vw, 112px);
   --gutter: clamp(24px, 2.5vw, 40px);
   --container: 1920px;
-  --container-narrow: 880px;
+  --container-narrow: 1280px;
   --header-h: 72px;
 
   /* ---------- L5 shape / elevation / motion ---------- */
