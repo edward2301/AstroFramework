@@ -104,6 +104,12 @@ const dict = t(locale);
       scrollLabel={`${dict.products.h1} — ${dict.products.filterAll}`}
     />
 
+    <nav class="catalog-pagination" data-pagination hidden aria-label={dict.products.paginationLabel}>
+      <button type="button" data-page-prev aria-label={dict.products.paginationPrev}>←</button>
+      <span data-page-info aria-live="polite"></span>
+      <button type="button" data-page-next aria-label={dict.products.paginationNext}>→</button>
+    </nav>
+
     <p class="catalog-empty" data-empty hidden>{dict.products.empty}</p>
   </div>
 </section>
@@ -129,6 +135,15 @@ const dict = t(locale);
     var unitMany = count.getAttribute('data-unit-plural') || unitOne;
     var category = 'all';
     var query = '';
+    var PAGE_SIZE = 24;
+    var currentPage = 1;
+    var totalVisible = 0;
+    var totalPages = 1;
+
+    var pagNav = page.querySelector('[data-pagination]');
+    var pagPrev = page.querySelector('[data-page-prev]');
+    var pagNext = page.querySelector('[data-page-next]');
+    var pageInfo = page.querySelector('[data-page-info]');
 
     function setActive(id) {
       for (var i = 0; i < pills.length; i += 1) {
@@ -141,18 +156,33 @@ const dict = t(locale);
     }
 
     function apply() {
-      var shown = 0;
+      totalVisible = 0;
+      var visibleIndexes = [];
       for (var i = 0; i < rows.length; i += 1) {
         var row = rows[i];
         var inCategory = category === 'all' || row.getAttribute('data-category') === category;
         var inQuery = query === '' || (row.getAttribute('data-search') || '').indexOf(query) !== -1;
         var visible = inCategory && inQuery;
-        row.hidden = !visible;
-        if (visible) shown += 1;
+        if (visible) visibleIndexes.push(row);
       }
-      count.textContent = shown + ' ' + (shown === 1 ? unitOne : unitMany);
-      empty.hidden = shown !== 0;
-      table.hidden = shown === 0;
+      totalPages = Math.max(1, Math.ceil(visibleIndexes.length / PAGE_SIZE));
+      if (currentPage > totalPages) currentPage = totalPages;
+      var start = (currentPage - 1) * PAGE_SIZE;
+      var end = start + PAGE_SIZE;
+      for (var j = 0; j < rows.length; j += 1) {
+        var idx = visibleIndexes.indexOf(rows[j]);
+        rows[j].hidden = idx === -1 || idx < start || idx >= end;
+      }
+      totalVisible = visibleIndexes.length;
+      count.textContent = totalVisible + ' ' + (totalVisible === 1 ? unitOne : unitMany);
+      empty.hidden = totalVisible !== 0;
+      table.hidden = totalVisible === 0;
+      if (pagNav) {
+        pagNav.hidden = totalPages <= 1;
+        if (pageInfo) pageInfo.textContent = currentPage + ' / ' + totalPages;
+        if (pagPrev) pagPrev.disabled = currentPage <= 1;
+        if (pagNext) pagNext.disabled = currentPage >= totalPages;
+      }
     }
 
     function syncUrl() {
@@ -176,6 +206,7 @@ const dict = t(locale);
         if (!id) return;
         event.preventDefault();
         category = id;
+        currentPage = 1;
         setActive(id);
         apply();
         syncUrl();
@@ -185,7 +216,28 @@ const dict = t(locale);
     if (input) {
       input.addEventListener('input', function () {
         query = this.value.trim().toLowerCase();
+        currentPage = 1;
         apply();
+      });
+    }
+
+    if (pagPrev) {
+      pagPrev.addEventListener('click', function () {
+        if (currentPage > 1) {
+          currentPage -= 1;
+          apply();
+          if (table) table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+
+    if (pagNext) {
+      pagNext.addEventListener('click', function () {
+        if (currentPage < totalPages) {
+          currentPage += 1;
+          apply();
+          if (table) table.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     }
 
@@ -347,5 +399,49 @@ const dict = t(locale);
       font-size: var(--fs-xs);
       color: var(--color-muted);
     }
+  }
+
+  /* 分页：工业极简 — 方形按钮 + 细线 + mono 页码 */
+  .catalog-pagination {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .catalog-pagination[hidden] {
+    display: none;
+  }
+
+  .catalog-pagination button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 10px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    font: inherit;
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: border-color var(--duration-1) var(--ease);
+  }
+
+  .catalog-pagination button:hover:not(:disabled) {
+    border-color: var(--color-border-strong);
+  }
+
+  .catalog-pagination button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .catalog-pagination [data-page-info] {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: var(--fs-sm);
+    color: var(--color-muted);
   }
 </style>

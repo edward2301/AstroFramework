@@ -65,6 +65,10 @@ export interface Dict {
     modelUnitPlural: string;
     empty: string;
     tableHint: string;
+    paginationLabel: string;
+    paginationPrev: string;
+    paginationNext: string;
+    pageInfo: (current: number, total: number) => string;
     modelColumn: string;
     categoryColumn: string;
     keyParamsColumn: string;
@@ -252,6 +256,10 @@ const en: Dict = {
     modelUnitPlural: 'models',
     empty: 'No models match this filter.',
     tableHint: 'Swipe horizontally to see all columns.',
+    paginationLabel: 'Pagination',
+    paginationPrev: 'Previous page',
+    paginationNext: 'Next page',
+    pageInfo: (current, total) => `Page ${current} of ${total}`,
     modelColumn: 'Model',
     categoryColumn: 'Category',
     keyParamsColumn: 'Key parameters',
@@ -447,6 +455,10 @@ const zh: Dict = {
     modelUnitPlural: '个型号',
     empty: '没有符合条件的型号。',
     tableHint: '左右滑动查看完整参数。',
+    paginationLabel: '分页',
+    paginationPrev: '上一页',
+    paginationNext: '下一页',
+    pageInfo: (current, total) => `第 ${current} / ${total} 页`,
     modelColumn: '型号',
     categoryColumn: '品类',
     keyParamsColumn: '关键参数',
