@@ -78,7 +78,7 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 - 开发态看 1920 / 1440 / 1024 / 768 / 390，en + zh 四页；`scrollWidth === clientWidth`。
 - 产物：旧型号 URL 不在 HTML；sitemap 只有扁平型号 URL；canonical / og:url / Product JSON-LD / BreadcrumbList 末项为扁平路径；三条 hreflang 仍在。
 - 目录页：无 JS 全行可见 + pill 可跳；有 JS 筛选/搜索/计数/空态/`?category=` 正常。
-- 390px：无横向溢出；表格在 ≤1024 有「左右滑动」提示；按钮/筛选 pill/输入框/型号 chip/页眉 logo/卡片入口链接 ≥44px。
+- 390px：无横向溢出；表格在 ≤1024 有「左右滑动」提示；按钮/筛选 pill/输入框/型号 chip/页眉 logo/卡片入口链接/表格内链接 ≥44px。
 - `dist/_astro/*.css` 总增量 ≤ +8 KB；`dist/_astro/*.js` 不因目录脚本增长。
 - 表格滚动区可键盘聚焦；图片四属性齐全；全站唯一 h1。
 

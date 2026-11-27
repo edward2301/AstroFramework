@@ -308,6 +308,20 @@ const searchIndex = (m: ModelRow) =>
     white-space: nowrap;
   }
 
+  /* 移动/平板端：表格内的 Category / Details 链接补到 44px 触控高度 */
+  @media (max-width: 1024px) {
+    .category-link,
+    .details-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+
+    .category-link {
+      min-width: 44px;
+    }
+  }
+
   /* 停产行整体降对比度，但仍可读、可点 */
   .is-discontinued .model-thumb {
     opacity: 0.6;
