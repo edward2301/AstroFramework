@@ -40,10 +40,19 @@ function devTrailingSlash() {
           const raw = req.url ?? '/';
           const [path, search] = raw.split('?');
           /*
+           * Vite 内部自请求偶尔带尾斜杠（/@id/__x00__astro:toolbar:internal/），
+           * 会被 Astro 路由器当成页面路由 404（工具栏已通过无斜杠路径正常加载，
+           * 这里是纯日志噪音）。归一回无斜杠交给 Vite 模块加载器，消除噪音。
+           */
+          if (path.startsWith('/@') && path.endsWith('/') && path !== '/@/') {
+            req.url = path.replace(/\/+$/, '') + (search ? `?${search}` : '');
+            next();
+            return;
+          }
+          /*
            * 豁免清单：
            *   · 根路径 / 带尾斜杠 / 带扩展名（robots.txt、图片等资源）
-           *   · Vite 内部路径：/@id/、/@fs/、/@vite/（dev 工具栏与虚拟模块，
-           *     如 /@id/__x00__astro:toolbar:internal —— 308 会把模块加载打坏）
+           *   · Vite 内部路径：/@id/、/@fs/、/@vite/（dev 工具栏与虚拟模块）
            *   · /_astro 与 /node_modules（构建资源与依赖）
            */
           if (

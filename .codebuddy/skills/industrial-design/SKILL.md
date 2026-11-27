@@ -89,6 +89,7 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 - **双细线夹空白像渲染残留**：相邻两条 1px 线之间只要有空白就会被当成 bug——首块不再画分隔线，页头下边线即分隔。
 - **`order` 在不对称 grid 列下错位**：reverse 布局用显式 `grid-column` + 列宽互换（FeatureRow 模式），不用 order。
 - **astro dev（7.4.13）无尾斜杠拦截在中间件与自定义 404 之前**：合法页 404、未知页弹品牌提示页，middleware/connect 都拦不到——由 astro.config 的 `devTrailingSlash` 集成（connect 栈 unshift）+ `trailingSlash: 'ignore'` 处理；**不要再往 middleware.ts 塞这类逻辑**。
+- **Vite 内部自请求带尾斜杠会刷 [404] 日志噪音**：`/@id/__x00__astro:toolbar:internal/`（带斜杠）被 Astro 路由器当页面 404，但工具栏已通过无斜杠路径正常加载（浏览器侧全 200）。集成里对 `/@` 开头且带斜杠的路径做「去斜杠归正」即可消除。
 - **astro dev 错误路由匹配不到带前缀 404**：未知 /zh/ 路径回落英文 404——根 404.astro 按路径前缀动态推断语言已缓解。
 - **体检脚本两类误报口径**：桌面按设计隐藏的元素（型号页询价条）offsetParent 为 null，不计异常；滚动条 15px 假溢出必须用 `clientWidth` 口径比较；首页 hero 大顶距与透明页眉描边主按钮是设计使然，已豁免。
 
