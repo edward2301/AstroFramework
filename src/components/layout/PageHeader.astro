@@ -1,6 +1,6 @@
 ---
 /**
- * 内页页头：full-bleed 浅色带，面包屑 + h1 + lead + meta + actions。
+ * 内页页头：full-bleed 石墨深色带，面包屑 + h1 + lead + meta + actions。
  *
  * 必须放在 `.section` 之外（紧贴页头下方），内部自带 container；
  * 放进 `.section > .container` 会出现双重内缩。
@@ -44,8 +44,7 @@ const dict = t(locale);
 
 <style>
   .page-header {
-    background: var(--color-bg);
-    border-bottom: 1px solid var(--color-border);
+    background: var(--color-ink);
     padding: var(--space-6) 0;
   }
 
@@ -69,7 +68,7 @@ const dict = t(locale);
     max-width: 22ch;
     font-size: var(--fs-h1);
     font-weight: 600;
-    color: var(--color-ink);
+    color: var(--color-on-dark);
   }
 
   .page-header-lead {
@@ -77,7 +76,7 @@ const dict = t(locale);
     max-width: var(--measure-lead);
     font-size: var(--fs-lead);
     line-height: var(--lh-body);
-    color: var(--color-muted);
+    color: var(--color-on-dark-muted);
   }
 
   .page-header-meta {
@@ -85,7 +84,7 @@ const dict = t(locale);
     font-size: var(--fs-xs);
     letter-spacing: var(--ls-wide);
     text-transform: uppercase;
-    color: var(--color-muted);
+    color: var(--color-on-dark-muted);
     font-variant-numeric: tabular-nums;
   }
 

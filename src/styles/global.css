@@ -191,7 +191,7 @@ caption {
  * PageHeader 自带 32px 下内边距，其后的首个内容区不再叠加
  * --space-section 的 56–112px 上边距；上边距收紧为 24px。
  * 首个板块标题（.section-title:first-child）同时去掉自己的分隔线与上内边距：
- * 页头下边线已经完成分隔，两条细线夹一块空白会像渲染残留。
+ * 页头深色带本身已完成分隔，两条细线夹一块空白会像渲染残留。
  * 页尾的 .section 底边距不受影响。
  */
 .page-header + .section {
