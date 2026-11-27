@@ -37,6 +37,12 @@ const dict = t(locale);
 </section>
 
 <style>
+  /* 404 无 PageHeader，全局 `.page-header + .section` 收紧规则罩不到这里：
+     覆写 .section 的上边距，否则页头与 404 数字之间是 80–112px 空带 */
+  .section {
+    padding-top: var(--space-5);
+  }
+
   /* 404：等宽大号数字作视觉锚点，标题与正文回到可读层级 */
   .code {
     margin: 0 0 var(--space-5);

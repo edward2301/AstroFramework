@@ -5,9 +5,9 @@
  * 分语言是怎么做到的：
  *
  *   · 开发（astro dev）：/zh/ 下的错误路径会回落到本文件渲染的英文 404。
- *     这是 Astro 7.4.2 的框架缺陷，与项目文件形式无关（用 [lang]/404.astro 或
- *     字面量 zh/404.astro 实测均不命中）：i18n/error-routes.js 的 getErrorRoutePath
- *     在 trailingSlash: 'always' 时返回带尾斜杠的 /zh/404/，而路由表 route 字段
+ *     这是 Astro 的框架缺陷（7.4.2 与升级后的 7.4.13 均实测复现，与项目文件形式无关
+ *     ——用 [lang]/404.astro 或字面量 zh/404.astro 实测均不命中）：i18n/error-routes.js
+ *     的 getErrorRoutePath 在 trailingSlash: 'always' 时返回带尾斜杠的 /zh/404/，而路由表 route 字段
  *     无尾斜杠，find 失败后 getCustom404Route 的正则 /^\/404\/?$/ 又只认根 404。
  *     本地预览中文 404 直接访问 /zh/404/（内容为中文，状态码 200）。
  *     已具备向 Astro 上报的完整证据链；线上不受影响（见下）。
