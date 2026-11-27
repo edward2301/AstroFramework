@@ -538,4 +538,27 @@ function isActive(href: string): boolean {
       text-decoration: none;
     }
   }
+
+  /*
+   * 330px 极窄屏：品牌 + Menu + CTA 的最小内容宽度约 306px，
+   * 24px  gutter 下会顶到右边缘。压缩字号、间距与按钮内边距，
+   * 保留两侧 24px 对齐；360px 以上视觉不变。
+   */
+  @media (max-width: 480px) {
+    .site-header .header-inner {
+      gap: var(--space-2);
+    }
+
+    .site-header .brand {
+      font-size: var(--fs-body);
+    }
+
+    .site-header .mobile-nav summary {
+      padding: 0 var(--space-2);
+    }
+
+    .site-header .header-cta {
+      padding: 0 8px;
+    }
+  }
 </style>
