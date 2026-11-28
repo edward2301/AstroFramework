@@ -230,7 +230,7 @@ const en: Dict = {
     lead: (categories, models) =>
       `${categories} product categories, ${models} standard models. Every model page carries full specifications and dimensional data, with datasheets where available.`,
     browseProducts: 'Browse products',
-    requestQuote: 'Get selection advice',
+    requestQuote: 'Request a Quote',
     categories: 'Product categories',
     selectedModels: 'Select by application',
     viewModels: 'View models',
@@ -431,7 +431,7 @@ const zh: Dict = {
     lead: (categories, models) =>
       `现有 ${categories} 个品类、${models} 个标准型号。每个型号页都提供完整规格与安装尺寸，可下载的资料一并列出。`,
     browseProducts: '浏览产品',
-    requestQuote: '获取选型建议',
+    requestQuote: '获取报价',
     categories: '产品品类',
     selectedModels: '按应用选型',
     viewModels: '查看型号',

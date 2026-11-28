@@ -53,9 +53,6 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
         <a class="btn btn--primary btn--lg" href={localizePath(locale, ROUTES.products)}>
           {dict.home.browseProducts}
         </a>
-        <a class="btn btn--on-dark btn--lg" href={localizePath(locale, ROUTES.quote)}>
-          {dict.home.requestQuote}
-        </a>
       </div>
     </div>
 
@@ -253,7 +250,7 @@ const zhH1 = locale === 'zh' ? dict.home.h1.split('，') : null;
       font-size: clamp(2rem, 10vw, 2.25rem);
     }
 
-    /* 568px 首屏：导语降一档、按钮间距收紧，两个 CTA 可完整落在首屏内 */
+    /* 568px 首屏：导语降一档、按钮间距收紧，主 CTA 可完整落在首屏内 */
     .hero--en .lead {
       font-size: var(--fs-body);
     }
