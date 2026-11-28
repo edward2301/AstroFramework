@@ -91,14 +91,13 @@ if (!existsSync(edgePath)) {
 }
 
 let exitCode = 0;
-let edgeProc = null;
 const tmp = mkdtempSync(join(tmpdir(), 'check-layout-'));
 try {
   await ensureServer(
     'npx', ['astro', 'preview', '--port', String(PREVIEW_PORT)],
     `${BASE}/`, 'astro preview', true
   );
-  edgeProc = await ensureServer(
+  await ensureServer(
     edgePath,
     ['--headless=new', '--disable-gpu', '--no-first-run', '--no-default-browser-check',
      `--remote-debugging-port=${CDP_PORT}`, `--user-data-dir=${join(tmp, 'edge')}`, 'about:blank'],

@@ -36,6 +36,9 @@ const {
 const canonicalUrl = absoluteUrl(canonical);
 const imageUrl = absoluteUrl(image);
 const meta = LOCALE_META[locale];
+// noindex 页自身不输出任何语言版本声明。BaseLayout 已经会传入空数组，
+// 这里再过滤一层，避免组件被直接复用时误传 alternates 导致自相矛盾。
+const visibleAlternates = noindex ? [] : alternates;
 ---
 <title>{title}</title>
 <meta name="description" content={description} />
@@ -49,7 +52,7 @@ const meta = LOCALE_META[locale];
 {
   /* hreflang 必须与 canonical 同时存在：只声明多语言而不声明互指关系，
      等于把两个语言版本交给搜索引擎自行判断，容易变成重复内容 */
-  alternates.map((alt) => (
+  visibleAlternates.map((alt) => (
     <link rel="alternate" hreflang={alt.hreflang} href={absoluteUrl(alt.path)} />
   ))
 }
@@ -63,7 +66,7 @@ const meta = LOCALE_META[locale];
 <meta property="og:image" content={imageUrl} />
 <meta property="og:locale" content={meta.ogLocale} />
 {
-  alternates
+  visibleAlternates
     .filter((alt) => alt.hreflang !== 'x-default' && alt.hreflang !== meta.htmlLang)
     .map((alt) => <meta property="og:locale:alternate" content={alt.ogLocale} />)
 }

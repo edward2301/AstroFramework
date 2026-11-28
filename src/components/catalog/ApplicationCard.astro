@@ -12,15 +12,13 @@ interface Props {
   name: string;
   /** 工况/条件摘要，截断由调用方控制 */
   condition: string;
-  /** 推荐型号数（mono 显示） */
-  modelCount: number;
-  /** 型号数单位文案（如「3 models」/「3 个型号」） */
+  /** 型号数文案（如「3 models」/「3 个型号」，mono 显示） */
   modelCountLabel: string;
   /** 详情链接文案 */
   linkLabel: string;
 }
 
-const { href, name, condition, modelCount, modelCountLabel, linkLabel } = Astro.props;
+const { href, name, condition, modelCountLabel, linkLabel } = Astro.props;
 ---
 
 <div class="app-card">

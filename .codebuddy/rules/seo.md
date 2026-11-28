@@ -25,7 +25,7 @@
 
 ## noindex 页（404）
 
-- 404 等 `noindex` 页**不输出** canonical、`og:url` 与 hreflang（`BaseLayout` 在 `noindex` 时清空 alternates——404 不是「某页面的语言版本」，强行声明会指向未生成路径）；同时输出 `<meta name="robots" content="noindex, follow">`。
+- 404 等 `noindex` 页**不输出** canonical、`og:url` 与 hreflang（`BaseLayout` 在 `noindex` 时清空 alternates，`SEO.astro` 自身也过滤一层——404 不是「某页面的语言版本」，强行声明会指向未生成路径）；同时输出 `<meta name="robots" content="noindex, follow">`。
 
 ## 生成与校验分离
 

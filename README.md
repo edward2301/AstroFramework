@@ -24,6 +24,7 @@ Node 版本以 `.nvmrc` 为准（`package.json` 的 `engines` 同时约束 node 
 | `npm run test` | Vitest 单测（清单见 `tests/`） |
 | `npm run build` | 类型检查 → 内容体检 → 构建 → 链接检查 |
 | `npm run check:docs` | 文档对账（硬编码计数/版本、命令表、trailingSlash、多语言债） |
+| `npm run check:redirects` | 型号旧路径 301 校验（构建后；传 `--base <url>` 再验实际跳转） |
 | `npm run check:layout` | 全站布局体检（含 404：空带 / 溢出 / 按钮几何；页数见 `dist/`），需先 `npm run build`；本地跑 1600 与 390 两个视口 |
 | `npm run deploy` | 构建并部署到 Cloudflare Pages |
 
