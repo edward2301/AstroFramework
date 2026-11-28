@@ -81,6 +81,17 @@ function websiteId(locale: Locale): string {
 }
 
 /**
+ * Product 名称：型号名已含 code 时不再重复拼接。
+ * 例如 code=A1、name="Model A1"，拼成 "A1 Model A1" 会让实体名称出现两次型号。
+ * 按词边界匹配（大小写不敏感），避免 A1 误命中 A123。
+ */
+function productDisplayName(code: string, name: string): string {
+  const escaped = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const hasCode = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i').test(name);
+  return hasCode ? name : `${code} ${name}`;
+}
+
+/**
  * 型号页：Product。
  *
  * `availability` 必须由页面按 `status` 传入。停产型号若仍标记 InStock，
@@ -104,7 +115,7 @@ export function productSchema(input: {
   const url = absoluteUrl(localizePath(input.locale, input.path));
   return {
     '@type': 'Product',
-    name: `${input.code} ${input.name}`,
+    name: productDisplayName(input.code, input.name),
     sku: input.code,
     description: input.description,
     url,

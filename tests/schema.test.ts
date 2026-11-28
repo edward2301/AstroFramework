@@ -51,13 +51,33 @@ describe('页面类型节点', () => {
       })
     ).toMatchObject({
       '@type': 'Product',
-      name: 'a1 A1',
+      name: 'A1',
       sku: 'a1',
       url: `${SITE_ORIGIN}/zh/products/a1/`,
       offers: {
         availability: 'https://schema.org/Discontinued',
         seller: { '@id': `${SITE_ORIGIN}/#organization` },
       },
+    });
+  });
+
+  it('Product 名称在型号名已含 code 时不重复拼接', () => {
+    const base = { locale: 'en' as const, description: 'd', path: '/products/a1/', brand: 'Example' };
+    expect(productSchema({ ...base, code: 'A1', name: 'Model A1' })).toMatchObject({
+      name: 'Model A1',
+    });
+    expect(
+      productSchema({ ...base, code: 'SX-200', name: 'Pressure Transmitter' })
+    ).toMatchObject({ name: 'SX-200 Pressure Transmitter' });
+  });
+
+  it('Product 名称按词边界匹配，大小写不敏感', () => {
+    const base = { locale: 'en' as const, description: 'd', path: '/products/a1/', brand: 'Example' };
+    expect(productSchema({ ...base, code: 'A1', name: 'Model A123' })).toMatchObject({
+      name: 'A1 Model A123',
+    });
+    expect(productSchema({ ...base, code: 'a1', name: 'MODEL A1' })).toMatchObject({
+      name: 'MODEL A1',
     });
   });
 
