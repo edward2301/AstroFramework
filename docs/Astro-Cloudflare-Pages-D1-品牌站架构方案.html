@@ -133,7 +133,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
     <h1>Astro + Cloudflare Pages + D1<br>品牌产品站架构方案</h1>
     <p class="sub">本方案基于 soukacatv 全站 462 个 URL 的实测结论撰写：先判断那套方案哪些值得学、哪些是反面教材，再给出当前选定的部署与数据方案。核心结论放在最前面——<strong>Astro 静态产物直接托管到 Cloudflare Pages，交互数据存进 Cloudflare D1，由 Wrangler CLI 保存与读写；无需管理服务器，也没有运行期服务端。</strong></p>
     <div class="meta">
-      <span class="frozen">历史决策记录 · 已冻结（不随实现更新）</span>
+      <span class="frozen">选型决策已冻结 · 事实按当前实现校订</span>
       <span class="hot">技术选型评估</span>
       <span class="hot">Cloudflare Pages 托管</span>
       <span class="hot">D1 交互数据 + Wrangler</span>
@@ -262,15 +262,15 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
     <table class="wide">
       <thead><tr><th style="width:150px">意图</th><th style="width:230px">用户在想什么</th><th style="width:230px">对应的页面类型</th><th>示例</th></tr></thead>
       <tbody>
-        <tr><td><strong>产品轴</strong></td><td>「我需要一个 X 设备，参数要满足 Y」</td><td>品类页 → 产品详情页</td><td><code>/products/digital-modulator/</code> → <code>/products/skd2618/</code></td></tr>
-        <tr><td><strong>场景轴</strong></td><td>「我要做一个酒店电视系统，怎么配」</td><td>方案页（跨品类组合）</td><td><code>/solutions/hotel-iptv/</code></td></tr>
+        <tr><td><strong>产品轴</strong></td><td>「我需要一个 X 设备，参数要满足 Y」</td><td>品类页 → 产品详情页</td><td><code>/products/category-a/</code> → <code>/products/a1/</code></td></tr>
+        <tr><td><strong>场景轴</strong></td><td>「我要做一个酒店电视系统，怎么配」</td><td>应用页（跨品类组合）</td><td><code>/applications/constant-duty/</code></td></tr>
       </tbody>
     </table>
   </div>
   <p>这两轴的价值在于：<strong>同一批产品可以用两种方式被搜到</strong>。搜「QAM modulator」的人落到品类页，搜「hotel IPTV system design」的人落到方案页，两条路径最终都指向同一组产品，但切入的意图完全不同。</p>
 
   <h3>2.2 内容模型先行，页面模板后置</h3>
-  <p>它把内容拆成 7 类独立实体（产品 / 品类 / 方案 / 案例 / FAQ / 下载 / 视频），而不是「文章 + 分类」。这个决定的价值在两年后才显现：</p>
+  <p>它把内容拆成 7 类独立实体（产品 / 品类 / 方案 / 案例 / FAQ / 下载 / 视频），而不是「文章 + 分类」。本仓对应 7 个集合：<code>models</code> / <code>categories</code> / <code>applications</code> / <code>cases</code> / <code>faqs</code> / <code>downloads</code> / <code>guides</code>（没有视频类）。这个决定的价值在两年后才显现：</p>
   <ul class="clean">
     <li>每类实体可以有自己的字段（产品有型号、MOQ、认证；案例有酒店名、房间数、交付时间）</li>
     <li>每类实体可以有自己的模板与 schema</li>
@@ -318,7 +318,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
       </ul>
     </div>
   </div>
-  <p>项目保持 <code>output: static</code>，不引入 adapter、不开 SSR：<strong>页面在构建时就全部渲染完，请求路径上不存在任何服务端逻辑。</strong></p>
+  <p>项目不配置 <code>output</code>，保持 Astro 默认的静态输出；不引入 adapter、不开 SSR：<strong>页面在构建时就全部渲染完，请求路径上不存在任何服务端逻辑。</strong></p>
 
   <h3>3.2 Cloudflare Pages：静态产物的原生落点</h3>
   <div class="tbl-wrap">
@@ -329,7 +329,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
         <tr><td><strong>自动 HTTPS</strong></td><td>证书签发与续期由平台承担，不需要自签证书、不需要手工配置 TLS 参数</td></tr>
         <tr><td><strong>预览部署与回滚</strong></td><td>每次部署是不可变版本，<code>--branch</code> 生成独立预览 URL；出问题在控制台一键回滚</td></tr>
         <tr><td><strong>配置文件随产物</strong></td><td><code>_headers</code> / <code>_redirects</code> 与 HTML 同版本发布，规则变更可随部署一起回滚，不会出现「代码与部署规则不同步」</td></tr>
-        <tr><td><strong>构建集成</strong></td><td>连接 Git 仓库后自动跑 <code>npm run build</code>，构建守卫（内容体检 + 链接检查）在每次部署都执行</td></tr>
+        <tr><td><strong>构建集成</strong></td><td>连接 Git 仓库后自动跑 <code>npm run build</code>，构建守卫（内容体检 + 文档对账 + 链接检查）在每次部署都执行；PR 另有 GitHub Actions 跑四个纯检查</td></tr>
       </tbody>
     </table>
   </div>
@@ -399,7 +399,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
   <div class="arch">
     <div class="arch-row">
       <div class="arch-node"><div class="n-t">Git 仓库</div><div class="n-d">内容、代码、_headers、_redirects 同仓</div></div>
-      <div class="arch-node"><div class="n-t">构建流水线</div><div class="n-d">npm run build<br>内容体检 + 链接检查</div></div>
+      <div class="arch-node"><div class="n-t">构建流水线</div><div class="n-d">npm run build<br>内容体检 + 文档对账 + 链接检查</div></div>
       <div class="arch-node hl"><div class="n-t">Cloudflare Pages</div><div class="n-d">dist/ 静态产物 + 边缘 CDN<br>自动 HTTPS · 预览 · 回滚</div></div>
     </div>
     <div class="arch-arrow">↓ 访客访问页面　　↓ 运维按需读写数据（两条独立链路）</div>
@@ -440,7 +440,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
   <p class="lead">十项。目标是让第 1 节列出的工程缺陷在新架构里<strong>不可能再发生</strong>。</p>
 
   <h3>5.1 URL 与路由：用目录把层级写死</h3>
-  <p>所有 URL 末尾带斜杠（链接层统一，匹配策略 <code>trailingSlash: 'ignore'</code>，dev 由集成 308 归一），产物是目录式 <code>/path/index.html</code>。Pages 默认的 <code>auto-trailing-slash</code> 会自动补齐缺斜杠的请求，不产生重复 URL。旧链接 301 在 <code>_redirects</code> 里用精确路径逐条登记，<strong>不要用正则或通配，避免误伤正常页面</strong>。</p>
+  <p>所有 URL 末尾带斜杠（链接层统一，匹配策略 <code>trailingSlash: 'ignore'</code>，dev 由集成 308 归一），产物是目录式 <code>/path/index.html</code>。Pages 默认的 <code>auto-trailing-slash</code> 会自动补齐缺斜杠的请求，不产生重复 URL。手工旧链接在 <code>public/_redirects</code> 精确登记；型号旧路径 <code>/products/&lt;品类&gt;/&lt;型号&gt;/</code> 由 <code>scripts/model-redirects.mjs</code> 在构建期生成到 <code>dist/_redirects</code> 并指向扁平 URL。<strong>全部精确匹配，不要用正则或通配，避免误伤正常页面</strong>。</p>
 
   <h3>5.2 内容模型：用 schema 卡住字段</h3>
   <p>内容集合的 schema 集中在 <code>src/content.config.ts</code>：型号必须有 5 项关键参数、品类 <code>intro</code> 不少于 300 字、译文 <code>intro</code> 不少于 150 字。<code>draft: true</code> 的条目不生成路由、不进列表；已发布条目引用草稿会在体检阶段报错。</p>
@@ -495,6 +495,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
       <thead><tr><th style="width:200px">监控项</th><th style="width:170px">手段</th><th>频率</th></tr></thead>
       <tbody>
         <tr><td>标题长度与唯一性、对比表键名、缺译、图片属性</td><td>构建期脚本（每次部署自动跑）</td><td>每次部署</td></tr>
+        <tr><td>文档漂移：硬编码计数/版本、命令表、trailingSlash、多语言断言</td><td><code>scripts/check-doc-sync.mjs</code>（构建守卫 + PR CI）</td><td>每次部署 / 每次 PR</td></tr>
         <tr><td>站内断链与语言版本配对</td><td><code>scripts/check-links.mjs</code>（构建守卫）</td><td>每次部署</td></tr>
         <tr><td>抓取趋势、访问量、边缘命中率</td><td>Cloudflare Web Analytics</td><td>每周</td></tr>
         <tr><td>404 / 301 规则是否仍生效</td><td><code>deploy/cloudflare/README.md</code> 的 <code>curl</code> 清单实测</td><td>每次改配置后</td></tr>
@@ -549,7 +550,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
     <li class="ok"><code>_headers</code> 生效：带 hash 资源长缓存，404 / sitemap / robots 为 <code>no-store</code></li>
     <li class="ok">无通配 200 rewrite、无 SPA fallback、无冲突的 <code>Cache-Control</code></li>
     <li class="ok">若用 Wrangler 直传，<code>CLOUDFLARE_API_TOKEN</code> 仅在环境变量中；仓库无凭证与真实客户数据</li>
-    <li class="ok"><code>npm run validate</code> / <code>check</code> / <code>test</code> / <code>build</code> 全绿，构建守卫未被告警绕过</li>
+    <li class="ok"><code>npm run check:docs</code> / <code>validate</code> / <code>check</code> / <code>test</code> / <code>build</code> 全绿，布局改动另跑 <code>check:layout</code>，构建守卫未被绕过</li>
   </ul>
 
   <div class="note">

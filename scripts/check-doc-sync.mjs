@@ -23,7 +23,8 @@ const report = (file, line, msg) => {
   issues.push(`${file}${line > 0 ? `:${line}` : ''} — ${msg}`);
 };
 
-// 技能目录可能新增，按目录枚举；冻结的选型 HTML 不参与对账（doc-sync 明确标为冻结）。
+// 技能目录可能新增，按目录枚举。选型 HTML 含竞品实测数字（如「462 页」），自动计数扫描会误报；
+// 其实现事实在全仓对账时人工核对，故不列入 docFiles。
 const skillDir = path.join(root, '.codebuddy', 'skills');
 const skillDocs = readdirSync(skillDir, { withFileTypes: true })
   .filter((entry) => entry.isDirectory())
