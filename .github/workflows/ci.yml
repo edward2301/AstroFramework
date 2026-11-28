@@ -32,8 +32,12 @@ jobs:
       - name: 内容体检
         run: npm run validate
 
+      # astro check 会加载 astro.config.mjs，其中的域名守卫在 CI=true 下会拒绝占位域名。
+      # 这里只做类型检查、不构建不部署，故仅对本步骤关闭守卫；build/deploy 仍受闸门约束。
       - name: 类型检查
         run: npm run check
+        env:
+          CI: 'false'
 
       - name: 单测
         run: npm run test
