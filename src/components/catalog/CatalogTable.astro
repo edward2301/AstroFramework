@@ -327,7 +327,7 @@ const searchIndex = (m: ModelRow) =>
     font-variant-numeric: tabular-nums;
   }
 
-  /* 状态：1px 细线小徽标；在售用实心方点，停产用空心方点 */
+  /* 状态：1px 细线小徽标；在售绿方点，非在售灰方点 */
   .status-badge {
     display: inline-flex;
     align-items: center;
@@ -350,11 +350,11 @@ const searchIndex = (m: ModelRow) =>
 
   .status-badge--discontinued {
     border-color: var(--color-border-soft);
-    color: var(--color-danger);
+    color: var(--color-muted);
   }
 
   .status-badge--discontinued::before {
-    background: var(--color-danger);
+    background: var(--color-muted);
     border: 0;
   }
 
