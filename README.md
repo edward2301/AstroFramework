@@ -32,6 +32,7 @@ Node 版本以 `.nvmrc` 为准（`package.json` 的 `engines` 同时约束 node 
 | `npm run check:docs` | 文档对账（硬编码计数/版本、命令表、trailingSlash、多语言债） |
 | `npm run check:redirects` | 型号旧路径 301 校验（构建后；传 `--base <url>` 再验实际跳转） |
 | `npm run check:layout` | 全站布局体检（含 404：空带 / 溢出 / 按钮几何；页数见 `dist/`），需先 `npm run build`；本地跑 1600 与 390 两个视口 |
+| `npm run images:optimize` | 图片优化：`assets-src/` PNG 母版 → `public/` WebP 发布件 |
 | `npm run deploy` | 构建并部署到 Cloudflare Pages |
 
 完整命令与“什么时候用”见 `docs/上手指南.md` §2.2 / `package.json`。
@@ -43,6 +44,7 @@ Node 版本以 `.nvmrc` 为准（`package.json` 的 `engines` 同时约束 node 
 ```
 src/          页面、内容、组件、样式
 public/       静态资产与 Pages 规则（_headers / _redirects）
+assets-src/   图片母版（PNG）：npm run images:optimize 出 public/ 的 WebP
 scripts/      内容体检、链接检查、构建守卫
 tests/        Vitest 单测
 deploy/       Cloudflare Pages / D1 运维手册

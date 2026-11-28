@@ -2,7 +2,7 @@
   "draft": false,
   "name": "Category A",
   "intro": "Category A is a placeholder group that exercises the catalog end to end: listing pages, comparison tables and detail layouts. Every item ships with sample specifications and an image slot, so spacing, typography and table behaviour can be reviewed before the real range is loaded. Replace the copy and images when the catalog goes live; no template change is required.",
-  "image": "/images/categories/category-a.png",
+  "image": "/images/categories/category-a.webp",
   "color": "#1f3a5f",
   "comparisonParams": [
     "Range",

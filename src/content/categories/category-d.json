@@ -2,7 +2,7 @@
   "draft": false,
   "name": "Category D",
   "intro": "Category D is a placeholder group that focuses on delivery and packaging notes. The items differ only in sample values, which is enough to check how shipping terms, lead-time statements and packaging details sit next to technical specifications without crowding them or breaking the column rhythm. Fields, links and structured data are generated from the entry, so no template change is needed when the real catalog arrives.",
-  "image": "/images/categories/category-d.png",
+  "image": "/images/categories/category-d.webp",
   "color": "#2a4a4d",
   "comparisonParams": [
     "Range",

@@ -579,6 +579,17 @@ for (const entry of categories) {
   }
 }
 
+/*
+ * 格式卫生：public/images/ 下的 PNG 是「母版没走发布流」的信号
+ * （母版应在 assets-src/，WebP 才进 public/），提醒跑 npm run images:optimize；不阻断构建。
+ */
+for (const png of fs.globSync('images/**/*.png', { cwd: PUBLIC_DIR })) {
+  const webp = png.replace(/\.png$/i, '.webp');
+  if (!fs.existsSync(path.join(PUBLIC_DIR, webp))) {
+    warn(png, 'public/images/ 下的 PNG 没有对应 WebP，运行 npm run images:optimize');
+  }
+}
+
 /* ---------- 3. 其它集合的引用完整性 ---------- */
 
 for (const a of publishedApplications) {

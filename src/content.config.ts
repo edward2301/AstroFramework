@@ -118,9 +118,10 @@ const models = defineCollection({
     certifications: z.array(z.string()).default([]),
     datasheet: z.string().optional(),
     /**
-     * 主图：`public/` 下的公开路径，如 `/images/models/a1.png`。
+     * 主图：`public/` 下的公开路径，如 `/images/models/a1.webp`。
+     * 母版（PNG）在 `assets-src/images/models/`，经 `npm run images:optimize` 转换。
      *
-     * 图片由运营人工维护（自己压好、自己上传），构建只做原样复制，
+     * 图片由运营人工维护（构建只做原样复制），
      * 不转换、不缩放、不生成多尺寸。与 `datasheet` 同一套约定，见 docs/开发框架设计.md §7.5。
      */
     image: z.string().optional(),
@@ -148,8 +149,8 @@ const categories = defineCollection({
     name: z.string(),
     intro: z.string().min(300),
     /**
-     * 品类封面：`public/` 下的公开路径，如 `/images/categories/category-a.png`。
-     * 图片由运营人工维护（构建不处理），与型号 `image` 同一套约定，见 §7.5。
+     * 品类封面：`public/` 下的公开路径，如 `/images/categories/category-a.webp`。
+     * 母版（PNG）在 `assets-src/images/categories/`；与型号 `image` 同一套约定，见 §7.5。
      */
     image: z.string().optional(),
     /**

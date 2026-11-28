@@ -31,7 +31,7 @@ description: "新增、修改或删除工业品型号 JSON（code、keyParams、
 3. 写必填字段：`code`、`name`、`category`、`status`、`keyParams`、`specGroups`、`seoTitle`、`seoDescription`。
 4. `keyParams` 恰好 5 项；en 的 `k` 覆盖 en 品类列，zh 的 `k` 覆盖 zh 品类列。列多出来可以，键缺一个都不行。
 5. `specGroups` 至少 1 组，每组 `rows` 至少 1 行。
-6. 可选字段按需：`dimensions`、`interface`、`certifications`、`datasheet`、`image`。写图片前先列出路径并确认；路径形如 `/images/models/<slug>.png`，文件必须真实存在于 `public/`。
+6. 可选字段按需：`dimensions`、`interface`、`certifications`、`datasheet`、`image`。写图片前先列出路径并确认；母版 PNG 放 `assets-src/images/models/`，跑 `npm run images:optimize` 得 `/images/models/<slug>.webp`；引用 webp 且文件必须存在于 `public/`。
 7. 补 `locales.zh` 必填：`name`、`keyParams`、`specGroups`、`seoTitle`、`seoDescription`。
 8. 引用只写已发布条目 id，不写型号 code：`category`、`replacement`、`applications`、`relatedCases`。
 9. 写 `seoTitle` / `seoDescription` 时按 `seo-copy` 的检查表自检：标题只写本体、宽度读 `SEO_LIMITS`、全站标题不重复。
@@ -75,7 +75,7 @@ description: "新增、修改或删除工业品型号 JSON（code、keyParams、
   "dimensions": "Ø32 × 80 mm",
   "interface": "G1/2",
   "certifications": ["CE", "RoHS"],
-  "image": "/images/models/a4.png",
+  "image": "/images/models/a4.webp",
   "applications": [],
   "relatedCases": [],
   "seoTitle": "<按 seo-copy 规则撰写>",

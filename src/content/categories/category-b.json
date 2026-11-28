@@ -2,7 +2,7 @@
   "draft": false,
   "name": "Category B",
   "intro": "Category B is a placeholder group built around selection work. The sample items differ only in measurable values, which makes them useful for checking how comparison columns read, how long values wrap in narrow cells, and how discontinued entries are marked. Use it to tune how much information each card carries before real data arrives.",
-  "image": "/images/categories/category-b.png",
+  "image": "/images/categories/category-b.webp",
   "color": "#274d3b",
   "comparisonParams": [
     "Range",

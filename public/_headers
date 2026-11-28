@@ -2,6 +2,10 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
+# 图片是同名覆盖的运营资产（非 hash），不能 immutable；1 天 = 覆盖次日生效与少一次重复下载的平衡
+/images/*
+  Cache-Control: public, max-age=86400
+
 # 404 产物禁止缓存：一次错误不能被边缘固化
 /404.html
   Cache-Control: no-store

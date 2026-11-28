@@ -20,6 +20,7 @@ Node 版本以 `.nvmrc` 为准，`.node-version` 与 `package.json` 的 `engines
 | `npm run check:docs` | 文档对账（计数/版本、命令表、trailingSlash、多语言债） |
 | `npm run check:redirects` | 型号旧路径 301 校验（构建后） |
 | `npm run check:layout` | 全站布局体检（需先 `npm run build`） |
+| `npm run images:optimize` | 图片优化：PNG 母版 → WebP |
 | `npm run deploy` | 构建并部署到 Cloudflare Pages |
 
 完整命令与“什么时候用”见 `docs/上手指南.md` §2.2。

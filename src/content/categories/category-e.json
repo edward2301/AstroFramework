@@ -2,7 +2,7 @@
   "draft": false,
   "name": "Category E",
   "intro": "Category E is a placeholder group that covers replacement and end-of-life handling. One sample item is marked as discontinued so the greyed card state, the badge and the replacement link can be reviewed together; real ranges usually need the same treatment sooner or later. Fields, links and structured data are generated from the entry, so no template change is needed when the real catalog arrives.",
-  "image": "/images/categories/category-e.png",
+  "image": "/images/categories/category-e.webp",
   "color": "#6b5230",
   "comparisonParams": [
     "Input",

@@ -33,7 +33,7 @@ description: "新增、修改或删除品类与品类对比表（comparisonParam
 5. 枚举该品类下**全部已发布型号**，逐列核对每个型号的 `keyParams.k`；新增品类时至少确认没有遗留型号。
 6. 要改列名或删列时，先列出所有受影响型号，给出"改列还是改型号键"的方案并等确认；不得静默删列。
 7. 补 `locales.zh`：`name`、`intro`（至少 150 字）、`comparisonParams`（必填）、`seoTitle`、`seoDescription`；`selectionPoints` 与 `purchaseInfo` 按需翻。
-8. 写品类图前先列出路径并确认；路径形如 `/images/categories/<id>.png`，文件必须存在于 `public/`。
+8. 写品类图前先列出路径并确认；母版 PNG 放 `assets-src/images/categories/`，跑 `npm run images:optimize` 得 `/images/categories/<id>.webp`；引用 webp 且文件必须存在于 `public/`。
 9. 跑 `npm run validate`；开发态逐语言查看 `/products/<id>/` 与 `/zh/products/<id>/`。
 
 ## 不变量
@@ -54,7 +54,7 @@ description: "新增、修改或删除品类与品类对比表（comparisonParam
   "draft": false,
   "name": "Pressure Sensors",
   "intro": "<300 字以上的品类介绍>",
-  "image": "/images/categories/category-a.png",
+  "image": "/images/categories/category-a.webp",
   "comparisonParams": ["Range", "Accuracy", "Output", "Connection", "IP Rating"],
   "selectionPoints": ["<选型要点>"],
   "purchaseInfo": {
