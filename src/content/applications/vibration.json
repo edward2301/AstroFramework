@@ -11,7 +11,9 @@
   "recommended": [
     "a4",
     "d1",
-    "d2"
+    "d2",
+    "d3",
+    "d4"
   ],
   "cautions": [
     "Avoid mounting directly on a resonating panel.",

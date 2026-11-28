@@ -225,7 +225,7 @@ export type RenderedPage = PageCommon &
             code: string;
             name: string;
           }[];
-          applications: { id: string; name: string }[];
+          applications: { id: string; name: string; condition: string }[];
           cases: { id: string; title: string }[];
           /** 同品类其他型号（横向内链） */
           siblings: { id: string; categoryId: string; code: string }[];
@@ -477,7 +477,10 @@ export async function loadPage(input: PageInput): Promise<RenderedPage> {
             };
           }),
           /* 关联区块必须走本地化视图：直接用 data.name 会让中文页出现英文标题 */
-          applications: applications.map((a) => ({ id: a.id, name: applicationView(a, locale).name })),
+          applications: applications.map((a) => {
+            const av = applicationView(a, locale);
+            return { id: a.id, name: av.name, condition: av.condition };
+          }),
           cases: cases.map((c) => ({ id: c.id, title: caseView(c, locale).title })),
           siblings,
         },

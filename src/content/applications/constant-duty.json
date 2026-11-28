@@ -11,7 +11,9 @@
   "recommended": [
     "a1",
     "a2",
-    "a3"
+    "a3",
+    "a5",
+    "a6"
   ],
   "cautions": [
     "Do not size the range at the working value exactly.",

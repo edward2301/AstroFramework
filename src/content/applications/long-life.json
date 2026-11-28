@@ -1,0 +1,42 @@
+{
+  "draft": false,
+  "name": "Long service interval",
+  "condition": "A7, D5 and D6 are specified for long service intervals: the stated long-term drift is within 0.2% FS per year, with IP65/IP67 housings for points that are not opened between checks.",
+  "criteria": [
+    "Check the long-term drift figure, not just the accuracy at commissioning.",
+    "Match the span: A7 covers 0-60 MPa; D5 covers -200 to 50 °C; D6 covers 0 to 1200 °C.",
+    "Confirm the process connection: M20×1.5 on A7, G1/2 on D5, G3/4 on D6.",
+    "Prefer IP67 housings where the point is exposed to washdown."
+  ],
+  "recommended": [
+    "a7",
+    "d5",
+    "d6"
+  ],
+  "cautions": [
+    "A wide span does not guarantee accuracy across the whole range.",
+    "IP65 and IP67 are different limits; choose by the actual exposure.",
+    "Long service intervals still need a scheduled zero check."
+  ],
+  "seoTitle": "Long Service Interval: Drift and Span Choice",
+  "seoDescription": "Long service selection: check long-term drift within 0.2% FS per year and match the span. Covers A7 pressure at 0-60 MPa and D5-D6 temperature points.",
+  "locales": {
+    "zh": {
+      "name": "长周期免维护",
+      "condition": "A7、D5 与 D6 用于长周期维护点位：长期漂移不超过每年 0.2% FS，外壳 IP65/IP67，适合两次校验之间不开盖的点位。",
+      "criteria": [
+        "看长期漂移指标，而不只是投运当时的精度。",
+        "量程按工况核对：A7 覆盖 0–60 MPa，D5 覆盖 −200 至 50 °C，D6 覆盖 0 至 1200 °C。",
+        "确认过程连接：A7 为 M20×1.5，D5 为 G1/2，D6 为 G3/4。",
+        "有点冲洗的工况优先选 IP67 外壳。"
+      ],
+      "cautions": [
+        "量程宽不等于全量程都保精度。",
+        "IP65 与 IP67 防护等级不同，按实际暴露环境选。",
+        "长周期维护仍需按计划做零点复核。"
+      ],
+      "seoTitle": "长周期免维护选型：漂移指标与量程怎么定才准",
+      "seoDescription": "长周期点位选型要点：以年漂移不超过 0.2% FS 为指标，量程按工况核对；A7 压力覆盖 0–60 MPa，D5 与 D6 温度覆盖 −200 至 1200 °C，防护按现场环境选取。"
+    }
+  }
+}

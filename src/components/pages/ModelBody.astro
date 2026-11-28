@@ -36,7 +36,7 @@ interface Props {
   /** 资料文件存在时才输出下载按钮，避免死链 */
   datasheet?: { path: string; available: boolean };
   replacements: { id: string; categoryId: string; code: string; name: string }[];
-  applications: { id: string; name: string }[];
+  applications: { id: string; name: string; condition: string }[];
   cases: { id: string; title: string }[];
   /** 同品类其他型号（横向内链，用于型号间对比与抓取） */
   siblings: { id: string; categoryId: string; code: string }[];
@@ -185,7 +185,10 @@ const quoteHref = localizePath(locale, ROUTES.quote);
             <ul class="related">
               {applications.map((a) => (
                 <li>
-                  <a href={localizePath(locale, detailPath.application(a.id))}>{a.name}</a>
+                  <a class="app-link" href={localizePath(locale, detailPath.application(a.id))}>
+                    <span class="app-name">{a.name}</span>
+                    <span class="app-condition">{a.condition}</span>
+                  </a>
                 </li>
               ))}
             </ul>
@@ -417,6 +420,25 @@ const quoteHref = localizePath(locale, ROUTES.quote);
     display: block;
     padding: var(--space-3) 0;
     font-size: var(--fs-sm);
+  }
+
+  /* 适用方向：链接下加一行场景摘要，两行截断，保留 44px 触控高度 */
+  .app-link {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-height: 44px;
+  }
+
+  .app-condition {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: var(--fs-xs);
+    line-height: var(--lh-data);
+    color: var(--color-muted);
   }
 
   /* 同品类其他型号：方形 chip，编码等宽（reset 走全局 .chip-list） */

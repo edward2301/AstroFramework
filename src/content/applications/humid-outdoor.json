@@ -11,7 +11,9 @@
   "recommended": [
     "b1",
     "b2",
-    "c1"
+    "c1",
+    "c2",
+    "c3"
   ],
   "cautions": [
     "IP65 is not a substitute for a protective housing.",

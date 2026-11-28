@@ -1,0 +1,44 @@
+{
+  "draft": false,
+  "name": "Panel mounting",
+  "condition": "C4-C6 and E1-E2 are panel-mounted: the level units use a 45 × 45 mm cut-out in a 48 × 48 mm face, and the indicators use a 72 × 72 mm panel opening with an IP65 front.",
+  "criteria": [
+    "Match the cut-out to the face: 45 × 45 mm for C4-C6, 72 × 72 mm for E1-E2.",
+    "Confirm the rear depth fits the cabinet: 96 mm for C4-C6, 110 mm for E1-E2.",
+    "Keep the front rating intact at the cut-out with a proper gasket.",
+    "Record the cut-out size on the drawing so a later replacement fits the same panel."
+  ],
+  "recommended": [
+    "c4",
+    "c5",
+    "c6",
+    "e1",
+    "e2"
+  ],
+  "cautions": [
+    "A gasketed face keeps the IP65 rating; an unsealed cut-out does not.",
+    "Rear depth is measured from the panel face, not from the cabinet door.",
+    "Check supply before ordering: E1 is loop-powered, E2 needs 90-250 V AC."
+  ],
+  "seoTitle": "Panel Mounting: Cut-out and Rear Depth Notes",
+  "seoDescription": "Panel mounting: match the cut-out size and rear depth, keep the IP65 front rating at the opening. A checklist for C4-C6 level units and E1-E2 panel meters.",
+  "locales": {
+    "zh": {
+      "name": "面板安装",
+      "condition": "C4–C6 与 E1–E2 为面板安装仪表：物位计用 48×48 mm 面板、45×45 mm 开孔；显示仪表用 72×72 mm 开孔、IP65 正面防护。",
+      "criteria": [
+        "开孔与面板尺寸对应：C4–C6 为 45×45 mm，E1–E2 为 72×72 mm。",
+        "确认柜内背部净空：C4–C6 为 96 mm，E1–E2 为 110 mm。",
+        "开孔处加垫圈以维持正面防护等级。",
+        "把开孔尺寸标注在图纸上，后续替换沿用同一面板。"
+      ],
+      "cautions": [
+        "面板加密封垫圈才能保持 IP65，裸开孔不保证防护等级。",
+        "背部深度自面板正面起算，不是柜门。",
+        "下单前确认供电：E1 为回路供电，E2 需 90–250 V 交流。"
+      ],
+      "seoTitle": "面板安装选型：开孔尺寸与背部深度怎么核对",
+      "seoDescription": "面板安装选型顺序：先核对开孔尺寸（C4–C6 为 45×45 mm、E1–E2 为 72×72 mm），再确认柜内背部净空；开孔处需密封以维持面板防护等级，避免装不下或返工。"
+    }
+  }
+}

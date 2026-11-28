@@ -1,0 +1,43 @@
+{
+  "draft": false,
+  "name": "Clean process",
+  "condition": "B3-B6 are flow meters for clean process lines: bodies are 304 or 316L stainless steel with DN15 to DN80 flange or threaded connections, and the output is 4-20 mA or pulse.",
+  "criteria": [
+    "Choose 316L wetted parts where the medium or cleaning agent is aggressive.",
+    "Match the line size: DN15, DN50 and DN80 connections across B3-B6.",
+    "Match the output to the control system: 4-20 mA for analog loops, pulse for totalizers.",
+    "Record the body material and connection on the drawing for the next replacement."
+  ],
+  "recommended": [
+    "b3",
+    "b4",
+    "b5",
+    "b6"
+  ],
+  "cautions": [
+    "A 304 body is not equivalent to 316L in corrosive service.",
+    "Flange and thread connections are not interchangeable on the same line.",
+    "Accuracy is given as percent of reading; check it at the actual flow, not at full scale."
+  ],
+  "seoTitle": "Clean Process Lines: 316L Bodies and Flow Range",
+  "seoDescription": "Clean process flow selection: choose 316L wetted parts, match the DN15 to DN80 connection and pick 4-20 mA or pulse output. A checklist for B3-B6 flow meters.",
+  "locales": {
+    "zh": {
+      "name": "洁净工艺",
+      "condition": "B3–B6 为洁净工艺管路流量计：外壳为 304 或 316L 不锈钢，连接为 DN15 至 DN80 法兰或螺纹，输出 4–20 mA 或脉冲。",
+      "criteria": [
+        "介质或清洗剂有腐蚀性时优先选 316L 接液部件。",
+        "按管径选连接：B3–B6 覆盖 DN15、DN50 与 DN80。",
+        "输出按控制系统选：模拟回路用 4–20 mA，累积用脉冲。",
+        "把外壳材质与连接标注在图纸上，便于后续替换。"
+      ],
+      "cautions": [
+        "腐蚀性工况下 304 外壳不等同于 316L。",
+        "法兰与螺纹连接在同一管路上不能互换。",
+        "精度按读数百分比给出，要在实际流量点而非满量程处核对。"
+      ],
+      "seoTitle": "洁净工艺选型：接液材质与流量范围如何确定",
+      "seoDescription": "洁净工艺选型要点：腐蚀性介质优先选 316L 接液部件，连接按 DN15 至 DN80 法兰或螺纹核对，输出按控制系统选 4–20 mA 或脉冲；适用于 B3–B6 流量计。"
+    }
+  }
+}
