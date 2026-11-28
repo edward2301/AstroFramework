@@ -39,6 +39,7 @@ a{color:var(--accent);text-decoration:none;}
 .meta{display:flex;flex-wrap:wrap;gap:10px;}
 .meta span{font-size:12.5px;color:#c9d4e1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.11);border-radius:6px;padding:5px 11px;}
 .meta span.hot{background:rgba(224,145,63,.14);border-color:rgba(224,145,63,.4);color:#f0b169;}
+.meta span.frozen{background:rgba(127,176,245,.15);border-color:rgba(127,176,245,.48);color:#bcd8ff;}
 .layout{max-width:1180px;margin:0 auto;padding:44px 32px 90px;display:grid;grid-template-columns:224px minmax(0,1fr);gap:52px;align-items:start;}
 .toc{position:sticky;top:28px;font-size:13px;max-height:calc(100vh - 56px);overflow-y:auto;padding-right:6px;}
 .toc-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;font-weight:600;}
@@ -132,6 +133,7 @@ footer{border-top:1px solid var(--line);padding:26px 32px 46px;text-align:center
     <h1>Astro + Cloudflare Pages + D1<br>品牌产品站架构方案</h1>
     <p class="sub">本方案基于 soukacatv 全站 462 个 URL 的实测结论撰写：先判断那套方案哪些值得学、哪些是反面教材，再给出当前选定的部署与数据方案。核心结论放在最前面——<strong>Astro 静态产物直接托管到 Cloudflare Pages，交互数据存进 Cloudflare D1，由 Wrangler CLI 保存与读写；无需管理服务器，也没有运行期服务端。</strong></p>
     <div class="meta">
+      <span class="frozen">历史决策记录 · 已冻结（不随实现更新）</span>
       <span class="hot">技术选型评估</span>
       <span class="hot">Cloudflare Pages 托管</span>
       <span class="hot">D1 交互数据 + Wrangler</span>
