@@ -96,7 +96,7 @@ Docs: updated/no change — <文件/章节 或 理由>
 ## 验证
 - `npm run check`：Astro/TS 通过。
 - `npm run build`：内容体检、链接检查通过。
-- **布局体检硬门（样式改动必跑）**：`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`——124 页全扫（含 404），空带 / 溢出 / 按钮几何自动判定，退出码非 0 先修再交。
+- **布局体检硬门（样式改动必跑）**：`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`——dist 全扫（含 404），空带 / 溢出 / 按钮几何自动判定，退出码非 0 先修再交。
 - 开发态看 en/zh、桌面/移动端；一次改动只对比一个变量。
 - 对比 `dist/_astro/*.css` 体积；明显上涨时拆回页面局部或拆分路由。
 - 写后回读文件，确认 `<style>` 块没有重复、没有误删既有规则。

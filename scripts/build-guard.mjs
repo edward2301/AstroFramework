@@ -4,7 +4,7 @@
  * 目的：让 `astro build` 本身也经过内容体检、分语言 404 产物补齐与站内链接检查，
  * 而不是只在 `npm run build` 这一条路径上串联脚本。
  *
- * - build:start：执行 validate-content.mjs，任一错误即抛出并中断构建
+ * - build:start：执行 validate-content.mjs 与 check-doc-sync.mjs，任一错误即抛出并中断构建
  * - build:done ：把 <前缀>/404/index.html 复制成 <前缀>/404.html（Cloudflare Pages 约定），
  *               再扫描 dist 中的站内链接，未登记的路由缺口直接失败
  *
@@ -26,10 +26,12 @@ export default function contentGuard() {
     name: 'content-guard',
     hooks: {
       'astro:build:start': () => {
-        execFileSync(process.execPath, [path.join(root, 'scripts', 'validate-content.mjs')], {
-          cwd: root,
-          stdio: 'inherit',
-        });
+        for (const script of ['validate-content.mjs', 'check-doc-sync.mjs']) {
+          execFileSync(process.execPath, [path.join(root, 'scripts', script)], {
+            cwd: root,
+            stdio: 'inherit',
+          });
+        }
       },
 
       'astro:build:done': ({ dir, logger }) => {

@@ -212,9 +212,9 @@ curl -sI https://你的域名/products/category-a/ | head -1
 curl -s https://你的域名/zh/this-does-not-exist/ | grep -o '<html lang="[^"]*"'
 # 期望 zh-CN；返回 en 说明 dist/zh/404.html 没有生成
 
-# ⑥ 型号旧路径 301 实际跳转（en/zh、带/不带斜杠，共 108 条）
+# ⑥ 型号旧路径 301 实际跳转（en/zh、带/不带斜杠；条数见 dist/_redirects）
 node scripts/check-redirects.mjs --base https://你的域名
-# 期望：108 条规则，108 条实际跳转；每条 301 → 200 → canonical 为扁平路径
+# 期望：规则数与实际跳转数一致；每条 301 → 200 → canonical 为扁平路径
 ```
 
 ① 返回 200 最严重：说明误配了通配 200 rewrite 或 SPA fallback，全站每个错误网址都会变成首页副本。

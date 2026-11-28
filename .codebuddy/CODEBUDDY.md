@@ -17,6 +17,8 @@ Node 版本以 `.nvmrc` 为准，`.node-version` 与 `package.json` 的 `engines
 | `npm run check` | TypeScript / Astro 类型检查 |
 | `npm run test` | Vitest 单测（清单见 `tests/`；测试池见 `vitest.config.ts`） |
 | `npm run build` | 类型检查 → 内容体检 → 构建 → 链接检查 |
+| `npm run check:docs` | 文档对账（计数/版本、命令表、trailingSlash、多语言债） |
+| `npm run check:layout` | 全站布局体检（需先 `npm run build`） |
 | `npm run deploy` | 构建并部署到 Cloudflare Pages |
 
 完整命令与“什么时候用”见 `docs/上手指南.md` §2.2。
