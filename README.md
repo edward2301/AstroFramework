@@ -29,7 +29,7 @@ Node 版本以 `.nvmrc` 为准（`package.json` 的 `engines` 同时约束 node 
 
 完整命令与“什么时候用”见 `docs/上手指南.md` §2.2 / `package.json`。
 
-内容体检、分语言 404 复制与链接检查由 `scripts/build-guard.mjs` 挂在构建生命周期上，**直接执行 `astro build` 也无法绕过**，产出的 `dist/` 可直接上传。质量门与执行时机见 `docs/上手指南.md` §2.2；Pages Git 集成需完整 git 历史（逐页 `lastmod` 依赖 `git log`）。`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时，`site` 仍是 `example.com` 会构建失败。
+内容体检、分语言 404 复制与链接检查由 `scripts/build-guard.mjs` 挂在构建生命周期上，**直接执行 `astro build` 也无法绕过**，产出的 `dist/` 可直接上传。PR 上的 CI 只跑四个纯检查（不含 build）；质量门与执行时机见 `docs/上手指南.md` §2.2；Pages Git 集成需完整 git 历史（逐页 `lastmod` 依赖 `git log`）。`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时，`site` 仍是 `example.com` 会构建失败。
 
 ## 目录
 

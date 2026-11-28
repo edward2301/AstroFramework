@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# 只跑不依赖域名的纯检查。构建（含链接检查、301 生成）留在本地发布流程：
+# astro.config.mjs 的域名守卫在 CI=true 时会拒绝占位域名，这是有意的发布闸门。
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # lastmod 由 git log 推导，需要完整历史
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
+
+      - name: 文档对账
+        run: npm run check:docs
+
+      - name: 内容体检
+        run: npm run validate
+
+      - name: 类型检查
+        run: npm run check
+
+      - name: 单测
+        run: npm run test
