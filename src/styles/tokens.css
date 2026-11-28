@@ -24,6 +24,7 @@
   --blue-50: #e8f0ff;
 
   --red-700: #b3261e;
+  --green-600: #1f7a4d;
   --on-dark: #f7f4ee;
   --on-dark-muted: #c2ccd6;
   --on-dark-active: #8fb8ff;
@@ -53,6 +54,7 @@
   --color-data: var(--graphite-600);
   --color-data-soft: var(--neutral-100);
   --color-danger: var(--red-700);
+  --color-success: var(--green-600);
   --color-on-dark: var(--on-dark);
   --color-on-dark-muted: var(--on-dark-muted);
   --color-on-dark-active: var(--on-dark-active);

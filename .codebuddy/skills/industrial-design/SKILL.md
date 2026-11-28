@@ -45,7 +45,7 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 
 ### Products
 `PageHeader` + 品类 pill（真实链接到品类页）+ 默认隐藏的搜索表单 + `aria-live` 计数 + 密集表：
-Model（桌面 200px、≤1280 160px、卡片 120px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters（5 组 `k: v`）/ Status / Details；列宽 40/12/30/11/7%，≤1280 参数改单列。
+四列：Model（桌面 200px、≤1280 160px、卡片 120px 缩略图 + 名称 16px/600 + 编码辅助（名称含编码时隐藏）+ 品类）/ Key parameters（5 组 `k: v` 自适应成行）/ Status（在售绿点、停产红点）/ Details（80×44 触点，列内居中）；列宽 25/57/11/7%（≤1280 左列 340px、状态 168px、详情 112px），首屏 10 个型号（配置：`src/data/site.ts` 的 `CATALOG_PAGE_SIZE`），滚动自动加载 + 显式「加载更多」按钮（IO 只作增强），≤768 参数单列。
 所有行服务器渲染；JS 只做行过滤与计数；脚本用 `<script is:inline>`，不得进入全站共享 JS。
 
 ### Category
@@ -94,6 +94,7 @@ Model（桌面 200px、≤1280 160px、卡片 120px 缩略图 + `.mono` 编码 +
 - **astro dev 错误路由匹配不到带前缀 404**：未知 /zh/ 路径回落英文 404——根 404.astro 按路径前缀动态推断语言已缓解。
 - **体检脚本两类误报口径**：桌面按设计隐藏的元素（型号页询价条）offsetParent 为 null，不计异常；滚动条 15px 假溢出必须用 `clientWidth` 口径比较；首页 hero 大顶距与透明页眉描边主按钮是设计使然，已豁免。
 - **同落点 CTA 不是靠统一文案解决的**：首屏曾同时有页眉询价按钮、hero 询价按钮、页尾 CtaBand 三个 → `/quote/` 入口；把 hero 按钮文案从「获取选型建议」改成与页眉一致的「获取报价」只是制造两个一模一样的按钮，用户仍要二次判断。正解是遵守「每个视口区域只一个填充主按钮」：**删除 hero 内重复的询价按钮**，首屏只留「浏览产品」，询价由页眉 CTA（浮层态白描边降权）+ 页尾 CtaBand 承接。`check-layout` 不检测视觉权重，是否真改善必须用 CDP 测首屏 `a[href$="/quote/"]` 数量并截图抽查。
+- **翻页不要 `scrollIntoView` + 隐藏大量行**：隐藏行会让文档缩短，浏览器钳制 scrollY，再 smooth 回滚形成双重跳动；目录分批改为向前追加（页面只增长），用显式「加载更多」按钮 + `aria-live` 状态，IntersectionObserver 只作增强，不自动滚动。
 
 ## 验证
 
@@ -101,7 +102,7 @@ Model（桌面 200px、≤1280 160px、卡片 120px 缩略图 + `.mono` 编码 +
 - `npm run test`、`npm run validate`、`npm run check`、`npm run build`。
 - 开发态看 1920 / 1440 / 1024 / 768 / 390，en + zh 四页；`scrollWidth === clientWidth`。
 - 产物：旧型号 URL 不在 HTML；sitemap 只有扁平型号 URL；canonical / og:url / Product JSON-LD / BreadcrumbList 末项为扁平路径；三条 hreflang 仍在。
-- 目录页：无 JS 全行可见 + pill 可跳；有 JS 筛选/搜索/计数/空态/`?category=` 正常。
+- 目录页：无 JS 全行可见 + pill 可跳；有 JS 筛选/搜索/计数/空态/`?category=` 正常；加载更多按钮可键盘触发、焦点不丢、加载不自动滚动。
 - 390px：无横向溢出；目录表 ≤768 卡片化、对比表在 ≤1024 有「左右滑动」提示；按钮/筛选 pill/输入框/型号 chip/页眉 logo/语言切换/卡片入口链接/表格内链接/页脚栏目链接 ≥44px。
 - `dist/_astro/*.css` 总增量 ≤ +8 KB；`dist/_astro/*.js` 不因目录脚本增长。
 - 表格滚动区可键盘聚焦；图片四属性齐全；全站唯一 h1。

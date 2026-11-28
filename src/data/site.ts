@@ -48,3 +48,9 @@ export const SEO_LIMITS = {
   descriptionMin: 140,
   descriptionMax: 158,
 } as const;
+
+/**
+ * 产品目录首屏显示与每次「加载更多」的型号数。
+ * 只影响前端渐进显示，服务端仍渲染完整列表；改这一个值即可调整批大小。
+ */
+export const CATALOG_PAGE_SIZE = 10;

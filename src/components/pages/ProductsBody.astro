@@ -14,6 +14,7 @@ import CatalogTable from '../catalog/CatalogTable.astro';
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
 import { detailPath, ROUTES } from '../../data/routes';
+import { CATALOG_PAGE_SIZE } from '../../data/site';
 import type { Crumb } from '../../lib/seo/breadcrumb';
 
 interface Props {
@@ -52,7 +53,7 @@ const dict = t(locale);
   width="wide"
 />
 
-<section class="section" data-catalog>
+<section class="section" data-catalog data-page-size={CATALOG_PAGE_SIZE}>
   <div class="container">
     <div class="catalog-toolbar">
       <nav class="filter-nav" aria-label={dict.products.filterLabel}>
@@ -104,11 +105,25 @@ const dict = t(locale);
       scrollLabel={`${dict.products.h1} — ${dict.products.filterAll}`}
     />
 
-    <nav class="catalog-pagination" data-pagination hidden aria-label={dict.products.paginationLabel}>
-      <button type="button" data-page-prev aria-label={dict.products.paginationPrev}>←</button>
-      <span data-page-info aria-live="polite"></span>
-      <button type="button" data-page-next aria-label={dict.products.paginationNext}>→</button>
-    </nav>
+    <div
+      class="catalog-more"
+      data-catalog-more
+      data-status-more={dict.products.showingCount(0, 0)}
+      data-status-done={dict.products.allShown(0)}
+      hidden
+    >
+      <button type="button" class="btn btn--secondary" data-load-more aria-controls="catalog-table">
+        {dict.products.loadMore}
+      </button>
+      <p
+        class="catalog-more-status"
+        data-more-status
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></p>
+      <div class="catalog-sentinel" data-catalog-sentinel aria-hidden="true"></div>
+    </div>
 
     <p class="catalog-empty" data-empty hidden>{dict.products.empty}</p>
   </div>
@@ -135,16 +150,18 @@ const dict = t(locale);
     var unitMany = count.getAttribute('data-unit-plural') || unitOne;
     var category = 'all';
     var query = '';
-    /* 当前目录 27 个型号，保持单页；超过 30 自动恢复分页 */
-    var PAGE_SIZE = 30;
-    var currentPage = 1;
+    /* 每页条数由 src/data/site.ts 的 CATALOG_PAGE_SIZE 配置 */
+    var PAGE_SIZE = parseInt(page.getAttribute('data-page-size'), 10) || 10;
+    var shown = PAGE_SIZE;
     var totalVisible = 0;
-    var totalPages = 1;
 
-    var pagNav = page.querySelector('[data-pagination]');
-    var pagPrev = page.querySelector('[data-page-prev]');
-    var pagNext = page.querySelector('[data-page-next]');
-    var pageInfo = page.querySelector('[data-page-info]');
+    var moreWrap = page.querySelector('[data-catalog-more]');
+    var loadMoreBtn = page.querySelector('[data-load-more]');
+    var moreStatus = page.querySelector('[data-more-status]');
+    var sentinel = page.querySelector('[data-catalog-sentinel]');
+    var statusMoreTemplate = moreWrap ? moreWrap.getAttribute('data-status-more') : '';
+    var statusDoneTemplate = moreWrap ? moreWrap.getAttribute('data-status-done') : '';
+    var observer = null;
 
     function setActive(id) {
       for (var i = 0; i < pills.length; i += 1) {
@@ -156,32 +173,82 @@ const dict = t(locale);
       }
     }
 
-    function apply() {
-      var visibleIndexes = [];
+    function apply(reset) {
+      if (reset) {
+        shown = PAGE_SIZE;
+        if (moreStatus) moreStatus.textContent = '';
+      }
+      var visibleCount = 0;
       for (var i = 0; i < rows.length; i += 1) {
         var row = rows[i];
         var inCategory = category === 'all' || row.getAttribute('data-category') === category;
         var inQuery = query === '' || (row.getAttribute('data-search') || '').indexOf(query) !== -1;
-        var visible = inCategory && inQuery;
-        if (visible) visibleIndexes.push(row);
+        if (inCategory && inQuery) {
+          row.hidden = visibleCount >= shown;
+          visibleCount += 1;
+        } else {
+          row.hidden = true;
+        }
       }
-      totalPages = Math.max(1, Math.ceil(visibleIndexes.length / PAGE_SIZE));
-      if (currentPage > totalPages) currentPage = totalPages;
-      var start = (currentPage - 1) * PAGE_SIZE;
-      var end = start + PAGE_SIZE;
-      for (var j = 0; j < rows.length; j += 1) {
-        var idx = visibleIndexes.indexOf(rows[j]);
-        rows[j].hidden = idx === -1 || idx < start || idx >= end;
-      }
-      totalVisible = visibleIndexes.length;
+      totalVisible = visibleCount;
+      if (shown > totalVisible) shown = totalVisible;
       count.textContent = totalVisible + ' ' + (totalVisible === 1 ? unitOne : unitMany);
       empty.hidden = totalVisible !== 0;
       table.hidden = totalVisible === 0;
-      if (pagNav) {
-        pagNav.hidden = totalPages <= 1;
-        if (pageInfo) pageInfo.textContent = currentPage + ' / ' + totalPages;
-        if (pagPrev) pagPrev.disabled = currentPage <= 1;
-        if (pagNext) pagNext.disabled = currentPage >= totalPages;
+      syncMore();
+    }
+
+    function formatStatus(template, visibleCount, total) {
+      if (!template) return '';
+      return template.replace(/\b0\b/, String(visibleCount)).replace(/\b0\b/, String(total));
+    }
+
+    function syncMore() {
+      if (!moreWrap) return;
+      var remaining = totalVisible - shown;
+      if (totalVisible <= PAGE_SIZE) {
+        moreWrap.hidden = true;
+        if (observer) observer.disconnect();
+        return;
+      }
+      moreWrap.hidden = false;
+      if (remaining > 0) {
+        if (loadMoreBtn) loadMoreBtn.hidden = false;
+        if (moreStatus) moreStatus.textContent = formatStatus(statusMoreTemplate, shown, totalVisible);
+        if (observer && sentinel) observer.observe(sentinel);
+      } else {
+        if (loadMoreBtn) loadMoreBtn.hidden = true;
+        if (moreStatus) moreStatus.textContent = formatStatus(statusDoneTemplate, totalVisible, totalVisible);
+        if (observer) observer.disconnect();
+      }
+    }
+
+    function loadMore() {
+      if (totalVisible - shown <= 0) return;
+      var focusWasOnButton = document.activeElement === loadMoreBtn;
+      shown = Math.min(shown + PAGE_SIZE, totalVisible);
+      apply(false);
+      if (focusWasOnButton && loadMoreBtn && loadMoreBtn.hidden && moreStatus) {
+        moreStatus.tabIndex = -1;
+        moreStatus.focus({ preventScroll: true });
+      }
+    }
+
+    if ('IntersectionObserver' in window && sentinel) {
+      try {
+        observer = new IntersectionObserver(
+          function (entries) {
+            for (var i = 0; i < entries.length; i += 1) {
+              if (entries[i].isIntersecting) {
+                loadMore();
+                break;
+              }
+            }
+          },
+          { rootMargin: '0px 0px 300px 0px', threshold: 0 }
+        );
+      } catch (error) {
+        observer = null;
       }
     }
 
@@ -206,9 +273,8 @@ const dict = t(locale);
         if (!id) return;
         event.preventDefault();
         category = id;
-        currentPage = 1;
         setActive(id);
-        apply();
+        apply(true);
         syncUrl();
       });
     }
@@ -216,29 +282,12 @@ const dict = t(locale);
     if (input) {
       input.addEventListener('input', function () {
         query = this.value.trim().toLowerCase();
-        currentPage = 1;
-        apply();
+        apply(true);
       });
     }
 
-    if (pagPrev) {
-      pagPrev.addEventListener('click', function () {
-        if (currentPage > 1) {
-          currentPage -= 1;
-          apply();
-          if (table) table.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
-
-    if (pagNext) {
-      pagNext.addEventListener('click', function () {
-        if (currentPage < totalPages) {
-          currentPage += 1;
-          apply();
-          if (table) table.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', loadMore);
     }
 
     if (form) {
@@ -259,7 +308,7 @@ const dict = t(locale);
       }
     }
 
-    apply();
+    apply(true);
   })();
 </script>
 
@@ -395,47 +444,33 @@ const dict = t(locale);
     }
   }
 
-  /* 分页：工业极简 — 方形按钮 + 细线 + mono 页码 */
-  .catalog-pagination {
+  /* 渐进加载：显式按钮 + 状态；IntersectionObserver 只作增强 */
+  .catalog-more {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: var(--space-3);
     margin-top: var(--space-5);
   }
 
-  .catalog-pagination[hidden] {
+  .catalog-more[hidden] {
     display: none;
   }
 
-  .catalog-pagination button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 44px;
-    min-height: 44px;
-    padding: 0 10px;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    font: inherit;
-    font-size: var(--fs-sm);
-    color: var(--color-text);
-    cursor: pointer;
-    transition: border-color var(--duration-1) var(--ease);
+  .catalog-more [data-load-more][hidden] {
+    display: none;
   }
 
-  .catalog-pagination button:hover:not(:disabled) {
-    border-color: var(--color-border-strong);
-  }
-
-  .catalog-pagination button:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
-
-  .catalog-pagination [data-page-info] {
+  .catalog-more-status {
+    min-height: 1.4em;
+    margin: 0;
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
     color: var(--color-muted);
+  }
+
+  .catalog-sentinel {
+    height: 1px;
   }
 </style>

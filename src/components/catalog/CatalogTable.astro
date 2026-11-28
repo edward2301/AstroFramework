@@ -34,6 +34,12 @@ type ModelRow = Props['models'][number];
 
 const { locale, models, scrollLabel } = Astro.props;
 const dict = t(locale);
+
+/** 型号名已含编码时不再重复显示编码（按词边界、大小写不敏感） */
+const nameContainsCode = (code: string, name: string) => {
+  const escaped = code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`, 'i').test(name);
+};
 /** 中英分号宽度不同，与型号卡保持同一规则 */
 const colon = locale === 'zh' ? '：' : ': ';
 
@@ -45,6 +51,7 @@ const searchIndex = (m: ModelRow) =>
 ---
 
 <div
+  id="catalog-table"
   class="table-scroll catalog-scroll"
   role="region"
   aria-label={scrollLabel}
@@ -56,7 +63,6 @@ const searchIndex = (m: ModelRow) =>
     <thead>
       <tr>
         <th class="col-model" scope="col">{dict.products.modelColumn}</th>
-        <th class="col-category" scope="col">{dict.products.categoryColumn}</th>
         <th class="col-params" scope="col">{dict.products.keyParamsColumn}</th>
         <th class="col-status" scope="col">{dict.products.statusColumn}</th>
         <th class="col-details" scope="col">{dict.products.detailsColumn}</th>
@@ -87,17 +93,19 @@ const searchIndex = (m: ModelRow) =>
                       decoding="async"
                     />
                   )}
-                  <a class="model-link" href={href}>
-                    <span class="mono model-code">{m.code}</span>
-                    <span class="model-name">{m.name}</span>
-                  </a>
+                  <div class="model-body">
+                    <a class="model-link" href={href}>
+                      {!nameContainsCode(m.code, m.name) && (
+                        <span class="mono model-code">{m.code}</span>
+                      )}
+                      <span class="model-name">{m.name}</span>
+                    </a>
+                    <a class="category-link" href={localizePath(locale, detailPath.category(m.categoryId))}>
+                      {m.categoryName}
+                    </a>
+                  </div>
                 </div>
               </th>
-              <td class="cell-category" data-label={dict.products.categoryColumn}>
-                <a class="category-link" href={localizePath(locale, detailPath.category(m.categoryId))}>
-                  {m.categoryName}
-                </a>
-              </td>
               <td class="cell-params" data-label={dict.products.keyParamsColumn}>
                 <dl class="param-list">
                   {m.keyParams.slice(0, 5).map((p) => (
@@ -138,6 +146,8 @@ const searchIndex = (m: ModelRow) =>
   /* 最小宽度触发表内横滚：窄屏不压扁参数列，页面容器不随之溢出 */
   .catalog {
     min-width: 960px;
+    /* 固定列宽：长型号名在单元格内换行，不会把参数列挤走 */
+    table-layout: fixed;
   }
 
   .catalog th,
@@ -165,17 +175,13 @@ const searchIndex = (m: ModelRow) =>
     background: var(--color-subtle);
   }
 
-  /* 列宽：参数列吃掉剩余空间，状态与详情只占必要宽度 */
+  /* 四列：产品身份 | 参数（压缩给状态列让位）| 状态 | 详情 */
   .col-model {
-    width: 40%;
-  }
-
-  .col-category {
-    width: 12%;
+    width: 25%;
   }
 
   .col-params {
-    width: 30%;
+    width: 57%;
   }
 
   .col-status {
@@ -187,7 +193,17 @@ const searchIndex = (m: ModelRow) =>
   }
 
   .cell-model {
-    min-width: 320px;
+    min-width: 340px;
+  }
+
+  .col-status,
+  .cell-status {
+    text-align: center;
+  }
+
+  .col-details,
+  .cell-details {
+    text-align: center;
   }
 
   /* 图与文字并列；可点目标只有编码+名称链接（与型号卡约定一致） */
@@ -216,6 +232,17 @@ const searchIndex = (m: ModelRow) =>
     color: var(--color-link);
   }
 
+  .model-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .category-link {
+    font-size: var(--fs-xs);
+  }
+
   /* 源图是黄金比（800×494）：桌面 200px 宽（源图 1/4），按比例取高，零裁切 */
   .model-thumb {
     display: block;
@@ -228,21 +255,29 @@ const searchIndex = (m: ModelRow) =>
     background: var(--color-subtle);
   }
 
-  /* 字重与颜色走全局 .model-code/.model-name；这里只补表格语境的字号与行高 */
+  /* 型号名是行内主信息：加大字号与字重，编码退为辅助元数据 */
   .model-code {
-    font-size: var(--fs-sm);
+    font-size: var(--fs-xs);
+    color: var(--color-muted);
   }
 
   .model-name {
-    font-size: var(--fs-sm);
+    font-size: var(--fs-body);
+    font-weight: 600;
     line-height: var(--lh-data);
+    color: var(--color-ink);
+    overflow-wrap: anywhere;
   }
 
-  /* 参数：5 组键值按 2 列网格紧凑排布，键值同行、过长自然折行 */
+  .model-link:hover .model-name {
+    color: var(--color-link);
+  }
+
+  /* 参数：5 组键值自适应排成一行；窄屏由媒体查询改单列 */
   .param-list {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 2px var(--space-5);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 2px var(--space-4);
     margin: 0;
   }
 
@@ -278,43 +313,60 @@ const searchIndex = (m: ModelRow) =>
     letter-spacing: var(--ls-wide);
     text-transform: uppercase;
     white-space: nowrap;
-    color: var(--color-text);
+    color: var(--color-success);
   }
 
   .status-badge::before {
     content: '';
     width: 5px;
     height: 5px;
-    background: var(--color-data);
+    background: var(--color-success);
   }
 
   .status-badge--discontinued {
     border-color: var(--color-border-soft);
-    color: var(--color-muted);
+    color: var(--color-danger);
   }
 
   .status-badge--discontinued::before {
-    background: transparent;
-    border: 1px solid var(--color-border-strong);
+    background: var(--color-danger);
+    border: 0;
   }
 
   .details-link {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 80px;
+    padding: 0 var(--space-2);
     gap: 6px;
     font-size: var(--fs-sm);
+    font-weight: 500;
     white-space: nowrap;
   }
 
-  /* 平板带：缩略图降一档，参数改单列，避免每格折行形成竖墙 */
+  /* 平板带：缩略图降一档；左列固定 340px，参数列吃剩余宽度并自动排成 3–4 列 */
   @media (max-width: 1280px) {
     .model-thumb {
       flex: 0 0 160px;
       width: 160px;
     }
 
-    .param-list {
-      grid-template-columns: minmax(0, 1fr);
+    .col-model {
+      width: 340px;
+    }
+
+    .col-params {
+      width: auto;
+    }
+
+    .col-status {
+      width: 168px;
+    }
+
+    .col-details {
+      width: 112px;
     }
   }
 
@@ -329,6 +381,10 @@ const searchIndex = (m: ModelRow) =>
 
     .category-link {
       min-width: 44px;
+    }
+
+    .cell-params .param-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 
@@ -404,18 +460,26 @@ const searchIndex = (m: ModelRow) =>
       width: 120px;
     }
 
+    .cell-params {
+      margin-top: var(--space-3);
+      padding-top: var(--space-3);
+      border-top: 1px solid var(--color-border);
+    }
+
     .cell-params .param-list {
       grid-template-columns: minmax(0, 1fr);
     }
 
     .cell-status {
       margin-top: var(--space-3);
+      text-align: left;
     }
 
     .cell-details {
       margin-top: var(--space-3);
       padding-top: var(--space-3);
       border-top: 1px solid var(--color-border);
+      text-align: left;
     }
   }
 </style>
