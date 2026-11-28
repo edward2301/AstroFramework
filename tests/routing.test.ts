@@ -3,6 +3,7 @@ import {
   DEFAULT_LOCALE,
   LOCALES,
   LOCALE_PREFIX,
+  LOCALE_META,
   alternatePaths,
   localizePath,
   parsePath,
@@ -64,7 +65,7 @@ describe('alternatePaths', () => {
   it('含全部语言与 x-default，x-default 指向默认语言', () => {
     const paths = alternatePaths('/about/');
     expect(paths.map((p) => p.hreflang)).toEqual([
-      ...LOCALES.map((l) => (l === 'en' ? 'en' : 'zh-CN')),
+      ...LOCALES.map((l) => LOCALE_META[l].htmlLang),
       'x-default',
     ]);
 

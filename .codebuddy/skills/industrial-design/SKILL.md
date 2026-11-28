@@ -79,7 +79,7 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 反复返工的教训都来自「只修被标记的那一处」。任何版式 / CSS 修复按此执行：
 
 1. **先定性**：空带 = 多层边距叠加；双细线 = 页头下边线 + 首块自带分隔线；错位 = order/列宽；文案语言 = locale 链路。
-2. **修模式，不修实例**：同类模式全站扫——`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`（124 页，含 /404/ 与 /zh/404/，绝不排除任何页面类）。
+2. **修模式，不修实例**：同类模式全站扫——`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`（dist 全扫，含 /404/ 与 /zh/404/，绝不排除任何页面类）。
 3. **双语言 + 双端**：zh/en × 桌面 1600 + 移动 390，四个组合都要过。
 4. **改完必须视觉抽查**：对被修页面截图确认，不能只凭构建绿灯宣布完成。
 5. **知识回写**：新坑追加进下方踩坑清单与 ui-component 的「常见失败」。
@@ -96,7 +96,7 @@ Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters�
 
 ## 验证
 
-- **布局体检硬门（版式/CSS 改动必跑）**：`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`——对 dist 全部 124 页（含 /404/ 与 /zh/404/）自动测空带（页头→首块内容 >72px）、横向溢出（clientWidth 口径）与全部 .btn（高度/主按钮配色/空文案）。退出码非 0 先修再交。
+- **布局体检硬门（版式/CSS 改动必跑）**：`npm run build` 后 `npm run check:layout 1600` 与 `npm run check:layout 390`——对 dist 全部页面（含 /404/ 与 /zh/404/）自动测空带（页头→首块内容 >72px）、横向溢出（clientWidth 口径）与全部 .btn（高度/主按钮配色/空文案）。退出码非 0 先修再交。
 - `npm run test`、`npm run validate`、`npm run check`、`npm run build`。
 - 开发态看 1920 / 1440 / 1024 / 768 / 390，en + zh 四页；`scrollWidth === clientWidth`。
 - 产物：旧型号 URL 不在 HTML；sitemap 只有扁平型号 URL；canonical / og:url / Product JSON-LD / BreadcrumbList 末项为扁平路径；三条 hreflang 仍在。

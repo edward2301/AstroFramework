@@ -23,12 +23,13 @@ Node 版本以 `.nvmrc` 为准（`package.json` 的 `engines` 同时约束 node 
 | `npm run check` | TypeScript / Astro 类型检查 |
 | `npm run test` | Vitest 单测（清单见 `tests/`） |
 | `npm run build` | 类型检查 → 内容体检 → 构建 → 链接检查 |
-| `npm run check:layout` | 全站布局体检（124 页含 404：空带 / 溢出 / 按钮几何），需先 `npm run build`；本地跑 1600 与 390 两个视口 |
+| `npm run check:docs` | 文档对账（硬编码计数/版本、命令表、trailingSlash、多语言债） |
+| `npm run check:layout` | 全站布局体检（含 404：空带 / 溢出 / 按钮几何；页数见 `dist/`），需先 `npm run build`；本地跑 1600 与 390 两个视口 |
 | `npm run deploy` | 构建并部署到 Cloudflare Pages |
 
 完整命令与“什么时候用”见 `docs/上手指南.md` §2.2 / `package.json`。
 
-内容体检、分语言 404 复制与链接检查由 `scripts/build-guard.mjs` 挂在构建生命周期上，**直接执行 `astro build` 也无法绕过**，产出的 `dist/` 可直接上传。质量门与执行时机见 `docs/上手指南.md` §2.2；Pages Git 集成需完整 git 历史（逐页 `lastmod` 依赖 `git log`）。`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时，`site` 仍是 `example.com` 会构建失败。
+内容体检、分语言 404 复制与链接检查由 `scripts/build-guard.mjs` 挂在构建生命周期上，**直接执行 `astro build` 也无法绕过**，产出的 `dist/` 可直接上传。PR 上的 CI 只跑四个纯检查（不含 build）；质量门与执行时机见 `docs/上手指南.md` §2.2；Pages Git 集成需完整 git 历史（逐页 `lastmod` 依赖 `git log`）。`CI=true` 或 `REQUIRE_REAL_DOMAIN=1` 时，`site` 仍是 `example.com` 会构建失败。
 
 ## 目录
 

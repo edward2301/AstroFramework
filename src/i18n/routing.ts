@@ -23,10 +23,10 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   zh: '中文',
 };
 
-/** html lang 与 og:locale，两者格式不同需分开维护 */
-export const LOCALE_META: Record<Locale, { htmlLang: string; ogLocale: string }> = {
-  en: { htmlLang: 'en', ogLocale: 'en_US' },
-  zh: { htmlLang: 'zh-CN', ogLocale: 'zh_CN' },
+/** html lang、og:locale 与地址分隔符，三者按语言分别维护 */
+export const LOCALE_META: Record<Locale, { htmlLang: string; ogLocale: string; addressSeparator: string }> = {
+  en: { htmlLang: 'en', ogLocale: 'en_US', addressSeparator: ', ' },
+  zh: { htmlLang: 'zh-CN', ogLocale: 'zh_CN', addressSeparator: ' ' },
 };
 
 /**

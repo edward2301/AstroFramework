@@ -25,7 +25,7 @@ description: "新增语言（第三种及以后）并完成全站接入：routin
 - 组织信息：`src/data/organization.ts` 的 `locales`。
 - 部署规则：`public/_headers`、`public/_redirects`。
 - 测试：`tests/routing.test.ts`、`tests/dict.test.ts`、`tests/content.test.ts`、`tests/nav.test.ts`。
-- 页脚格式：`src/components/layout/Footer.astro` 的 `locale === 'zh'` 分支。
+- 页脚格式：`src/i18n/routing.ts` 的 `LOCALE_META[locale].addressSeparator`（`Footer.astro` 直接读取，无需改组件）。
 
 ## 步骤
 
@@ -49,7 +49,7 @@ description: "新增语言（第三种及以后）并完成全站接入：routin
    - `tests/routing.test.ts` 的 `alternatePaths` 期望值写死了 `zh-CN`，必须改为按 `LOCALE_META[locale].htmlLang` 生成；
    - `tests/dict.test.ts` 与 `tests/content.test.ts` 只覆盖 en/zh，应把循环扩展到 `LOCALES`；
    - `tests/nav.test.ts` 按需补新语言断言；
-   - `Footer.astro` 的 `locale === 'zh'` 地址分隔符分支改为按语言判断。
+   - `Footer.astro` 读 `LOCALE_META[locale].addressSeparator`，新语言只需在 `LOCALE_META` 补该字段，不再改组件。
 8. 全量验证：`npm run validate && npm run check && npm run test && npm run build`；再跑 `npm run check-links`。
 
 ## 不变量
@@ -81,10 +81,10 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   ja: '日本語',
 };
 
-export const LOCALE_META: Record<Locale, { htmlLang: string; ogLocale: string }> = {
-  en: { htmlLang: 'en', ogLocale: 'en_US' },
-  zh: { htmlLang: 'zh-CN', ogLocale: 'zh_CN' },
-  ja: { htmlLang: 'ja', ogLocale: 'ja_JP' },
+export const LOCALE_META: Record<Locale, { htmlLang: string; ogLocale: string; addressSeparator: string }> = {
+  en: { htmlLang: 'en', ogLocale: 'en_US', addressSeparator: ', ' },
+  zh: { htmlLang: 'zh-CN', ogLocale: 'zh_CN', addressSeparator: ' ' },
+  ja: { htmlLang: 'ja', ogLocale: 'ja_JP', addressSeparator: '、' },
 };
 ```
 

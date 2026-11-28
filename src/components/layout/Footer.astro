@@ -7,7 +7,7 @@
 import { SITE } from '../../data/site';
 import { organizationFor } from '../../data/organization';
 import { t } from '../../i18n/ui';
-import type { Locale } from '../../i18n/routing';
+import { LOCALE_META, type Locale } from '../../i18n/routing';
 import type { FooterColumnView } from '../../lib/nav';
 
 interface Props {
@@ -50,7 +50,7 @@ const year = new Date().getFullYear();
                   </li>
                   <li>{org.address.street}</li>
                   <li>
-                    {org.address.city}{locale === 'zh' ? ' ' : ', '}{org.address.region}
+                    {org.address.city}{LOCALE_META[locale].addressSeparator}{org.address.region}
                     {' '}{org.address.postalCode}
                   </li>
                 </>
