@@ -45,7 +45,7 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 
 ### Products
 `PageHeader` + 品类 pill（真实链接到品类页）+ 默认隐藏的搜索表单 + `aria-live` 计数 + 密集表：
-Model（48px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters（5 组 `k: v`）/ Status / Details。
+Model（桌面 200px、≤1280 160px、卡片 120px 缩略图 + `.mono` 编码 + 名称）/ Category / Key parameters（5 组 `k: v`）/ Status / Details；列宽 40/12/30/11/7%，≤1280 参数改单列。
 所有行服务器渲染；JS 只做行过滤与计数；脚本用 `<script is:inline>`，不得进入全站共享 JS。
 
 ### Category

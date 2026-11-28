@@ -135,7 +135,8 @@ const dict = t(locale);
     var unitMany = count.getAttribute('data-unit-plural') || unitOne;
     var category = 'all';
     var query = '';
-    var PAGE_SIZE = 24;
+    /* 当前目录 27 个型号，保持单页；超过 30 自动恢复分页 */
+    var PAGE_SIZE = 30;
     var currentPage = 1;
     var totalVisible = 0;
     var totalPages = 1;

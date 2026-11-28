@@ -81,8 +81,8 @@ const searchIndex = (m: ModelRow) =>
                       class="model-thumb"
                       src={m.image}
                       alt={`${m.code} ${m.name}`}
-                      width="48"
-                      height="30"
+                      width="800"
+                      height="494"
                       loading="lazy"
                       decoding="async"
                     />
@@ -167,27 +167,27 @@ const searchIndex = (m: ModelRow) =>
 
   /* 列宽：参数列吃掉剩余空间，状态与详情只占必要宽度 */
   .col-model {
-    width: 30%;
+    width: 40%;
   }
 
   .col-category {
-    width: 15%;
+    width: 12%;
   }
 
   .col-params {
-    width: 37%;
+    width: 30%;
   }
 
   .col-status {
-    width: 10%;
+    width: 11%;
   }
 
   .col-details {
-    width: 8%;
+    width: 7%;
   }
 
   .cell-model {
-    min-width: 240px;
+    min-width: 320px;
   }
 
   /* 图与文字并列；可点目标只有编码+名称链接（与型号卡约定一致） */
@@ -216,11 +216,11 @@ const searchIndex = (m: ModelRow) =>
     color: var(--color-link);
   }
 
-  /* 源图是黄金比（800×494）：48px 宽、按比例取高，零裁切 */
+  /* 源图是黄金比（800×494）：桌面 200px 宽（源图 1/4），按比例取高，零裁切 */
   .model-thumb {
     display: block;
-    flex: 0 0 48px;
-    width: 48px;
+    flex: 0 0 200px;
+    width: 200px;
     height: auto;
     aspect-ratio: 1.618;
     object-fit: cover;
@@ -306,6 +306,18 @@ const searchIndex = (m: ModelRow) =>
     white-space: nowrap;
   }
 
+  /* 平板带：缩略图降一档，参数改单列，避免每格折行形成竖墙 */
+  @media (max-width: 1280px) {
+    .model-thumb {
+      flex: 0 0 160px;
+      width: 160px;
+    }
+
+    .param-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
   /* 移动/平板端：表格内的 Category / Details 链接补到 44px 触控高度 */
   @media (max-width: 1024px) {
     .category-link,
@@ -385,6 +397,11 @@ const searchIndex = (m: ModelRow) =>
 
     .cell-model {
       margin-bottom: var(--space-3);
+    }
+
+    .model-thumb {
+      flex: 0 0 120px;
+      width: 120px;
     }
 
     .cell-params .param-list {
