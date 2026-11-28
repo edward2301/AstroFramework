@@ -45,7 +45,7 @@ description: "全站视觉改版与产品线版式：全宽流式容器、德系
 
 ### Products
 `PageHeader` + 品类 pill（真实链接到品类页）+ 默认隐藏的搜索表单 + `aria-live` 计数 + 密集表：
-四列：Model（桌面 200px、≤1280 160px、卡片 120px 缩略图 + 名称 16px/600 + 编码辅助（名称含编码时隐藏）+ 品类）/ Key parameters（5 组 `k: v` 自适应成行）/ Status（在售绿点、停产红点）/ Details（80×44 触点，列内居中）；列宽 25/57/11/7%（≤1280 左列 340px、状态 168px、详情 112px），首屏 10 个型号（配置：`src/data/site.ts` 的 `CATALOG_PAGE_SIZE`），滚动自动加载 + 显式「加载更多」按钮（IO 只作增强），≤768 参数单列。
+四列：Model（桌面 200px、≤1280 160px、卡片 120px 缩略图 + 名称 16px/600 + 编码辅助（名称含编码时隐藏）+ 品类）/ Key parameters（5 组 `k: v` 自适应成行）/ Status（在售绿点、停产红点）/ Details（80×44 触点，列内居中）；列宽 25/57/11/7%（≤1280 左列 340px、状态 168px、详情 112px），首屏 10 个型号（配置：`src/data/site.ts` 的 `CATALOG_PAGE_SIZE`），滚动自动加载 + 显式「加载更多」按钮（IO 只作增强），超出首屏的行 SSR 预置 hidden（noscript 展开），≤768 参数单列。
 所有行服务器渲染；JS 只做行过滤与计数；脚本用 `<script is:inline>`，不得进入全站共享 JS。
 
 ### Category

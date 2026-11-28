@@ -7,12 +7,15 @@
  * 不按品类拆动态列（列数一变整张表就错位）。
  *
  * 所有行都进首屏 HTML：产品总览页的筛选与搜索只切 `hidden`，不重新渲染。
+ * 超出首屏（CATALOG_PAGE_SIZE）的行由服务端预置 `hidden`——首帧不参与布局、无闪烁；
+ * 无 JS 时由下方 noscript CSS 展开为全量列表。
  * 行上带 data-category / data-search，供页面内联脚本过滤；无 JS 时全行可见。
  * 外层 .table-scroll 保证窄屏只在表内横滚，页面本身不溢出；≤768 行转为卡片，无横滚。
  */
 import { t } from '../../i18n/ui';
 import { localizePath, type Locale } from '../../i18n/routing';
 import { detailPath } from '../../data/routes';
+import { CATALOG_PAGE_SIZE } from '../../data/site';
 
 interface Props {
   locale: Locale;
@@ -70,13 +73,16 @@ const searchIndex = (m: ModelRow) =>
     </thead>
     <tbody>
       {
-        models.map((m) => {
+        models.map((m, i) => {
           const href = localizePath(locale, detailPath.model(m.id));
           const discontinued = m.status === 'discontinued';
+          const lazy = i >= CATALOG_PAGE_SIZE;
           return (
             <tr
               class:list={[discontinued && 'is-discontinued']}
               data-model-row
+              data-lazy-row={lazy || undefined}
+              hidden={lazy || undefined}
               data-category={m.categoryId}
               data-search={searchIndex(m)}
             >
@@ -136,6 +142,25 @@ const searchIndex = (m: ModelRow) =>
     </tbody>
   </table>
 </div>
+
+<noscript>
+  <style>
+    /* 无 JS：展开服务端预隐藏的行，隐藏加载入口 */
+    .catalog tbody tr[data-lazy-row][hidden] {
+      display: table-row;
+    }
+
+    .catalog-more {
+      display: none !important;
+    }
+
+    @media (max-width: 768px) {
+      .catalog tbody tr[data-lazy-row][hidden] {
+        display: block;
+      }
+    }
+  </style>
+</noscript>
 
 <style>
   .catalog-scroll {
