@@ -7,6 +7,12 @@ import { defineConfig } from 'vitest/config';
  * 测试全部通过；不要随手改回默认池。
  */
 export default defineConfig({
+  // meta.ts / schema.ts 在模块加载期读 import.meta.env.SITE（生产由 Astro 注入），
+  // 测试里用占位域名注入，避免测试文件一导入就抛错。
+  define: {
+    'import.meta.env.SITE': JSON.stringify('https://example.com'),
+    'import.meta.env.BASE_URL': JSON.stringify('/'),
+  },
   test: {
     pool: 'vmForks',
   },

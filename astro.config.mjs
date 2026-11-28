@@ -80,17 +80,6 @@ function devTrailingSlash() {
   };
 }
 
-/**
- * 域名守卫：CI 或显式要求时，占位域名直接让构建失败。
- * 本地构建不启用，避免没有真实域名时无法验证产物。
- */
-const strictDomain = process.env.CI === 'true' || process.env.REQUIRE_REAL_DOMAIN === '1';
-if (strictDomain && new URL(site).hostname.endsWith('example.com')) {
-  throw new Error(
-    '[build] astro.config.mjs 的 site 仍是占位域名。canonical、og:url、JSON-LD 与 sitemap 都依赖它，请先替换为真实域名。'
-  );
-}
-
 // https://astro.build/config
 export default defineConfig({
   /**
@@ -171,6 +160,6 @@ export default defineConfig({
         return item;
       },
     }),
-    contentGuard(),
+    contentGuard({ site }),
   ],
 });

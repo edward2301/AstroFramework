@@ -4,7 +4,7 @@
  * 目的：让 `astro build` 本身也经过内容体检、分语言 404 产物补齐与站内链接检查，
  * 而不是只在 `npm run build` 这一条路径上串联脚本。
  *
- * - build:start：执行 validate-content.mjs 与 check-doc-sync.mjs，任一错误即抛出并中断构建
+ * - build:start：域名守卫 + validate-content.mjs + check-doc-sync.mjs，任一错误即抛出并中断构建
  * - build:done ：把 <前缀>/404/index.html 复制成 <前缀>/404.html（Cloudflare Pages 约定），
  *               再扫描 dist 中的站内链接，未登记的路由缺口直接失败
  *
@@ -19,13 +19,30 @@ import { LOCALES, DEFAULT_LOCALE, LOCALE_PREFIX } from '../src/i18n/routing.ts';
 import { checkLinks } from './check-links.mjs';
 import { appendModelRedirects } from './model-redirects.mjs';
 
-export default function contentGuard() {
+/**
+ * 域名守卫：CI 或显式要求时拒绝占位域名。
+ *
+ * 放在 build:start 而不是配置加载期：canonical/og:url/JSON-LD/sitemap 都依赖 site，
+ * 带占位域名构建出来的产物不可发布；但 astro check / dev 不应因此失败，
+ * 否则 CI 里的类型检查只能靠临时关掉 CI 变量绕过。
+ */
+function assertRealDomain(site) {
+  const strict = process.env.CI === 'true' || process.env.REQUIRE_REAL_DOMAIN === '1';
+  if (strict && new URL(site).hostname.endsWith('example.com')) {
+    throw new Error(
+      '[build] astro.config.mjs 的 site 仍是占位域名。canonical、og:url、JSON-LD 与 sitemap 都依赖它，请先替换为真实域名。'
+    );
+  }
+}
+
+export default function contentGuard({ site }) {
   const root = process.cwd();
 
   return {
     name: 'content-guard',
     hooks: {
       'astro:build:start': () => {
+        assertRealDomain(site);
         for (const script of ['validate-content.mjs', 'check-doc-sync.mjs']) {
           execFileSync(process.execPath, [path.join(root, 'scripts', script)], {
             cwd: root,
