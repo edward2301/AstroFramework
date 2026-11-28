@@ -7,8 +7,14 @@ B2B 工业品出口品牌站。Astro 静态构建，静态产物托管在 Cloudf
 **中英文双语**：英文在根路径（`/products/a1/`），中文在 `/zh` 前缀下（`/zh/products/a1/`）。
 除分语言 404 由独立页面产出外，两种语言由同一个路由分发器 `src/pages/[...slug].astro` 按 `LOCALES` 产出：静态页载荷由 `src/lib/pages/static.ts` 按版式装配（文案在 `src/data/pages/entries/`，一页一文件），内容页载荷由 `src/lib/pages/render.ts` 按集合装配，导航由 `src/lib/nav.ts` 从页面条目派生。
 
-- 想快速上手（怎么跑、改哪里、怎么排查）：[`docs/上手指南.md`](docs/上手指南.md)
-- 想看设计取舍与编码约束：[`docs/开发框架设计.md`](docs/开发框架设计.md)
+## 文档地图
+
+| 文档 | 看什么 |
+|---|---|
+| [`docs/上手指南.md`](docs/上手指南.md) | 怎么跑、改哪里、报错怎么修 |
+| [`docs/开发框架设计.md`](docs/开发框架设计.md) | 分层、模块职责与实现约束（§6 SEO / §7 技术约束） |
+| [`docs/Astro-Cloudflare-Pages-D1-品牌站架构方案.html`](docs/Astro-Cloudflare-Pages-D1-品牌站架构方案.html) | 选型论证：技术优缺点见 §3，风险见 §6 |
+| [`deploy/cloudflare/README.md`](deploy/cloudflare/README.md) | 部署与 D1 运维；上线前占位清单见 §7 |
 
 ## 环境
 
