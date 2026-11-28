@@ -31,7 +31,12 @@ const dict = t(locale);
   .cta-band {
     background: var(--color-ink);
     margin-top: var(--space-section);
+    /* 抵消页脚的 margin-top：黑带与黑页脚贴合，形成完整石墨收尾，
+       不被一段白空割裂；无 CtaBand 的页面页脚 margin 照常生效 */
+    margin-bottom: calc(-1 * var(--space-section));
     padding: var(--space-6) 0;
+    /* 与页脚贴合但留一道细线：暗示「转化区 → 导航区」的层级，与 footer-bottom 分隔线同款 */
+    border-bottom: 1px solid rgb(255 255 255 / 14%);
   }
 
   .cta-band-inner {
